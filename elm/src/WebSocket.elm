@@ -11,16 +11,26 @@ type alias WebSocket =
     }
 
 
-openWebSocket : String -> T.Task TP.Error WebSocket
-openWebSocket url =
+type alias OpenWebSocketJson =
+    { url : String
+    }
+
+
+encodeOpenWebSocketJson packet =
+    E.object
+        [ ( "url", E.string packet.url ) ]
+
+
+open : String -> T.Task TP.Error WebSocket
+open url =
     let
         ws =
             TP.call
                 { function = "openWebSocket"
-                , argsEncoder = E.string
+                , argsEncoder = encodeOpenWebSocketJson
                 , valueDecoder = decode
                 }
-                url
+                { url = url }
     in
     ws
 
@@ -31,6 +41,30 @@ callWebSocket ws message =
         , argsEncoder = encode
         , valueDecoder = D.string
         }
+
+
+type alias SendWebSocketJson =
+    { uuid : String
+    , message : E.Value
+    }
+
+
+encodeSendWebSocketJson : SendWebSocketJson -> E.Value
+encodeSendWebSocketJson packet =
+    E.object
+        [ ( "uuid", E.string packet.uuid )
+        , ( "message", packet.message )
+        ]
+
+
+sendWebSocket : WebSocket -> E.Value -> T.Task TP.Error String
+sendWebSocket ws message =
+    TP.call
+        { function = "sendWebSocket"
+        , argsEncoder = encodeSendWebSocketJson
+        , valueDecoder = D.string
+        }
+        { uuid = ws.uuid, message = message }
 
 
 decode : D.Decoder WebSocket

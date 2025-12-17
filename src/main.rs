@@ -51,6 +51,7 @@ async fn handle_socket(mut ws: WebSocket, mut state: SharedServerState) {
         if let Ok(msg) = msg {
             match msg {
                 Message::Text(json_str) => {
+                    println!("Received: {:#?}", json_str);
                     let cmd = serde_json::from_str(&json_str).unwrap();
                     handle_command(cmd, &mut state);
                 }
@@ -83,26 +84,24 @@ fn launch_web_view() {
         <script src="https://unpkg.com/material-components-web-elm@9.1.0/dist/material-components-web-elm.min.js"></script>
         <script src="https://unpkg.com/elm-taskport@2.0.1/dist/taskport.min.js"></script>
         <script>
-        {js}
+        {elmjs}
+        {runtimejs}
+        {websocketjs}
         </script>
         </head>
         <body>
         <div id="app"></div>
         <script>
-        TaskPort.install();
-        TaskPort.register("functionName", (args) => {{
-            return "test api";
-        }});
-        var app = Elm.Main.init({{ node: document.getElementById('app') }});
-        app.ports.sendMessage.subscribe(function(message) {{
-            app.ports.messageReceiver.send(message);
-        }});
+        {mainjs}
         </script>
         </body>
     </html>
     "#,
         css = r#"body { background: #ffffff; }"#,
-        js = include_str!("../elm/dist/main.js")
+        elmjs = include_str!("../elm/dist/elm.js"),
+        mainjs = include_str!("../js/main.js"),
+        runtimejs = include_str!("../js/runtime.js"),
+        websocketjs = include_str!("../js/web_socket.js"),
     );
 
     std::fs::write("index.html", html.clone()).unwrap();
