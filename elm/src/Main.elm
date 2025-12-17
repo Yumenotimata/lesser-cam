@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Camera exposing (Camera)
 import Html
 import Html.Events exposing (onClick)
 import Json.Encode as E
@@ -12,15 +13,14 @@ import WebSocket exposing (WebSocket)
 
 
 type alias Model =
-    { ws : Maybe WebSocket
-    , error : Maybe String
+    { error : Maybe String
+    , camera : Maybe Camera
     }
 
 
 type Msg
-    = OpenWebSocket String
-    | SetWebSocket WebSocket
-    | SendWebSocket WebSocket String
+    = OpenCamera String
+    | SetCamera Camera
     | Throw String
     | None
 
@@ -30,15 +30,12 @@ main =
 
 
 init () =
-    ( { ws = Nothing, error = Nothing }, Cmd.none )
+    ( { camera = Nothing, error = Nothing }, Cmd.none )
 
 
 view model =
     Html.div []
-        [ Html.button [ onClick (OpenWebSocket "ws://localhost:8000/ws") ] [ Html.text "Open WebSocket" ]
-        , model.ws
-            |> Maybe.map (\ws -> Html.button [ onClick (SendWebSocket ws "Hello") ] [ Html.text "Send WebSocket" ])
-            |> Maybe.withDefault (Html.text "WebSocket is not open")
+        [ Html.button [ onClick (OpenCamera "test_path") ] [ Html.text "Open Camera" ]
         , model.error
             |> Maybe.map Html.text
             |> Maybe.withDefault (Html.text "")
@@ -47,28 +44,18 @@ view model =
 
 update msg model =
     case msg of
-        OpenWebSocket url ->
+        OpenCamera name ->
             let
-                openWebSocketTask =
-                    WebSocket.open url
-                        |> T.map SetWebSocket
+                openCameraTask =
+                    Camera.open name
+                        |> T.map SetCamera
                         |> T.mapError (TP.errorToString >> Throw)
                         |> T.attempt R.merge
             in
-            ( model, openWebSocketTask )
+            ( model, openCameraTask )
 
-        SetWebSocket ws ->
-            ( { model | ws = Just ws }, Cmd.none )
-
-        SendWebSocket ws message ->
-            let
-                sendWebSocketTask =
-                    WebSocket.sendWebSocket ws (E.object [ ( "OpenCamera", E.object [ ( "path", E.string "test_path" ) ] ) ])
-                        |> T.map (\_ -> None)
-                        |> T.mapError (TP.errorToString >> Throw)
-                        |> T.attempt R.merge
-            in
-            ( model, sendWebSocketTask )
+        SetCamera camera ->
+            ( { model | camera = Just camera }, Cmd.none )
 
         Throw error ->
             ( { model | error = Just error }, Cmd.none )
