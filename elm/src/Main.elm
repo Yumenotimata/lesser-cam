@@ -1,26 +1,31 @@
 module Main exposing (..)
 
 import Browser
-import Camera exposing (Camera)
+import Grpc as G
 import Html
 import Html.Events exposing (onClick)
 import Json.Encode as E
+import Proto.Camera exposing (OpenCameraRequest, OpenCameraResponse)
+import Proto.Camera.CameraService as CameraService exposing (openCamera)
 import Result as R
 import Result.Extra as R
 import Task as T
-import TaskPort as TP
-import WebSocket exposing (WebSocket)
+
+
+
+-- import TaskPort as TP
 
 
 type alias Model =
     { error : Maybe String
-    , camera : Maybe Camera
+
+    -- , camera : Maybe Camera
     }
 
 
 type Msg
     = OpenCamera String
-    | SetCamera Camera
+    | SetCamera OpenCameraResponse
     | Throw String
     | None
 
@@ -30,7 +35,7 @@ main =
 
 
 init () =
-    ( { camera = Nothing, error = Nothing }, Cmd.none )
+    ( { error = Nothing }, Cmd.none )
 
 
 view model =
@@ -42,20 +47,38 @@ view model =
         ]
 
 
+errorToString : G.Error -> String
+errorToString error =
+    case error of
+        G.BadUrl _ ->
+            "Bad URL"
+
+        G.Timeout ->
+            "Timeout"
+
+        G.NetworkError ->
+            "Network error"
+
+        _ ->
+            "Unknown error"
+
+
 update msg model =
     case msg of
         OpenCamera name ->
             let
                 openCameraTask =
-                    Camera.open name
+                    G.new openCamera { name = name }
+                        |> G.setHost "http://localhost:50051"
+                        |> G.toTask
                         |> T.map SetCamera
-                        |> T.mapError (TP.errorToString >> Throw)
+                        |> T.mapError (\e -> Throw (errorToString e))
                         |> T.attempt R.merge
             in
             ( model, openCameraTask )
 
-        SetCamera camera ->
-            ( { model | camera = Just camera }, Cmd.none )
+        SetCamera response ->
+            ( { model | error = Just response.message }, Cmd.none )
 
         Throw error ->
             ( { model | error = Just error }, Cmd.none )

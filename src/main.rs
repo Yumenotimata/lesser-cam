@@ -1,69 +1,75 @@
-extern crate web_view;
+mod camera {
+    tonic::include_proto!("camera");
+}
 
-use std::{
-    net::SocketAddr,
-    sync::{Arc, Mutex},
-    thread,
-};
+use std::thread::{self, sleep};
 
-use axum::{
-    Router,
-    extract::{
-        State, WebSocketUpgrade,
-        ws::{Message, WebSocket},
-    },
-    response::Response,
-    routing::get,
+use camera::{
+    OpenCameraRequest, OpenCameraResponse,
+    camera_service_server::{CameraService, CameraServiceServer},
 };
-use lesser_cam::{ServerState, SharedServerState, handle_command};
-use web_view::*;
+use tonic::{Request, Response, Status};
+use tonic_reflection::server::Builder;
+use tonic_web::GrpcWebLayer;
+use tower_http::cors::CorsLayer;
+use web_view::{Content, run};
+
+struct MyCameraService {}
+
+#[tonic::async_trait]
+impl CameraService for MyCameraService {
+    async fn open_camera(
+        &self,
+        request: Request<OpenCameraRequest>,
+    ) -> Result<Response<OpenCameraResponse>, Status> {
+        println!("Open camera: {}", request.get_ref().name);
+        Ok(Response::new(OpenCameraResponse {
+            message: String::from("Hello, world!"),
+        }))
+    }
+}
 
 fn main() {
-    // WebViewがメインスレッドじゃないと動かないのでaxumは別スレッド
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
-            let state = Arc::new(Mutex::new(ServerState {}));
+            let addr = "127.0.0.1:50051".parse().unwrap();
+            let camera_service = MyCameraService {};
 
-            let app = Router::new()
-                .route("/ws", get(ws_handler))
-                .with_state(state);
+            // gRPC-web対応
+            let allow_cors = CorsLayer::new()
+                .allow_origin(tower_http::cors::Any)
+                .allow_headers(tower_http::cors::Any)
+                .allow_methods(tower_http::cors::Any);
 
-            let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
-            println!("Listening on http://{}", addr);
-            axum::Server::bind(&addr)
-                .serve(app.into_make_service())
+            // let greeter = tower::ServiceBuilder::new()
+            //     .layer(tower_http::cors::CorsLayer::new())
+            //     .layer(tonic_web::GrpcWebLayer::new())
+            //     .into_inner();
+
+            tonic::transport::Server::builder()
+                .accept_http1(true)
+                // .add_service(greeter)
+                .layer(allow_cors)
+                .layer(GrpcWebLayer::new())
+                // .layer(allow_cors)
+                // .layer(GrpcWebLayer::new())
+                .add_service(CameraServiceServer::new(camera_service))
+                // .add_service(
+                //     Builder::configure()
+                //         .register_encoded_file_descriptor_set(tonic::include_file_descriptor_set!(
+                //             "camera_descriptor"
+                //         ))
+                //         .build()
+                //         .unwrap(),
+                // )
+                .serve(addr)
                 .await
                 .unwrap();
         });
     });
 
-    // Elmで生成されたJsをWebViewで表示
     launch_web_view();
-}
-
-async fn ws_handler(ws: WebSocketUpgrade, State(state): State<SharedServerState>) -> Response {
-    ws.on_upgrade(|socket| handle_socket(socket, state))
-}
-
-async fn handle_socket(mut ws: WebSocket, mut state: SharedServerState) {
-    while let Some(msg) = ws.recv().await {
-        if let Ok(msg) = msg {
-            match msg {
-                Message::Text(json_str) => {
-                    println!("Received: {:#?}", json_str);
-                    let cmd = serde_json::from_str(&json_str).unwrap();
-                    handle_command(cmd, &mut state);
-                }
-                Message::Close(_) => {
-                    break;
-                }
-                _ => {}
-            }
-        } else {
-            break;
-        }
-    }
 }
 
 fn launch_web_view() {

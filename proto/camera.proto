@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package camera;
+
+service CameraService {
+    rpc OpenCamera (OpenCameraRequest) returns (OpenCameraResponse);
+}
+
+message OpenCameraRequest {
+    string name = 1;
+}
+
+message OpenCameraResponse {
+    string message = 1;
+}
