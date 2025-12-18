@@ -64,7 +64,7 @@ update msg model =
         OpenCamera name ->
             let
                 openCameraTask =
-                    GH.send model.grpcHandler CameraService.openCamera { name = name }
+                    GH.send model.grpcHandler CameraService.openCamera { id = 0 }
                         |> T.map SetCamera
                         |> T.mapError (\e -> Throw (errorToString e))
                         |> T.attempt R.merge

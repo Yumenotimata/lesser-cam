@@ -7,3 +7,7 @@
 ## gRPC Server
 - elmを動作させるWebView(というかChromium?)はgRPCが使用するHTTP/2をサポートしていないため、rust側でHTTP/2をHTTP/1に変換するプロキシサーバー(tonic-web)を使用
 - tonic-webのわかりやすいサンプルソースがかなりバージョンセンシティブなので、このプロジェクトの構成を再利用する際はCargo.tomlを丸コピすることを強く推奨
+
+## gRPC in Elm
+- elmのgRPC生成はunaryプロトコルのみの対応で、streamingプロトコルに対応してない、、、
+- javascriptのgRPCを生成して、portでelmとjsのffiをしてもいいけど、protoで型スキーマを共有できる嬉しさがなくなるのと、通信のレイヤーが増え

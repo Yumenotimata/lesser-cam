@@ -4,12 +4,22 @@ package camera;
 
 service CameraService {
     rpc OpenCamera (OpenCameraRequest) returns (OpenCameraResponse);
+    rpc GetImage (GetImageRequest) returns (stream GetImageResponse);
 }
 
 message OpenCameraRequest {
-    string name = 1;
+    int32 id = 1;
 }
 
 message OpenCameraResponse {
     string message = 1;
+}
+
+message GetImageRequest {
+    int32 id = 1;
+}
+
+message GetImageResponse {
+    bytes image = 1;
+    int32 position = 2;
 }

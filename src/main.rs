@@ -11,14 +11,27 @@ use camera::{
     OpenCameraRequest, OpenCameraResponse,
     camera_service_server::{CameraService, CameraServiceServer},
 };
+use lesser_cam::Camera;
 use tokio::sync::Mutex;
+use tokio::sync::mpsc;
+use tokio_stream::{StreamExt, wrappers::ReceiverStream};
 use tonic::{Request, Response, Status};
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::CorsLayer;
 use web_view::{Content, run};
 
+use crate::camera::{GetImageRequest, GetImageResponse};
+
 struct CameraServiceState {
-    counter: u32,
+    cameras: Vec<Camera>,
+}
+
+impl CameraServiceState {
+    fn new() -> Self {
+        Self {
+            cameras: Vec::new(),
+        }
+    }
 }
 
 struct MyCameraService {
@@ -28,24 +41,61 @@ struct MyCameraService {
 impl MyCameraService {
     fn new() -> Self {
         Self {
-            state: Arc::new(Mutex::new(CameraServiceState { counter: 0 })),
+            state: Arc::new(Mutex::new(CameraServiceState::new())),
         }
     }
 }
 
 #[tonic::async_trait]
 impl CameraService for MyCameraService {
+    type GetImageStream = ReceiverStream<Result<GetImageResponse, Status>>;
     async fn open_camera(
         &self,
         request: Request<OpenCameraRequest>,
     ) -> Result<Response<OpenCameraResponse>, Status> {
         let mut state = self.state.lock().await;
-        state.counter += 1;
 
-        println!("Open camera: {}", request.get_ref().name);
+        state
+            .cameras
+            .push(Camera::new(request.get_ref().id).unwrap());
+
         Ok(Response::new(OpenCameraResponse {
-            message: format!("Hello, world! {}", state.counter),
+            message: format!("Hello, world! {}", state.cameras.len()),
         }))
+    }
+
+    async fn get_image(
+        &self,
+        request: Request<GetImageRequest>,
+    ) -> Result<Response<Self::GetImageStream>, Status> {
+        let req_stream = request.into_inner();
+        let mut state = self.state.lock().await;
+
+        // state
+        //     .cameras
+        //     .push(Camera::new(request.get_ref().id).unwrap());
+
+        // Ok(Response::new(GetImageResponse {
+        //     image: vec![0, 0, 0],
+        //     position: 0,
+        // }))
+        // Ok(Response::new(GetImageResponse {
+        //     message: format!("Hello, world! {}", state.cameras.len()),
+        // }))
+
+        let (tx, rx) = mpsc::channel(1000);
+        for i in 0..10 {
+            // *index.write().unwrap() = num + 1;
+            // let pong = *index.read().unwrap();
+            tx.send(Ok(GetImageResponse {
+                image: vec![1, 2, 3],
+                position: i,
+            }))
+            .await
+            .unwrap();
+        }
+
+        Ok(Response::new(ReceiverStream::new(rx)))
     }
 }
 
