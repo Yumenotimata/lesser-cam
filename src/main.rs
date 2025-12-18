@@ -2,19 +2,36 @@ mod camera {
     tonic::include_proto!("camera");
 }
 
-use std::thread::{self, sleep};
+use std::{
+    sync::Arc,
+    thread::{self, sleep},
+};
 
 use camera::{
     OpenCameraRequest, OpenCameraResponse,
     camera_service_server::{CameraService, CameraServiceServer},
 };
+use tokio::sync::Mutex;
 use tonic::{Request, Response, Status};
-use tonic_reflection::server::Builder;
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::CorsLayer;
 use web_view::{Content, run};
 
-struct MyCameraService {}
+struct CameraServiceState {
+    counter: u32,
+}
+
+struct MyCameraService {
+    state: Arc<Mutex<CameraServiceState>>,
+}
+
+impl MyCameraService {
+    fn new() -> Self {
+        Self {
+            state: Arc::new(Mutex::new(CameraServiceState { counter: 0 })),
+        }
+    }
+}
 
 #[tonic::async_trait]
 impl CameraService for MyCameraService {
@@ -22,9 +39,12 @@ impl CameraService for MyCameraService {
         &self,
         request: Request<OpenCameraRequest>,
     ) -> Result<Response<OpenCameraResponse>, Status> {
+        let mut state = self.state.lock().await;
+        state.counter += 1;
+
         println!("Open camera: {}", request.get_ref().name);
         Ok(Response::new(OpenCameraResponse {
-            message: String::from("Hello, world!"),
+            message: format!("Hello, world! {}", state.counter),
         }))
     }
 }
@@ -34,7 +54,7 @@ fn main() {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
             let addr = "127.0.0.1:50051".parse().unwrap();
-            let camera_service = MyCameraService {};
+            let camera_service = MyCameraService::new();
 
             // gRPC-web対応
             let allow_cors = CorsLayer::new()
@@ -42,27 +62,11 @@ fn main() {
                 .allow_headers(tower_http::cors::Any)
                 .allow_methods(tower_http::cors::Any);
 
-            // let greeter = tower::ServiceBuilder::new()
-            //     .layer(tower_http::cors::CorsLayer::new())
-            //     .layer(tonic_web::GrpcWebLayer::new())
-            //     .into_inner();
-
             tonic::transport::Server::builder()
                 .accept_http1(true)
-                // .add_service(greeter)
                 .layer(allow_cors)
                 .layer(GrpcWebLayer::new())
-                // .layer(allow_cors)
-                // .layer(GrpcWebLayer::new())
                 .add_service(CameraServiceServer::new(camera_service))
-                // .add_service(
-                //     Builder::configure()
-                //         .register_encoded_file_descriptor_set(tonic::include_file_descriptor_set!(
-                //             "camera_descriptor"
-                //         ))
-                //         .build()
-                //         .unwrap(),
-                // )
                 .serve(addr)
                 .await
                 .unwrap();
@@ -91,8 +95,6 @@ fn launch_web_view() {
         <script src="https://unpkg.com/elm-taskport@2.0.1/dist/taskport.min.js"></script>
         <script>
         {elmjs}
-        {runtimejs}
-        {websocketjs}
         </script>
         </head>
         <body>
@@ -105,9 +107,7 @@ fn launch_web_view() {
     "#,
         css = r#"body { background: #ffffff; }"#,
         elmjs = include_str!("../elm/dist/elm.js"),
-        mainjs = include_str!("../js/main.js"),
-        runtimejs = include_str!("../js/runtime.js"),
-        websocketjs = include_str!("../js/web_socket.js"),
+        mainjs = include_str!("../js/main.js")
     );
 
     std::fs::write("index.html", html.clone()).unwrap();

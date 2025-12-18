@@ -5557,11 +5557,17 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$GrpcHandler$new = function (host) {
+	return {host: host};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{error: $elm$core$Maybe$Nothing},
+		{
+			error: $elm$core$Maybe$Nothing,
+			grpcHandler: $author$project$GrpcHandler$new('http://localhost:50051')
+		},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5628,31 +5634,6 @@ var $elm_community$result_extra$Result$Extra$merge = function (r) {
 		return rr;
 	}
 };
-var $anmolitor$elm_grpc$Grpc$InternalRpcRequest = function (a) {
-	return {$: 'InternalRpcRequest', a: a};
-};
-var $anmolitor$elm_grpc$Grpc$grpcContentType = 'application/grpc-web+proto';
-var $elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var $elm$http$Http$header = $elm$http$Http$Header;
-var $anmolitor$elm_grpc$Grpc$new = F2(
-	function (rpc, req) {
-		return $anmolitor$elm_grpc$Grpc$InternalRpcRequest(
-			{
-				body: req,
-				headers: _List_fromArray(
-					[
-						A2($elm$http$Http$header, 'accept', $anmolitor$elm_grpc$Grpc$grpcContentType)
-					]),
-				host: '',
-				risky: false,
-				rpc: rpc,
-				timeout: $elm$core$Maybe$Nothing,
-				tracker: $elm$core$Maybe$Nothing
-			});
-	});
 var $anmolitor$elm_grpc$Grpc$Internal$Rpc = function (a) {
 	return {$: 'Rpc', a: a};
 };
@@ -6948,6 +6929,31 @@ var $author$project$Proto$Camera$Internals_$encodeProto__Camera__OpenCameraReque
 var $author$project$Proto$Camera$encodeOpenCameraRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__OpenCameraRequest;
 var $author$project$Proto$Camera$CameraService$openCamera = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
 	{decoder: $author$project$Proto$Camera$decodeOpenCameraResponse, encoder: $author$project$Proto$Camera$encodeOpenCameraRequest, _package: 'camera', rpcName: 'OpenCamera', service: 'CameraService'});
+var $anmolitor$elm_grpc$Grpc$InternalRpcRequest = function (a) {
+	return {$: 'InternalRpcRequest', a: a};
+};
+var $anmolitor$elm_grpc$Grpc$grpcContentType = 'application/grpc-web+proto';
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $anmolitor$elm_grpc$Grpc$new = F2(
+	function (rpc, req) {
+		return $anmolitor$elm_grpc$Grpc$InternalRpcRequest(
+			{
+				body: req,
+				headers: _List_fromArray(
+					[
+						A2($elm$http$Http$header, 'accept', $anmolitor$elm_grpc$Grpc$grpcContentType)
+					]),
+				host: '',
+				risky: false,
+				rpc: rpc,
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing
+			});
+	});
 var $anmolitor$elm_grpc$Grpc$setHost = F2(
 	function (host, _v0) {
 		var req = _v0.a;
@@ -7329,6 +7335,14 @@ var $anmolitor$elm_grpc$Grpc$toTask = function (_v0) {
 				$anmolitor$elm_grpc$Grpc$rpcPath(req.rpc))
 		});
 };
+var $author$project$GrpcHandler$send = F3(
+	function (grpcHandler, rpc, request) {
+		return $anmolitor$elm_grpc$Grpc$toTask(
+			A2(
+				$anmolitor$elm_grpc$Grpc$setHost,
+				grpcHandler.host,
+				A2($anmolitor$elm_grpc$Grpc$new, rpc, request)));
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7346,14 +7360,11 @@ var $author$project$Main$update = F2(
 						A2(
 							$elm$core$Task$map,
 							$author$project$Main$SetCamera,
-							$anmolitor$elm_grpc$Grpc$toTask(
-								A2(
-									$anmolitor$elm_grpc$Grpc$setHost,
-									'http://localhost:50051',
-									A2(
-										$anmolitor$elm_grpc$Grpc$new,
-										$author$project$Proto$Camera$CameraService$openCamera,
-										{name: name}))))));
+							A3(
+								$author$project$GrpcHandler$send,
+								model.grpcHandler,
+								$author$project$Proto$Camera$CameraService$openCamera,
+								{name: name}))));
 				return _Utils_Tuple2(model, openCameraTask);
 			case 'SetCamera':
 				var response = msg.a;

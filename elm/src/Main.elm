@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Grpc as G
+import GrpcHandler as GH
 import Html
 import Html.Events exposing (onClick)
 import Json.Encode as E
@@ -12,14 +13,9 @@ import Result.Extra as R
 import Task as T
 
 
-
--- import TaskPort as TP
-
-
 type alias Model =
     { error : Maybe String
-
-    -- , camera : Maybe Camera
+    , grpcHandler : GH.GrpcHandler
     }
 
 
@@ -35,7 +31,7 @@ main =
 
 
 init () =
-    ( { error = Nothing }, Cmd.none )
+    ( { grpcHandler = GH.new "http://localhost:50051", error = Nothing }, Cmd.none )
 
 
 view model =
@@ -68,9 +64,7 @@ update msg model =
         OpenCamera name ->
             let
                 openCameraTask =
-                    G.new openCamera { name = name }
-                        |> G.setHost "http://localhost:50051"
-                        |> G.toTask
+                    GH.send model.grpcHandler CameraService.openCamera { name = name }
                         |> T.map SetCamera
                         |> T.mapError (\e -> Throw (errorToString e))
                         |> T.attempt R.merge
