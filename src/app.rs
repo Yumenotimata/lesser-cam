@@ -41,7 +41,6 @@ impl Component for App {
         html! {
             <main>
                 <div>
-                    <FrameViewer ..yew::props!{ Props { name: "f".to_string() } }/>
                 </div>
             </main>
         }
