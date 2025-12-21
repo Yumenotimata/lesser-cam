@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
+// use stylist::style;
+use wasm_bindgen::{prelude::*, Clamped};
 use wasm_bindgen_futures::spawn_local;
+use web_sys::{console, window, Blob, CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
 use yew::prelude::*;
 
 #[wasm_bindgen]
@@ -9,74 +11,125 @@ extern "C" {
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
 }
 
-#[derive(Serialize, Deserialize)]
-struct GreetArgs<'a> {
-    name: &'a str,
+pub enum Msg {
+    None,
 }
 
-#[function_component(App)]
-pub fn app() -> Html {
-    let greet_input_ref = use_node_ref();
+pub struct App {}
 
-    let name = use_state(|| String::new());
+impl Component for App {
+    type Message = Msg;
+    type Properties = ();
 
-    let greet_msg = use_state(|| String::new());
-    {
-        let greet_msg = greet_msg.clone();
-        let name = name.clone();
-        let name2 = name.clone();
-        use_effect_with(
-            name2,
-            move |_| {
-                spawn_local(async move {
-                    if name.is_empty() {
-                        return;
-                    }
-
-                    let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &*name }).unwrap();
-                    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-                    let new_msg = invoke("greet", args).await.as_string().unwrap();
-                    greet_msg.set(new_msg);
-                });
-
-                || {}
-            },
-        );
+    fn create(_ctx: &Context<Self>) -> Self {
+        console::log_1(&"hello canvas".into());
+        Self {}
     }
 
-    let greet = {
-        let name = name.clone();
-        let greet_input_ref = greet_input_ref.clone();
-        Callback::from(move |e: SubmitEvent| {
-            e.prevent_default();
-            name.set(
-                greet_input_ref
-                    .cast::<web_sys::HtmlInputElement>()
-                    .unwrap()
-                    .value(),
-            );
-        })
-    };
+    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        // println!("update");
+        false
+    }
 
-    html! {
-        <main class="container">
-            <h1>{"Welcome to Tauri + Yew"}</h1>
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        // let button_style = style! {
+        //     color: white;
+        //     background-color: blue;
+        // }
+        // .unwrap();
 
-            <div class="row">
-                <a href="https://tauri.app" target="_blank">
-                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-                </a>
-                <a href="https://yew.rs" target="_blank">
-                    <img src="public/yew.png" class="logo yew" alt="Yew logo"/>
-                </a>
+        html! {
+            <main>
+                <div>
+                    <FrameViewer ..yew::props!{ Props { name: "f".to_string() } }/>
+                </div>
+            </main>
+        }
+    }
+}
+
+#[derive(yew::Properties, PartialEq)]
+pub struct Props {
+    name: String,
+}
+
+pub struct FrameViewer {
+    canvas: NodeRef,
+}
+
+impl Component for FrameViewer {
+    type Message = Msg;
+    type Properties = Props;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            canvas: NodeRef::default(),
+        }
+    }
+
+    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {
+        if !first_render {
+            return;
+        }
+
+        let canvas: HtmlCanvasElement = self.canvas.cast().expect("canvas not found");
+
+        canvas.set_width(400);
+        canvas.set_height(100);
+
+        let ctx = canvas
+            .get_context("2d")
+            .unwrap()
+            .unwrap()
+            .dyn_into::<CanvasRenderingContext2d>()
+            .unwrap();
+
+        // ctx.set_fill_style_str("red");
+        // ctx.fill_rect(0.0, 0.0, 400.0, 100.0);
+
+        let bytes: Vec<u8> = vec![0xffffffffu32; 400 * 100]
+            .into_iter()
+            .flat_map(|x| x.to_le_bytes())
+            .collect();
+
+        console::log_1(&bytes[0].into());
+        console::log_1(&bytes[1].into());
+        console::log_1(&bytes[2].into());
+        console::log_1(&bytes[3].into());
+        // let bytes = vec![0xffu8; 400 * 100];
+        let image_data = ImageData::new_with_u8_clamped_array(Clamped(&bytes), 400).unwrap();
+        ctx.put_image_data(&image_data, 0.0, 0.0).unwrap();
+
+        console::log_1(&"image data".into());
+        // let blob = vec![0u8; 100];
+        // let blob: JsValue = blob.into();
+        // let blob = Blob::new_with_u8_array_sequence(&blob).unwrap();
+        // // let image_bitmap = create_image (&blob).unwrap();
+        // let window = window().unwrap();
+        // let image_bitmap =
+        //     window
+        //         .create_image_bitmap_with_blob(&blob)
+        //         .unwrap()
+        //         .then(&Closure::wrap(Box::new(move |image_bitmap| {
+        //             ctx.draw_image_with_image_bitmap(&image_bitmap, 0.0, 0.0);
+        //         })));
+        // ctx.draw_image_with
+        // ctx.draw_image_with_image_bitmap(image, dx, dy)
+        // ctx.draw_image_with_image_bitmap(&image_bitmap, 0.0, 0.0);
+        // ctx.draw_image_with_html_canvas_element(image, dx, dy)
+
+        // ctx.set_fill_style_str("black");
+        // ctx.fill_text("hello canvas", 10.0, 50.0).unwrap();
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let props = _ctx.props();
+        html! {
+            <div>
+                <canvas ref={self.canvas.clone()} />
+                <p>{props.name.clone()}</p>
             </div>
-            <p>{"Click on the Tauri and Yew logos to learn more."}</p>
-
-            <form class="row" onsubmit={greet}>
-                <input id="greet-input" ref={greet_input_ref} placeholder="Enter a name..." />
-                <button type="submit">{"Greet"}</button>
-            </form>
-            <p>{ &*greet_msg }</p>
-        </main>
+            // <p>{_}</p>
+        }
     }
 }
