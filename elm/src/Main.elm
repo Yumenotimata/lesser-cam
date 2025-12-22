@@ -18,15 +18,15 @@ import WebSocket exposing (WebSocket)
 type alias Model =
     { error : Maybe String
     , cameraH : Maybe CameraHandler
-    , selectableCameras : List String
+    , availableCameraList : List String
     }
 
 
 type Msg
-    = SetCameraH CameraHandler
-    | GetCameraH (CameraHandler -> Cmd Msg)
-    | SetSelectableCameras (List String)
-    | Throw String
+    = InitCameraH CameraHandler
+    | GetAvailableCameraList
+    | GotAvailableCameraList CameraHandler.GetCameraListResponse
+    | FatalException String
     | None
 
 
@@ -39,88 +39,52 @@ init _ =
     let
         initCameraHandler =
             CameraHandler.new ()
-                |> T.map SetCameraH
-    in
-    let
-        getCameraListTask =
-            initCameraHandler
-                |> T.andThen
-                    (\_ ->
-                        T.succeed <|
-                            GetCameraH
-                                (\camH ->
-                                    getCameraList camH
-                                        |> T.map
-                                            (\result ->
-                                                case result of
-                                                    Ok res ->
-                                                        Throw "reslut test"
-
-                                                    -- SetSelectableCameras [ "f", "t" ]
-                                                    Err err ->
-                                                        Throw "okoko"
-                                            )
-                                        |> unwrapTask
-                                )
-                    )
+                |> T.map InitCameraH
                 |> unwrapTask
     in
-    ( { cameraH = Nothing, error = Nothing, selectableCameras = [] }, getCameraListTask )
+    ( { cameraH = Nothing, error = Nothing, availableCameraList = [] }, initCameraHandler )
 
 
 view : Model -> Html.Html Msg
 view model =
-    let
-        html =
-            case model.selectableCameras of
-                [] ->
-                    Html.text "no camera"
-
-                _ ->
-                    Html.text "camera list"
-    in
     Html.div []
-        --     Html.button [ onClick (OpenCamera "test_path") ] [ Html.text "Open Camera" ]
-        -- , model.error
-        --     |> Maybe.map (\error -> Html.text ("Error: " ++ error))
-        --     |> Maybe.withDefault (Html.text "no error")
-        --     (model.selectableCameras
-        --     |> List.map (\camera -> Html.text camera)
-        --  )
-        [ model.cameraH |> Maybe.map (\camH -> Html.text "has camera") |> Maybe.withDefault (Html.text "no camera") ]
-
-
-
--- [ html, model.error |> Maybe.map (\error -> Html.text ("Error: " ++ error)) |> Maybe.withDefault (Html.text "no error") ]
--- [ Html.text (Maybe.withDefault "no camera" (Maybe.Just "test")) ]
+        [ model.cameraH
+            |> Maybe.map
+                (\camH -> Html.text "has camera")
+            |> Maybe.withDefault (Html.text "no camera")
+        , model.availableCameraList
+            |> List.map Html.text
+            |> Html.ul []
+        , model.error
+            |> Maybe.map Html.text
+            |> Maybe.withDefault (Html.text "")
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SetCameraH cameraH ->
-            ( { model | cameraH = Just cameraH }, Cmd.none )
+        InitCameraH cameraH ->
+            ( { model | cameraH = Just cameraH }, C.perform GetAvailableCameraList )
 
-        -- GetCameraH f ->
-        --     case Maybe.map f model.cameraH of
-        --         Just cmd ->
-        --             ( model, cmd )
-        --         Nothing ->
-        --             ( model, Cmd.none )
-        GetCameraH f ->
-            case Maybe.map f model.cameraH of
-                Just cmd ->
-                    ( model, T.succeed (Throw "fff") |> unwrapTask )
+        GetAvailableCameraList ->
+            case model.cameraH of
+                Just cameraH ->
+                    let
+                        task =
+                            getCameraList cameraH
+                                |> T.map (R.unpack (D.errorToString >> FatalException) GotAvailableCameraList)
+                                |> unwrapTask
+                    in
+                    ( model, task )
 
                 Nothing ->
-                    ( model, T.succeed (Throw "ggg") |> unwrapTask )
+                    ( model, C.perform <| FatalException "no camera handler" )
 
-        SetSelectableCameras cameras ->
-            ( { model | selectableCameras = cameras }, Cmd.none )
+        GotAvailableCameraList res ->
+            ( { model | availableCameraList = res.cameras }, Cmd.none )
 
-        -- SetSelectableCameras cameras ->
-        --     ( { model | selectableCameras = cameras }, Cmd.none )
-        Throw error ->
+        FatalException error ->
             ( { model | error = Just error }, Cmd.none )
 
         None ->
@@ -133,5 +97,5 @@ subscriptions model =
 
 unwrapTask task =
     task
-        |> T.mapError (TP.errorToString >> Throw)
+        |> T.mapError (TP.errorToString >> FatalException)
         |> T.attempt R.merge
