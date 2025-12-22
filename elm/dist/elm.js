@@ -5342,6 +5342,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Init = {$: 'Init'};
 var $author$project$Main$InitCameraH = function (a) {
 	return {$: 'InitCameraH', a: a};
 };
@@ -6293,14 +6294,15 @@ var $author$project$Main$init = function (_v0) {
 			$elm$core$Task$map,
 			$author$project$Main$InitCameraH,
 			$author$project$CameraHandler$new(_Utils_Tuple0)));
-	return _Utils_Tuple2(
-		{availableCameraList: _List_Nil, currentImage: _List_Nil, error: $elm$core$Maybe$Nothing, openedCamera: $elm$core$Maybe$Nothing, reqS: $elm$core$Maybe$Nothing, selectedCamera: $elm$core$Maybe$Nothing},
-		initCameraHandler);
+	return _Utils_Tuple2($author$project$Main$Init, initCameraHandler);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
+};
+var $author$project$Main$FatalError = function (a) {
+	return {$: 'FatalError', a: a};
 };
 var $author$project$Main$GetAvailableCameraList = {$: 'GetAvailableCameraList'};
 var $author$project$Main$GetCameraImage = {$: 'GetCameraImage'};
@@ -6312,6 +6314,15 @@ var $author$project$Main$GotCamera = function (a) {
 };
 var $author$project$Main$GotCameraImage = function (a) {
 	return {$: 'GotCameraImage', a: a};
+};
+var $author$project$Main$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $author$project$Main$Unreachable = function (a) {
+	return {$: 'Unreachable', a: a};
+};
+var $author$project$Main$UnreachableS = function (a) {
+	return {$: 'UnreachableS', a: a};
 };
 var $author$project$CameraHandler$GetCameraImageResponseJson = function (image) {
 	return {image: image};
@@ -6496,122 +6507,125 @@ var $elm_community$result_extra$Result$Extra$unpack = F3(
 		}
 	});
 var $author$project$Main$update = F2(
-	function (msg, model) {
-		var _v0 = model.reqS;
-		if (_v0.$ === 'Nothing') {
-			if (msg.$ === 'InitCameraH') {
-				var initCameraH = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							reqS: $elm$core$Maybe$Just(
-								{cameraH: initCameraH})
-						}),
-					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetAvailableCameraList));
-			} else {
-				return _Utils_Tuple2(
-					model,
-					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-						$author$project$Main$FatalException('unreachable!')));
-			}
-		} else {
-			var cameraH = _v0.a.cameraH;
-			switch (msg.$) {
-				case 'OpenCameraClick':
-					var _v3 = model.selectedCamera;
-					if (_v3.$ === 'Just') {
-						var cameraName = _v3.a;
-						var task = $author$project$Main$unwrapTask(
-							A2(
-								$elm$core$Task$map,
-								A2(
-									$elm_community$result_extra$Result$Extra$unpack,
-									A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
-									$author$project$Main$GotCamera),
-								A2($author$project$CameraHandler$open, cameraH, cameraName)));
-						return _Utils_Tuple2(model, task);
-					} else {
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					}
-				case 'CameraSelect':
-					var cameraName = msg.a;
+	function (msg, model_) {
+		switch (model_.$) {
+			case 'Init':
+				if (msg.$ === 'InitCameraH') {
+					var initCameraH = msg.a;
 					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								selectedCamera: $elm$core$Maybe$Just(cameraName)
-							}),
-						$elm$core$Platform$Cmd$none);
-				case 'GotCamera':
-					var camera = msg.a;
+						$author$project$Main$Normal(
+							{availableCameraList: _List_Nil, cameraH: initCameraH, currentImage: _List_Nil, openedCamera: $elm$core$Maybe$Nothing, selectedCamera: $elm$core$Maybe$Nothing}),
+						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetAvailableCameraList));
+				} else {
 					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								openedCamera: $elm$core$Maybe$Just(camera)
-							}),
-						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
-				case 'GetCameraImage':
-					var _v4 = model.openedCamera;
-					if (_v4.$ === 'Just') {
-						var openedCamera = _v4.a;
-						var task = $author$project$Main$unwrapTask(
-							A2(
-								$elm$core$Task$map,
-								A2(
-									$elm_community$result_extra$Result$Extra$unpack,
-									A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
-									$author$project$Main$GotCameraImage),
-								A2($author$project$CameraHandler$getCameraImage, cameraH, openedCamera)));
-						return _Utils_Tuple2(model, task);
-					} else {
-						return _Utils_Tuple2(
-							model,
-							$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-								$author$project$Main$FatalException('Camera not opened')));
-					}
-				case 'GotCameraImage':
-					var res = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{currentImage: res.image}),
-						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
-				case 'InitCameraH':
-					return _Utils_Tuple2(
-						model,
+						$author$project$Main$Init,
 						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-							$author$project$Main$FatalException('CameraHandler not initialized, but this should never happen')));
-				case 'GetAvailableCameraList':
-					var task = $author$project$Main$unwrapTask(
-						A2(
-							$elm$core$Task$map,
+							$author$project$Main$Unreachable('failed to initialize camera handler')));
+				}
+			case 'Normal':
+				var model = model_.a;
+				switch (msg.$) {
+					case 'OpenCameraClick':
+						var _v3 = model.selectedCamera;
+						if (_v3.$ === 'Just') {
+							var cameraName = _v3.a;
+							var task = $author$project$Main$unwrapTask(
+								A2(
+									$elm$core$Task$map,
+									A2(
+										$elm_community$result_extra$Result$Extra$unpack,
+										A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
+										$author$project$Main$GotCamera),
+									A2($author$project$CameraHandler$open, model.cameraH, cameraName)));
+							return _Utils_Tuple2(model_, task);
+						} else {
+							return _Utils_Tuple2(model_, $elm$core$Platform$Cmd$none);
+						}
+					case 'CameraSelect':
+						var cameraName = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(
+								_Utils_update(
+									model,
+									{
+										selectedCamera: $elm$core$Maybe$Just(cameraName)
+									})),
+							$elm$core$Platform$Cmd$none);
+					case 'GotCamera':
+						var camera = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(
+								_Utils_update(
+									model,
+									{
+										openedCamera: $elm$core$Maybe$Just(camera)
+									})),
+							$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
+					case 'GetCameraImage':
+						var _v4 = model.openedCamera;
+						if (_v4.$ === 'Just') {
+							var openedCameraJ = _v4.a;
+							var task = $author$project$Main$unwrapTask(
+								A2(
+									$elm$core$Task$map,
+									A2(
+										$elm_community$result_extra$Result$Extra$unpack,
+										A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
+										$author$project$Main$GotCameraImage),
+									A2($author$project$CameraHandler$getCameraImage, model.cameraH, openedCameraJ)));
+							return _Utils_Tuple2(model_, task);
+						} else {
+							return _Utils_Tuple2(
+								model_,
+								$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+									$author$project$Main$FatalException('Camera not opened')));
+						}
+					case 'GotCameraImage':
+						var res = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(
+								_Utils_update(
+									model,
+									{currentImage: res.image})),
+							$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
+					case 'InitCameraH':
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(model),
+							$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+								$author$project$Main$FatalException('CameraHandler not initialized, but this should never happen')));
+					case 'GetAvailableCameraList':
+						var task = $author$project$Main$unwrapTask(
 							A2(
-								$elm_community$result_extra$Result$Extra$unpack,
-								A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
-								$author$project$Main$GotAvailableCameraList),
-							$author$project$CameraHandler$getCameraList(cameraH)));
-					return _Utils_Tuple2(model, task);
-				case 'GotAvailableCameraList':
-					var res = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{availableCameraList: res.cameras}),
-						$elm$core$Platform$Cmd$none);
-				case 'FatalException':
-					var error = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								error: $elm$core$Maybe$Just(error)
-							}),
-						$elm$core$Platform$Cmd$none);
-				default:
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			}
+								$elm$core$Task$map,
+								A2(
+									$elm_community$result_extra$Result$Extra$unpack,
+									A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
+									$author$project$Main$GotAvailableCameraList),
+								$author$project$CameraHandler$getCameraList(model.cameraH)));
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(model),
+							task);
+					case 'GotAvailableCameraList':
+						var res = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$Normal(
+								_Utils_update(
+									model,
+									{availableCameraList: res.cameras})),
+							$elm$core$Platform$Cmd$none);
+					case 'FatalException':
+						var error = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$FatalError(error),
+							$elm$core$Platform$Cmd$none);
+					default:
+						var error = msg.a;
+						return _Utils_Tuple2(
+							$author$project$Main$UnreachableS(error),
+							$elm$core$Platform$Cmd$none);
+				}
+			default:
+				return _Utils_Tuple2(model_, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$CameraSelect = function (a) {
@@ -7887,89 +7901,101 @@ var $elm$core$List$singleton = function (value) {
 		[value]);
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$view = function (model) {
-	var _v0 = model.error;
-	if (_v0.$ === 'Just') {
-		var error = _v0.a;
-		return A2(
-			$elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text(error)
-				]));
-	} else {
-		return A2(
-			$elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h1,
-					_List_fromArray(
-						[$aforemny$material_components_web_elm$Material$Typography$headline6]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Hello World')
-						])),
-					A2(
-					$elm$html$Html$ul,
-					_List_Nil,
-					A2(
-						$elm$core$List$map,
+var $author$project$Main$view = function (model_) {
+	switch (model_.$) {
+		case 'Init':
+			return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+		case 'Normal':
+			var model = model_.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
 						A2(
-							$elm$core$Basics$composeR,
-							$elm$html$Html$text,
+						$elm$html$Html$h1,
+						_List_fromArray(
+							[$aforemny$material_components_web_elm$Material$Typography$headline6]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Hello World')
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_Nil,
+						A2(
+							$elm$core$List$map,
 							A2(
 								$elm$core$Basics$composeR,
-								$elm$core$List$singleton,
-								$elm$html$Html$li(
-									_List_fromArray(
-										[$aforemny$material_components_web_elm$Material$Typography$body1])))),
-						model.availableCameraList)),
-					A3(
-					$aforemny$material_components_web_elm$Material$Select$filled,
-					A2(
-						$aforemny$material_components_web_elm$Material$Select$setOnChange,
-						$author$project$Main$CameraSelect,
+								$elm$html$Html$text,
+								A2(
+									$elm$core$Basics$composeR,
+									$elm$core$List$singleton,
+									$elm$html$Html$li(
+										_List_fromArray(
+											[$aforemny$material_components_web_elm$Material$Typography$body1])))),
+							model.availableCameraList)),
+						A3(
+						$aforemny$material_components_web_elm$Material$Select$filled,
 						A2(
-							$aforemny$material_components_web_elm$Material$Select$setSelected,
-							model.selectedCamera,
+							$aforemny$material_components_web_elm$Material$Select$setOnChange,
+							$author$project$Main$CameraSelect,
 							A2(
-								$aforemny$material_components_web_elm$Material$Select$setLabel,
-								$elm$core$Maybe$Just('Camera Source'),
-								$aforemny$material_components_web_elm$Material$Select$config))),
-					A2(
-						$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
-						$aforemny$material_components_web_elm$Material$Select$Item$config(
-							{value: 'None'}),
-						'None'),
-					A2(
-						$elm$core$List$map,
-						function (camera) {
-							return A2(
-								$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
-								$aforemny$material_components_web_elm$Material$Select$Item$config(
-									{value: camera}),
-								camera);
-						},
-						model.availableCameraList)),
-					A2(
-					$aforemny$material_components_web_elm$Material$IconButton$iconButton,
-					A2($aforemny$material_components_web_elm$Material$IconButton$setOnClick, $author$project$Main$OpenCameraClick, $aforemny$material_components_web_elm$Material$IconButton$config),
-					$aforemny$material_components_web_elm$Material$IconButton$icon('launch')),
-					A2(
-					$elm$core$Maybe$withDefault,
-					$elm$html$Html$text('No camera opened'),
-					A2(
-						$elm$core$Maybe$map,
-						function (camera) {
-							return $elm$html$Html$text(
-								'Opened Camera: ' + $elm$core$String$fromInt(camera.uuid));
-						},
-						model.openedCamera)),
-					$author$project$Main$canvas(model.currentImage)
-				]));
+								$aforemny$material_components_web_elm$Material$Select$setSelected,
+								model.selectedCamera,
+								A2(
+									$aforemny$material_components_web_elm$Material$Select$setLabel,
+									$elm$core$Maybe$Just('Camera Source'),
+									$aforemny$material_components_web_elm$Material$Select$config))),
+						A2(
+							$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
+							$aforemny$material_components_web_elm$Material$Select$Item$config(
+								{value: 'None'}),
+							'None'),
+						A2(
+							$elm$core$List$map,
+							function (camera) {
+								return A2(
+									$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
+									$aforemny$material_components_web_elm$Material$Select$Item$config(
+										{value: camera}),
+									camera);
+							},
+							model.availableCameraList)),
+						A2(
+						$aforemny$material_components_web_elm$Material$IconButton$iconButton,
+						A2($aforemny$material_components_web_elm$Material$IconButton$setOnClick, $author$project$Main$OpenCameraClick, $aforemny$material_components_web_elm$Material$IconButton$config),
+						$aforemny$material_components_web_elm$Material$IconButton$icon('launch')),
+						A2(
+						$elm$core$Maybe$withDefault,
+						$elm$html$Html$text('No camera opened'),
+						A2(
+							$elm$core$Maybe$map,
+							function (camera) {
+								return $elm$html$Html$text(
+									'Opened Camera: ' + $elm$core$String$fromInt(camera.uuid));
+							},
+							model.openedCamera)),
+						$author$project$Main$canvas(model.currentImage)
+					]));
+		case 'FatalError':
+			var error = model_.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(error)
+					]));
+		default:
+			var error = model_.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(error)
+					]));
 	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
