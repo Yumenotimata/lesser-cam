@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import CameraHandler exposing (CameraHandler, getCameraList)
+import CameraHandler exposing (Camera, CameraHandler, getCameraList)
 import Cmd.Extra as C
 import Do.Task as T
 import Html as H
@@ -21,9 +21,20 @@ import WebSocket exposing (WebSocket)
 
 type alias Model =
     { error : Maybe String
-    , cameraH : Maybe CameraHandler
+    , reqS : Maybe RequiredState
     , availableCameraList : List String
     , selectedCamera : Maybe String
+    , openedCamera : Maybe Camera
+    }
+
+
+
+-- アプリが正常に動作するために必ず必要なリソース
+-- これを確保できなかった時点でfatal exception
+
+
+type alias RequiredState =
+    { cameraH : CameraHandler
     }
 
 
@@ -33,6 +44,7 @@ type Msg
     | InitCameraH CameraHandler
     | GetAvailableCameraList
     | GotAvailableCameraList CameraHandler.GetCameraListResponse
+    | GotCamera Camera
     | FatalException String
     | None
 
@@ -49,10 +61,11 @@ init _ =
                 |> T.map InitCameraH
                 |> unwrapTask
     in
-    ( { cameraH = Nothing
+    ( { reqS = Nothing
       , error = Nothing
       , availableCameraList = []
       , selectedCamera = Nothing
+      , openedCamera = Nothing
       }
     , initCameraHandler
     )
@@ -71,6 +84,7 @@ view model =
                 , Select.filled
                     (Select.config
                         |> Select.setLabel (Just "Camera Source")
+                        |> Select.setSelected model.selectedCamera
                         |> Select.setOnChange CameraSelect
                     )
                     (SelectItem.selectItem (SelectItem.config { value = "None" }) "None")
@@ -80,26 +94,49 @@ view model =
                 , IconButton.iconButton
                     (IconButton.config |> IconButton.setOnClick OpenCameraClick)
                     (IconButton.icon "launch")
+                , model.openedCamera
+                    |> Maybe.map (\camera -> H.text ("Opened Camera: " ++ String.fromInt camera.uuid))
+                    |> Maybe.withDefault (H.text "No camera opened")
                 ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        OpenCameraClick ->
-            case model.selectedCamera of
+    case model.reqS of
+        Nothing ->
+            case msg of
+                InitCameraH initCameraH ->
+                    ( { model | reqS = Just { cameraH = initCameraH } }, C.perform GetAvailableCameraList )
+
                 _ ->
-                    ( model, Cmd.none )
+                    ( model, C.perform (FatalException "unreachable!") )
 
-        CameraSelect cameraName ->
-            ( { model | selectedCamera = Just cameraName }, Cmd.none )
+        Just { cameraH } ->
+            case msg of
+                OpenCameraClick ->
+                    case model.selectedCamera of
+                        Just cameraName ->
+                            let
+                                task =
+                                    CameraHandler.open cameraH cameraName
+                                        |> T.map (R.unpack (D.errorToString >> FatalException) GotCamera)
+                                        |> unwrapTask
+                            in
+                            ( model, task )
 
-        InitCameraH cameraH ->
-            ( { model | cameraH = Just cameraH }, C.perform GetAvailableCameraList )
+                        _ ->
+                            ( model, Cmd.none )
 
-        GetAvailableCameraList ->
-            case model.cameraH of
-                Just cameraH ->
+                CameraSelect cameraName ->
+                    ( { model | selectedCamera = Just cameraName }, Cmd.none )
+
+                GotCamera camera ->
+                    ( { model | openedCamera = Just camera }, Cmd.none )
+
+                InitCameraH _ ->
+                    ( model, C.perform (FatalException "unreachable!") )
+
+                GetAvailableCameraList ->
                     let
                         task =
                             getCameraList cameraH
@@ -108,17 +145,14 @@ update msg model =
                     in
                     ( model, task )
 
-                Nothing ->
-                    ( model, C.perform <| FatalException "no camera handler" )
+                GotAvailableCameraList res ->
+                    ( { model | availableCameraList = res.cameras }, Cmd.none )
 
-        GotAvailableCameraList res ->
-            ( { model | availableCameraList = res.cameras }, Cmd.none )
+                FatalException error ->
+                    ( { model | error = Just error }, Cmd.none )
 
-        FatalException error ->
-            ( { model | error = Just error }, Cmd.none )
-
-        None ->
-            ( model, Cmd.none )
+                None ->
+                    ( model, Cmd.none )
 
 
 subscriptions model =

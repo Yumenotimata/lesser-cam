@@ -6303,7 +6303,7 @@ var $author$project$Main$init = function (_v0) {
 			$author$project$Main$InitCameraH,
 			$author$project$CameraHandler$new(_Utils_Tuple0)));
 	return _Utils_Tuple2(
-		{availableCameraList: _List_Nil, cameraH: $elm$core$Maybe$Nothing, error: $elm$core$Maybe$Nothing},
+		{availableCameraList: _List_Nil, error: $elm$core$Maybe$Nothing, openedCamera: $elm$core$Maybe$Nothing, reqS: $elm$core$Maybe$Nothing, selectedCamera: $elm$core$Maybe$Nothing},
 		initCameraHandler);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6314,6 +6314,9 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$GetAvailableCameraList = {$: 'GetAvailableCameraList'};
 var $author$project$Main$GotAvailableCameraList = function (a) {
 	return {$: 'GotAvailableCameraList', a: a};
+};
+var $author$project$Main$GotCamera = function (a) {
+	return {$: 'GotCamera', a: a};
 };
 var $author$project$CameraHandler$GetCameraListResponse = function (cameras) {
 	return {cameras: cameras};
@@ -6379,6 +6382,62 @@ var $author$project$CameraHandler$getCameraList = function (camH) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$CameraHandler$OpenCameraResponseJson = function (uuid) {
+	return {uuid: uuid};
+};
+var $author$project$CameraHandler$decodeOpenCameraResponseJson = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$CameraHandler$OpenCameraResponseJson,
+	A2($elm$json$Json$Decode$field, 'Camera', $elm$json$Json$Decode$int));
+var $elm$core$Result$map = F2(
+	function (func, ra) {
+		if (ra.$ === 'Ok') {
+			var a = ra.a;
+			return $elm$core$Result$Ok(
+				func(a));
+		} else {
+			var e = ra.a;
+			return $elm$core$Result$Err(e);
+		}
+	});
+var $author$project$CameraHandler$encodeOpenCameraRequestJson = function (packet) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'OpenCamera',
+				$elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'name',
+							$elm$json$Json$Encode$string(packet.name))
+						])))
+			]));
+};
+var $author$project$CameraHandler$openCameraQuery = F2(
+	function (ws, name) {
+		return A2(
+			$author$project$WebSocket$sendWebSocket,
+			ws,
+			$author$project$CameraHandler$encodeOpenCameraRequestJson(
+				{name: name}));
+	});
+var $author$project$CameraHandler$open = F2(
+	function (camH, name) {
+		return A2(
+			$elm$core$Task$map,
+			$elm$core$Result$map(
+				function (r) {
+					return {uuid: r.uuid};
+				}),
+			A2(
+				$elm$core$Task$map,
+				function (q) {
+					return A2($elm$json$Json$Decode$decodeValue, $author$project$CameraHandler$decodeOpenCameraResponseJson, q.message);
+				},
+				A2($author$project$CameraHandler$openCameraQuery, camH.ws, name)));
+	});
 var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
 	$elm$core$Basics$composeL,
 	$elm$core$Task$perform($elm$core$Basics$identity),
@@ -6395,20 +6454,67 @@ var $elm_community$result_extra$Result$Extra$unpack = F3(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'InitCameraH':
-				var cameraH = msg.a;
+		var _v0 = model.reqS;
+		if (_v0.$ === 'Nothing') {
+			if (msg.$ === 'InitCameraH') {
+				var initCameraH = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							cameraH: $elm$core$Maybe$Just(cameraH)
+							reqS: $elm$core$Maybe$Just(
+								{cameraH: initCameraH})
 						}),
 					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetAvailableCameraList));
-			case 'GetAvailableCameraList':
-				var _v1 = model.cameraH;
-				if (_v1.$ === 'Just') {
-					var cameraH = _v1.a;
+			} else {
+				return _Utils_Tuple2(
+					model,
+					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+						$author$project$Main$FatalException('unreachable!')));
+			}
+		} else {
+			var cameraH = _v0.a.cameraH;
+			switch (msg.$) {
+				case 'OpenCameraClick':
+					var _v3 = model.selectedCamera;
+					if (_v3.$ === 'Just') {
+						var cameraName = _v3.a;
+						var task = $author$project$Main$unwrapTask(
+							A2(
+								$elm$core$Task$map,
+								A2(
+									$elm_community$result_extra$Result$Extra$unpack,
+									A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
+									$author$project$Main$GotCamera),
+								A2($author$project$CameraHandler$open, cameraH, cameraName)));
+						return _Utils_Tuple2(model, task);
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				case 'CameraSelect':
+					var cameraName = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								selectedCamera: $elm$core$Maybe$Just(cameraName)
+							}),
+						$elm$core$Platform$Cmd$none);
+				case 'GotCamera':
+					var camera = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								openedCamera: $elm$core$Maybe$Just(camera)
+							}),
+						$elm$core$Platform$Cmd$none);
+				case 'InitCameraH':
+					return _Utils_Tuple2(
+						model,
+						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+							$author$project$Main$FatalException('unreachable!')));
+				case 'GetAvailableCameraList':
 					var task = $author$project$Main$unwrapTask(
 						A2(
 							$elm$core$Task$map,
@@ -6418,32 +6524,31 @@ var $author$project$Main$update = F2(
 								$author$project$Main$GotAvailableCameraList),
 							$author$project$CameraHandler$getCameraList(cameraH)));
 					return _Utils_Tuple2(model, task);
-				} else {
+				case 'GotAvailableCameraList':
+					var res = msg.a;
 					return _Utils_Tuple2(
-						model,
-						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-							$author$project$Main$FatalException('no camera handler')));
-				}
-			case 'GotAvailableCameraList':
-				var res = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{availableCameraList: res.cameras}),
-					$elm$core$Platform$Cmd$none);
-			case 'FatalException':
-				var error = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							error: $elm$core$Maybe$Just(error)
-						}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						_Utils_update(
+							model,
+							{availableCameraList: res.cameras}),
+						$elm$core$Platform$Cmd$none);
+				case 'FatalException':
+					var error = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just(error)
+							}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			}
 		}
 	});
+var $author$project$Main$CameraSelect = function (a) {
+	return {$: 'CameraSelect', a: a};
+};
+var $author$project$Main$OpenCameraClick = {$: 'OpenCameraClick'};
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -7666,6 +7771,34 @@ var $aforemny$material_components_web_elm$Material$Select$setLabel = F2(
 				config_,
 				{label: label}));
 	});
+var $aforemny$material_components_web_elm$Material$Select$setOnChange = F2(
+	function (onChange, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$Select$Config(
+			_Utils_update(
+				config_,
+				{
+					onChange: $elm$core$Maybe$Just(onChange)
+				}));
+	});
+var $aforemny$material_components_web_elm$Material$IconButton$setOnClick = F2(
+	function (onClick, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$IconButton$Internal$Config(
+			_Utils_update(
+				config_,
+				{
+					onClick: $elm$core$Maybe$Just(onClick)
+				}));
+	});
+var $aforemny$material_components_web_elm$Material$Select$setSelected = F2(
+	function (selected, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$Select$Config(
+			_Utils_update(
+				config_,
+				{selected: selected}));
+	});
 var $elm$core$List$singleton = function (value) {
 	return _List_fromArray(
 		[value]);
@@ -7714,9 +7847,15 @@ var $author$project$Main$view = function (model) {
 					A3(
 					$aforemny$material_components_web_elm$Material$Select$filled,
 					A2(
-						$aforemny$material_components_web_elm$Material$Select$setLabel,
-						$elm$core$Maybe$Just('Camera Source'),
-						$aforemny$material_components_web_elm$Material$Select$config),
+						$aforemny$material_components_web_elm$Material$Select$setOnChange,
+						$author$project$Main$CameraSelect,
+						A2(
+							$aforemny$material_components_web_elm$Material$Select$setSelected,
+							model.selectedCamera,
+							A2(
+								$aforemny$material_components_web_elm$Material$Select$setLabel,
+								$elm$core$Maybe$Just('Camera Source'),
+								$aforemny$material_components_web_elm$Material$Select$config))),
 					A2(
 						$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
 						$aforemny$material_components_web_elm$Material$Select$Item$config(
@@ -7734,8 +7873,18 @@ var $author$project$Main$view = function (model) {
 						model.availableCameraList)),
 					A2(
 					$aforemny$material_components_web_elm$Material$IconButton$iconButton,
-					$aforemny$material_components_web_elm$Material$IconButton$config,
-					$aforemny$material_components_web_elm$Material$IconButton$icon('launch'))
+					A2($aforemny$material_components_web_elm$Material$IconButton$setOnClick, $author$project$Main$OpenCameraClick, $aforemny$material_components_web_elm$Material$IconButton$config),
+					$aforemny$material_components_web_elm$Material$IconButton$icon('launch')),
+					A2(
+					$elm$core$Maybe$withDefault,
+					$elm$html$Html$text('No camera opened'),
+					A2(
+						$elm$core$Maybe$map,
+						function (camera) {
+							return $elm$html$Html$text(
+								'Opened Camera: ' + $elm$core$String$fromInt(camera.uuid));
+						},
+						model.openedCamera))
 				]));
 	}
 };

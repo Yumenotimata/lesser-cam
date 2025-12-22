@@ -52,39 +52,36 @@ getCameraList camH =
 
 
 type alias Camera =
-    { ws : WS.WebSocket, name : String }
+    { uuid : Int }
 
 
-type alias OpenCameraJson =
+type alias OpenCameraRequestJson =
     { name : String }
 
 
-encodeOpenCameraJson : OpenCameraJson -> E.Value
-encodeOpenCameraJson packet =
+encodeOpenCameraRequestJson : OpenCameraRequestJson -> E.Value
+encodeOpenCameraRequestJson packet =
     E.object
         [ ( "OpenCamera", E.object [ ( "name", E.string packet.name ) ] )
         ]
 
 
 type alias OpenCameraResponseJson =
-    { name : String }
+    { uuid : Int }
 
 
 decodeOpenCameraResponseJson : D.Decoder OpenCameraResponseJson
 decodeOpenCameraResponseJson =
     D.map OpenCameraResponseJson
-        (D.field "Camera" D.string)
+        (D.field "Camera" D.int)
 
 
 openCameraQuery : WS.WebSocket -> String -> T.Task TP.Error WS.SendWebSocketJson
 openCameraQuery ws name =
-    WS.sendWebSocket ws (encodeOpenCameraJson { name = name })
-
-
-
--- open : CameraHandler -> String -> T.Task TP.Error Camera
+    WS.sendWebSocket ws (encodeOpenCameraRequestJson { name = name })
 
 
 open camH name =
     openCameraQuery camH.ws name
         |> T.map (\q -> D.decodeValue decodeOpenCameraResponseJson q.message)
+        |> T.map (R.map (\r -> { uuid = r.uuid }))
