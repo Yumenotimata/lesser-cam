@@ -5,7 +5,7 @@ use std::{
 
 use axum::extract::ws::{Message, WebSocket};
 use opencv::{
-    core::{Vector, VectorToVec},
+    core::{MatTraitConstManual, VecN, Vector, VectorToVec},
     imgcodecs,
 };
 use serde::{Deserialize, Serialize};
@@ -111,9 +111,15 @@ fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Res
                 camera.read().unwrap()
             };
 
-            let mut buffer = Vector::new();
-            imgcodecs::imencode_def(".jpg", &frame, &mut buffer).unwrap();
-            Some(Response::CameraImage(buffer.to_vec()))
+            // let mut buffer = Vector::new();
+            // imgcodecs::imencode_def(".bmp", &frame, &mut buffer).unwrap();
+
+            let frame_bytes = frame.data_bytes().unwrap();
+            let frame_vec: Vec<u8> = frame_bytes.into_iter().map(|s| *s).collect();
+            // let frame_vec: Vec<Vec<u8>> = frame.to_vec_2d().unwrap();
+            // let frame_vec: Vec<u8> = frame_vec.into_iter().flatten().collect();
+            // let frame_vec = vec![];
+            Some(Response::CameraImage(frame_vec))
         }
     }
 }

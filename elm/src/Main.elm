@@ -1,10 +1,12 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Events exposing (onAnimationFrame, onAnimationFrameDelta)
 import CameraHandler exposing (Camera, CameraHandler, GetCameraImageResponseJson, getCameraList)
 import Cmd.Extra as C
 import Do.Task as T
 import Html as H
+import Html.Attributes as HA
 import Html.Events exposing (onClick)
 import Json.Decode as D
 import Json.Encode as E
@@ -25,6 +27,7 @@ type alias Model =
     , availableCameraList : List String
     , selectedCamera : Maybe String
     , openedCamera : Maybe Camera
+    , currentImage : List Int
     }
 
 
@@ -68,6 +71,7 @@ init _ =
       , availableCameraList = []
       , selectedCamera = Nothing
       , openedCamera = Nothing
+      , currentImage = []
       }
     , initCameraHandler
     )
@@ -99,7 +103,16 @@ view model =
                 , model.openedCamera
                     |> Maybe.map (\camera -> H.text ("Opened Camera: " ++ String.fromInt camera.uuid))
                     |> Maybe.withDefault (H.text "No camera opened")
+                , canvas model.currentImage
                 ]
+
+
+canvas bytes =
+    H.node "elm-canvas" [ HA.property "bytes" (E.list E.int bytes), HA.attribute "text" "test" ] []
+
+
+
+--  H.canvas [ HA.id "elm-canvas" ] []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -150,7 +163,7 @@ update msg model =
                             ( model, C.perform (FatalException "Camera not opened") )
 
                 GotCameraImage res ->
-                    ( { model | error = Just res.image }, Cmd.none )
+                    ( { model | currentImage = res.image }, C.perform GetCameraImage )
 
                 InitCameraH _ ->
                     ( model, C.perform (FatalException "CameraHandler not initialized, but this should never happen") )
@@ -176,6 +189,12 @@ update msg model =
 
 subscriptions model =
     Sub.none
+
+
+
+-- onAnimationFrame (\_ -> GetCameraImage)
+-- Sub.none
+-- onAnimationFrameDelta (\_ -> GetCameraImage)
 
 
 unwrapTask task =

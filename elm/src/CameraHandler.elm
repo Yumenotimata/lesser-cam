@@ -99,13 +99,13 @@ encodeGetCameraImageJson packet =
 
 
 type alias GetCameraImageResponseJson =
-    { image : String }
+    { image : List Int }
 
 
 decodeGetCameraImageResponseJson : D.Decoder GetCameraImageResponseJson
 decodeGetCameraImageResponseJson =
     D.map GetCameraImageResponseJson
-        (D.field "CameraImage" D.string)
+        (D.field "CameraImage" (D.list D.int))
 
 
 getCameraImageQuery : WS.WebSocket -> Int -> T.Task TP.Error WS.SendWebSocketJson

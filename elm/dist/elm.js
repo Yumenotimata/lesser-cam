@@ -6294,7 +6294,7 @@ var $author$project$Main$init = function (_v0) {
 			$author$project$Main$InitCameraH,
 			$author$project$CameraHandler$new(_Utils_Tuple0)));
 	return _Utils_Tuple2(
-		{availableCameraList: _List_Nil, error: $elm$core$Maybe$Nothing, openedCamera: $elm$core$Maybe$Nothing, reqS: $elm$core$Maybe$Nothing, selectedCamera: $elm$core$Maybe$Nothing},
+		{availableCameraList: _List_Nil, currentImage: _List_Nil, error: $elm$core$Maybe$Nothing, openedCamera: $elm$core$Maybe$Nothing, reqS: $elm$core$Maybe$Nothing, selectedCamera: $elm$core$Maybe$Nothing},
 		initCameraHandler);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6319,7 +6319,10 @@ var $author$project$CameraHandler$GetCameraImageResponseJson = function (image) 
 var $author$project$CameraHandler$decodeGetCameraImageResponseJson = A2(
 	$elm$json$Json$Decode$map,
 	$author$project$CameraHandler$GetCameraImageResponseJson,
-	A2($elm$json$Json$Decode$field, 'CameraImage', $elm$json$Json$Decode$string));
+	A2(
+		$elm$json$Json$Decode$field,
+		'CameraImage',
+		$elm$json$Json$Decode$list($elm$json$Json$Decode$int)));
 var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $author$project$CameraHandler$encodeGetCameraImageJson = function (packet) {
@@ -6573,10 +6576,8 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								error: $elm$core$Maybe$Just(res.image)
-							}),
-						$elm$core$Platform$Cmd$none);
+							{currentImage: res.image}),
+						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
 				case 'InitCameraH':
 					return _Utils_Tuple2(
 						model,
@@ -6626,6 +6627,50 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $aforemny$material_components_web_elm$Material$Typography$body1 = $elm$html$Html$Attributes$class('mdc-typography--body1');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlJson(value));
+	});
+var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
+var $author$project$Main$canvas = function (bytes) {
+	return A3(
+		$elm$html$Html$node,
+		'elm-canvas',
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$Attributes$property,
+				'bytes',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, bytes)),
+				A2($elm$html$Html$Attributes$attribute, 'text', 'test')
+			]),
+		_List_Nil);
+};
 var $aforemny$material_components_web_elm$Material$IconButton$Internal$Config = function (a) {
 	return {$: 'Config', a: a};
 };
@@ -6647,14 +6692,6 @@ var $aforemny$material_components_web_elm$Material$Select$Item$config = function
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $aforemny$material_components_web_elm$Material$Select$Filled = {$: 'Filled'};
 var $aforemny$material_components_web_elm$Material$Select$anchorCs = $elm$html$Html$Attributes$class('mdc-select__anchor');
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $aforemny$material_components_web_elm$Material$Select$ariaExpanded = function (value) {
 	return A2(
 		$elm$html$Html$Attributes$attribute,
@@ -6692,14 +6729,6 @@ var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$virtual_dom$VirtualDom$property = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_property,
-			_VirtualDom_noInnerHtmlOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlJson(value));
-	});
-var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
 var $aforemny$material_components_web_elm$Material$Select$disabledProp = function (_v0) {
 	var disabled = _v0.a.disabled;
 	return $elm$core$Maybe$Just(
@@ -7018,11 +7047,6 @@ var $aforemny$material_components_web_elm$Material$List$Item$interactiveProp = f
 };
 var $aforemny$material_components_web_elm$Material$List$Item$listItemCs = $elm$core$Maybe$Just(
 	$elm$html$Html$Attributes$class('mdc-deprecated-list-item'));
-var $elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $aforemny$material_components_web_elm$Material$List$Item$rippleElt = A2(
 	$elm$html$Html$span,
@@ -7317,15 +7341,6 @@ var $elm$core$List$filter = F2(
 				}),
 			_List_Nil,
 			list);
-	});
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
 	});
 var $aforemny$material_components_web_elm$Material$List$selectedIndexProp = function (listItems) {
 	var selectedIndex = A2(
@@ -7952,7 +7967,8 @@ var $author$project$Main$view = function (model) {
 							return $elm$html$Html$text(
 								'Opened Camera: ' + $elm$core$String$fromInt(camera.uuid));
 						},
-						model.openedCamera))
+						model.openedCamera)),
+					$author$project$Main$canvas(model.currentImage)
 				]));
 	}
 };

@@ -74,7 +74,7 @@ async fn handle_socket(mut ws: WebSocket, mut state: SharedServerState) {
                         ws.send(Message::Text(serde_json::to_string(&response_msg).unwrap()))
                             .await
                             .unwrap();
-                        println!("Response: {:#?}", response_msg);
+                        // println!("Response: {:#?}", response_msg);
                     }
                 }
                 Message::Close(_) => {
@@ -109,6 +109,7 @@ fn launch_web_view() {
         {elmjs}
         {runtimejs}
         {websocketjs}
+        {canvasjs}
         </script>
         </head>
         <body>
@@ -124,6 +125,7 @@ fn launch_web_view() {
         mainjs = include_str!("../js/main.js"),
         runtimejs = include_str!("../js/runtime.js"),
         websocketjs = include_str!("../js/web_socket.js"),
+        canvasjs = include_str!("../js/canvas.js"),
     );
 
     std::fs::write("index.html", html.clone()).unwrap();
