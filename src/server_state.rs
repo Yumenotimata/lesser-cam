@@ -1,14 +1,31 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 use axum::extract::ws::{Message, WebSocket};
+use opencv::{
+    core::{Vector, VectorToVec},
+    imgcodecs,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::python_utils;
+use crate::{Camera, python_utils};
 
 pub type SharedServerState = Arc<Mutex<ServerState>>;
 
-pub struct ServerState {}
+pub struct ServerState {
+    opened_cameras: HashMap<i32, Camera>,
+}
+
+impl Default for ServerState {
+    fn default() -> Self {
+        Self {
+            opened_cameras: HashMap::new(),
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RuntimeRequest {
@@ -47,19 +64,35 @@ pub fn handle_runtime_request(
 pub enum Request {
     OpenCamera { name: String },
     GetCameraList {},
+    GetCameraImage { uuid: i32 },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Response {
     CameraList(Vec<String>),
-    Camera(String),
+    Camera(i32),
+    CameraImage(Vec<u8>),
 }
 
 fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Response> {
     match request {
         Request::OpenCamera { name } => {
-            println!("Open camera: {}", name);
-            None
+            let target_camera = python_utils::enumerate_cameras()
+                .unwrap()
+                .into_iter()
+                .find(|(_, n)| *n == name)
+                .map(|(id, _)| id);
+
+            if let Some(id) = target_camera {
+                let camera = Camera::new(id).unwrap();
+
+                // TODO: 重複があるならエラーを返すべき
+                state.lock().unwrap().opened_cameras.insert(id, camera);
+
+                Some(Response::Camera(id))
+            } else {
+                None
+            }
         }
         Request::GetCameraList {} => {
             println!("Get camera list");
@@ -70,6 +103,17 @@ fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Res
                 .collect();
 
             Some(Response::CameraList(cameras))
+        }
+        Request::GetCameraImage { uuid } => {
+            let frame = {
+                let mut camera_mutex = state.lock().unwrap();
+                let camera = camera_mutex.opened_cameras.get_mut(&uuid)?;
+                camera.read().unwrap()
+            };
+
+            let mut buffer = Vector::new();
+            imgcodecs::imencode_def(".jpg", &frame, &mut buffer).unwrap();
+            Some(Response::CameraImage(buffer.to_vec()))
         }
     }
 }

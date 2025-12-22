@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import CameraHandler exposing (Camera, CameraHandler, getCameraList)
+import CameraHandler exposing (Camera, CameraHandler, GetCameraImageResponseJson, getCameraList)
 import Cmd.Extra as C
 import Do.Task as T
 import Html as H
@@ -42,6 +42,8 @@ type Msg
     = OpenCameraClick
     | CameraSelect String
     | InitCameraH CameraHandler
+    | GetCameraImage
+    | GotCameraImage GetCameraImageResponseJson
     | GetAvailableCameraList
     | GotAvailableCameraList CameraHandler.GetCameraListResponse
     | GotCamera Camera
@@ -131,10 +133,27 @@ update msg model =
                     ( { model | selectedCamera = Just cameraName }, Cmd.none )
 
                 GotCamera camera ->
-                    ( { model | openedCamera = Just camera }, Cmd.none )
+                    ( { model | openedCamera = Just camera }, C.perform GetCameraImage )
+
+                GetCameraImage ->
+                    case model.openedCamera of
+                        Just openedCamera ->
+                            let
+                                task =
+                                    CameraHandler.getCameraImage cameraH openedCamera
+                                        |> T.map (R.unpack (D.errorToString >> FatalException) GotCameraImage)
+                                        |> unwrapTask
+                            in
+                            ( model, task )
+
+                        Nothing ->
+                            ( model, C.perform (FatalException "Camera not opened") )
+
+                GotCameraImage res ->
+                    ( { model | error = Just res.image }, Cmd.none )
 
                 InitCameraH _ ->
-                    ( model, C.perform (FatalException "unreachable!") )
+                    ( model, C.perform (FatalException "CameraHandler not initialized, but this should never happen") )
 
                 GetAvailableCameraList ->
                     let

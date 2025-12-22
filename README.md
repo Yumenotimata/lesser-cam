@@ -1,1 +1,3 @@
 # lesser-cam
+
+export LD_LIBRARY_PATH="/opt/homebrew/opt/llvm/lib"

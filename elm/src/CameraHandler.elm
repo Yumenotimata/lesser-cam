@@ -83,5 +83,40 @@ openCameraQuery ws name =
 
 open camH name =
     openCameraQuery camH.ws name
-        |> T.map (\q -> D.decodeValue decodeOpenCameraResponseJson q.message)
+        |> T.map (.message >> D.decodeValue decodeOpenCameraResponseJson)
         |> T.map (R.map (\r -> { uuid = r.uuid }))
+
+
+type alias GetCameraImageJson =
+    { uuid : Int }
+
+
+encodeGetCameraImageJson : GetCameraImageJson -> E.Value
+encodeGetCameraImageJson packet =
+    E.object
+        [ ( "GetCameraImage", E.object [ ( "uuid", E.int packet.uuid ) ] )
+        ]
+
+
+type alias GetCameraImageResponseJson =
+    { image : String }
+
+
+decodeGetCameraImageResponseJson : D.Decoder GetCameraImageResponseJson
+decodeGetCameraImageResponseJson =
+    D.map GetCameraImageResponseJson
+        (D.field "CameraImage" D.string)
+
+
+getCameraImageQuery : WS.WebSocket -> Int -> T.Task TP.Error WS.SendWebSocketJson
+getCameraImageQuery ws uuid =
+    WS.sendWebSocket ws (encodeGetCameraImageJson { uuid = uuid })
+
+
+getCameraImage camH camera =
+    getCameraImageQuery camH.ws camera.uuid
+        |> T.map (.message >> D.decodeValue decodeGetCameraImageResponseJson)
+
+
+
+-- |> T.map (R.map (\r -> r.image))

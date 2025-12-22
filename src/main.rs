@@ -36,7 +36,7 @@ fn main() {
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
-            let state = Arc::new(Mutex::new(ServerState {}));
+            let state = Arc::new(Mutex::new(ServerState::default()));
 
             let app = Router::new()
                 .route("/ws", get(ws_handler))

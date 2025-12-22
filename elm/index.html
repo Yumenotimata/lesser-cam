@@ -6312,30 +6312,38 @@ var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
 var $author$project$Main$GetAvailableCameraList = {$: 'GetAvailableCameraList'};
+var $author$project$Main$GetCameraImage = {$: 'GetCameraImage'};
 var $author$project$Main$GotAvailableCameraList = function (a) {
 	return {$: 'GotAvailableCameraList', a: a};
 };
 var $author$project$Main$GotCamera = function (a) {
 	return {$: 'GotCamera', a: a};
 };
-var $author$project$CameraHandler$GetCameraListResponse = function (cameras) {
-	return {cameras: cameras};
+var $author$project$Main$GotCameraImage = function (a) {
+	return {$: 'GotCameraImage', a: a};
 };
-var $author$project$CameraHandler$decodeGetCameraListResponse = A2(
+var $author$project$CameraHandler$GetCameraImageResponseJson = function (image) {
+	return {image: image};
+};
+var $author$project$CameraHandler$decodeGetCameraImageResponseJson = A2(
 	$elm$json$Json$Decode$map,
-	$author$project$CameraHandler$GetCameraListResponse,
-	A2(
-		$elm$json$Json$Decode$field,
-		'CameraList',
-		$elm$json$Json$Decode$list($elm$json$Json$Decode$string)));
+	$author$project$CameraHandler$GetCameraImageResponseJson,
+	A2($elm$json$Json$Decode$field, 'CameraImage', $elm$json$Json$Decode$string));
 var $elm$json$Json$Decode$decodeValue = _Json_run;
-var $author$project$CameraHandler$encodeGetCameraListJson = function (packet) {
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$CameraHandler$encodeGetCameraImageJson = function (packet) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'GetCameraList',
-				$elm$json$Json$Encode$object(_List_Nil))
+				'GetCameraImage',
+				$elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'uuid',
+							$elm$json$Json$Encode$int(packet.uuid))
+						])))
 			]));
 };
 var $author$project$WebSocket$SendWebSocketJson = F2(
@@ -6347,7 +6355,6 @@ var $author$project$WebSocket$decodeSendWebSocketJson = A3(
 	$author$project$WebSocket$SendWebSocketJson,
 	A2($elm$json$Json$Decode$field, 'uuid', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'message', $elm$json$Json$Decode$value));
-var $elm$json$Json$Encode$int = _Json_wrap;
 var $author$project$WebSocket$encodeSendWebSocketJson = function (packet) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -6365,6 +6372,45 @@ var $author$project$WebSocket$sendWebSocket = F2(
 			{argsEncoder: $author$project$WebSocket$encodeSendWebSocketJson, _function: 'sendWebSocket', valueDecoder: $author$project$WebSocket$decodeSendWebSocketJson},
 			{message: message, uuid: ws.uuid});
 	});
+var $author$project$CameraHandler$getCameraImageQuery = F2(
+	function (ws, uuid) {
+		return A2(
+			$author$project$WebSocket$sendWebSocket,
+			ws,
+			$author$project$CameraHandler$encodeGetCameraImageJson(
+				{uuid: uuid}));
+	});
+var $author$project$CameraHandler$getCameraImage = F2(
+	function (camH, camera) {
+		return A2(
+			$elm$core$Task$map,
+			A2(
+				$elm$core$Basics$composeR,
+				function ($) {
+					return $.message;
+				},
+				$elm$json$Json$Decode$decodeValue($author$project$CameraHandler$decodeGetCameraImageResponseJson)),
+			A2($author$project$CameraHandler$getCameraImageQuery, camH.ws, camera.uuid));
+	});
+var $author$project$CameraHandler$GetCameraListResponse = function (cameras) {
+	return {cameras: cameras};
+};
+var $author$project$CameraHandler$decodeGetCameraListResponse = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$CameraHandler$GetCameraListResponse,
+	A2(
+		$elm$json$Json$Decode$field,
+		'CameraList',
+		$elm$json$Json$Decode$list($elm$json$Json$Decode$string)));
+var $author$project$CameraHandler$encodeGetCameraListJson = function (packet) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'GetCameraList',
+				$elm$json$Json$Encode$object(_List_Nil))
+			]));
+};
 var $author$project$CameraHandler$getCameraListQuery = function (ws) {
 	return A2(
 		$author$project$WebSocket$sendWebSocket,
@@ -6433,9 +6479,12 @@ var $author$project$CameraHandler$open = F2(
 				}),
 			A2(
 				$elm$core$Task$map,
-				function (q) {
-					return A2($elm$json$Json$Decode$decodeValue, $author$project$CameraHandler$decodeOpenCameraResponseJson, q.message);
-				},
+				A2(
+					$elm$core$Basics$composeR,
+					function ($) {
+						return $.message;
+					},
+					$elm$json$Json$Decode$decodeValue($author$project$CameraHandler$decodeOpenCameraResponseJson)),
 				A2($author$project$CameraHandler$openCameraQuery, camH.ws, name)));
 	});
 var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
@@ -6508,12 +6557,40 @@ var $author$project$Main$update = F2(
 							{
 								openedCamera: $elm$core$Maybe$Just(camera)
 							}),
+						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$GetCameraImage));
+				case 'GetCameraImage':
+					var _v4 = model.openedCamera;
+					if (_v4.$ === 'Just') {
+						var openedCamera = _v4.a;
+						var task = $author$project$Main$unwrapTask(
+							A2(
+								$elm$core$Task$map,
+								A2(
+									$elm_community$result_extra$Result$Extra$unpack,
+									A2($elm$core$Basics$composeR, $elm$json$Json$Decode$errorToString, $author$project$Main$FatalException),
+									$author$project$Main$GotCameraImage),
+								A2($author$project$CameraHandler$getCameraImage, cameraH, openedCamera)));
+						return _Utils_Tuple2(model, task);
+					} else {
+						return _Utils_Tuple2(
+							model,
+							$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+								$author$project$Main$FatalException('Camera not opened')));
+					}
+				case 'GotCameraImage':
+					var res = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just(res.image)
+							}),
 						$elm$core$Platform$Cmd$none);
 				case 'InitCameraH':
 					return _Utils_Tuple2(
 						model,
 						$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-							$author$project$Main$FatalException('unreachable!')));
+							$author$project$Main$FatalException('CameraHandler not initialized, but this should never happen')));
 				case 'GetAvailableCameraList':
 					var task = $author$project$Main$unwrapTask(
 						A2(
