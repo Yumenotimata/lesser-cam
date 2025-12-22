@@ -3,6 +3,7 @@ class WebSocketWrapper {
         this.socket = new WebSocket(url);
         this.messagePool = {};
         this.isOpen = false;
+        this.message_uuid = 0;
 
         this.socket.addEventListener("open", (event) => {
             this.isOpen = true;
@@ -26,23 +27,25 @@ class WebSocketWrapper {
         });
     }
 
-    async send(message) {
-        this.socket.send(message);
-    }
+    // async send(message) {
+    //     this.socket.send(message);
+    // }
 
     async call(message) {
-        let uuid = crypto.randomUUID();
+        let uuid = this.message_uuid++;
+
+        let json = {
+            message: message,
+            uuid: uuid
+        };
+
         this.socket.send(
-            JSON.stringify(
-                Object.assign(
-                    { message: message },
-                    { uuid: uuid }
-                )
-            )
+            JSON.stringify(json)
         );
 
         return new Promise((resolve, reject) => {
             this.messagePool[uuid] = (recv) => {
+                console.log("WebSocketWrapper:call recv", recv);
                 resolve(JSON.parse(recv.data));
             }
         });

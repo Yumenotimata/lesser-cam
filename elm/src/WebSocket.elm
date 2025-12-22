@@ -7,7 +7,7 @@ import TaskPort as TP
 
 
 type alias WebSocket =
-    { uuid : String
+    { uuid : Int
     }
 
 
@@ -44,7 +44,7 @@ callWebSocket ws message =
 
 
 type alias SendWebSocketJson =
-    { uuid : String
+    { uuid : Int
     , message : E.Value
     }
 
@@ -52,27 +52,34 @@ type alias SendWebSocketJson =
 encodeSendWebSocketJson : SendWebSocketJson -> E.Value
 encodeSendWebSocketJson packet =
     E.object
-        [ ( "uuid", E.string packet.uuid )
+        [ ( "uuid", E.int packet.uuid )
         , ( "message", packet.message )
         ]
 
 
-sendWebSocket : WebSocket -> E.Value -> T.Task TP.Error String
+decodeSendWebSocketJson : D.Decoder SendWebSocketJson
+decodeSendWebSocketJson =
+    D.map2 SendWebSocketJson
+        (D.field "uuid" D.int)
+        (D.field "message" D.value)
+
+
+sendWebSocket : WebSocket -> E.Value -> T.Task TP.Error SendWebSocketJson
 sendWebSocket ws message =
     TP.call
         { function = "sendWebSocket"
         , argsEncoder = encodeSendWebSocketJson
-        , valueDecoder = D.string
+        , valueDecoder = decodeSendWebSocketJson
         }
         { uuid = ws.uuid, message = message }
 
 
 decode : D.Decoder WebSocket
 decode =
-    D.map WebSocket (D.field "uuid" D.string)
+    D.map WebSocket (D.field "uuid" D.int)
 
 
 encode : WebSocket -> E.Value
 encode socket =
     E.object
-        [ ( "uuid", E.string socket.uuid ) ]
+        [ ( "uuid", E.int socket.uuid ) ]

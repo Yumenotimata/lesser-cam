@@ -15,10 +15,23 @@ use axum::{
     response::Response,
     routing::get,
 };
-use lesser_cam::{ServerState, SharedServerState, handle_command};
+use lesser_cam::{
+    Request, RuntimeRequest, RuntimeResponse, ServerState, SharedServerState,
+    handle_runtime_request,
+};
 use web_view::*;
 
 fn main() {
+    let runtime_message = RuntimeRequest {
+        uuid: 4,
+        message: Request::GetCameraList {},
+    };
+
+    println!(
+        "runtime_message: {:#?}",
+        serde_json::to_string(&runtime_message).unwrap()
+    );
+
     // WebViewがメインスレッドじゃないと動かないのでaxumは別スレッド
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
@@ -51,9 +64,18 @@ async fn handle_socket(mut ws: WebSocket, mut state: SharedServerState) {
         if let Ok(msg) = msg {
             match msg {
                 Message::Text(json_str) => {
-                    println!("Received: {:#?}", json_str);
-                    let cmd = serde_json::from_str(&json_str).unwrap();
-                    handle_command(cmd, &mut state);
+                    println!("Received: {}", json_str);
+                    let msg: RuntimeRequest = serde_json::from_str(&json_str).unwrap();
+                    println!("Received: {:#?}", msg);
+
+                    // もしレスポンスがあるなら、送り元のuuidを付けて返す
+                    if let Some(response) = handle_runtime_request(&msg, &mut state) {
+                        let response_msg = RuntimeResponse::new(msg.uuid, response);
+                        ws.send(Message::Text(serde_json::to_string(&response_msg).unwrap()))
+                            .await
+                            .unwrap();
+                        println!("Response: {:#?}", response_msg);
+                    }
                 }
                 Message::Close(_) => {
                     break;
