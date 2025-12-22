@@ -6,9 +6,9 @@
     "elm-version": "0.19.1",
     "dependencies": {
         "direct": {
-            "Dacit/material-components-web-elm": "1.0.0",
             "GlobalWebIndex/cmd-extra": "1.4.0",
             "TSFoster/elm-uuid": "4.2.0",
+            "aforemny/material-components-web-elm": "9.1.0",
             "b0oh/elm-do": "1.0.0",
             "elm/browser": "1.0.2",
             "elm/core": "1.0.5",

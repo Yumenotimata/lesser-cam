@@ -4,6 +4,8 @@ use axum::extract::ws::{Message, WebSocket};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::python_utils;
+
 pub type SharedServerState = Arc<Mutex<ServerState>>;
 
 pub struct ServerState {}
@@ -43,26 +45,31 @@ pub fn handle_runtime_request(
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub enum Request {
-    OpenCamera { path: String },
+    OpenCamera { name: String },
     GetCameraList {},
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Response {
     CameraList(Vec<String>),
+    Camera(String),
 }
 
 fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Response> {
     match request {
-        Request::OpenCamera { path } => {
-            println!("Open camera: {}", path);
+        Request::OpenCamera { name } => {
+            println!("Open camera: {}", name);
             None
         }
         Request::GetCameraList {} => {
             println!("Get camera list");
-            Some(Response::CameraList(vec![
-                "okokokokokokokoko cam".to_string(),
-            ]))
+            let cameras = python_utils::enumerate_cameras()
+                .unwrap()
+                .into_iter()
+                .map(|(_, name)| name)
+                .collect();
+
+            Some(Response::CameraList(cameras))
         }
     }
 }

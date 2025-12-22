@@ -14,17 +14,6 @@ type alias CameraHandler =
     { ws : WS.WebSocket, name : String }
 
 
-type alias OpenCameraJson =
-    { name : String }
-
-
-encodeOpenCameraJson : OpenCameraJson -> E.Value
-encodeOpenCameraJson packet =
-    E.object
-        [ ( "OpenCamera", E.object [ ( "name", E.string packet.name ) ] )
-        ]
-
-
 type alias GetCameraListJson =
     {}
 
@@ -46,29 +35,10 @@ decodeGetCameraListResponse =
         (D.field "CameraList" (D.list D.string))
 
 
-openCameraQuery name ws =
-    WS.sendWebSocket ws (encodeOpenCameraJson { name = name })
-
-
 new : () -> T.Task TP.Error CameraHandler
 new _ =
     WS.open "ws://localhost:8000/ws"
         |> T.map (\ws -> CameraHandler ws "test camera name handler")
-
-
-
--- open : String -> T.Task TP.Error Camera
--- open name =
---     WS.open "ws://localhost:8000/ws"
---         |> T.map
---             (\ws ->
---                 let
---                     _ =
---                         openCameraQuery name ws
---                 in
---                 ws
---             )
---         |> T.map (\ws -> Camera ws name)
 
 
 getCameraListQuery ws =
@@ -79,3 +49,42 @@ getCameraList : CameraHandler -> T.Task TP.Error (Result D.Error GetCameraListRe
 getCameraList camH =
     getCameraListQuery camH.ws
         |> T.map (\q -> D.decodeValue decodeGetCameraListResponse q.message)
+
+
+type alias Camera =
+    { ws : WS.WebSocket, name : String }
+
+
+type alias OpenCameraJson =
+    { name : String }
+
+
+encodeOpenCameraJson : OpenCameraJson -> E.Value
+encodeOpenCameraJson packet =
+    E.object
+        [ ( "OpenCamera", E.object [ ( "name", E.string packet.name ) ] )
+        ]
+
+
+type alias OpenCameraResponseJson =
+    { name : String }
+
+
+decodeOpenCameraResponseJson : D.Decoder OpenCameraResponseJson
+decodeOpenCameraResponseJson =
+    D.map OpenCameraResponseJson
+        (D.field "Camera" D.string)
+
+
+openCameraQuery : WS.WebSocket -> String -> T.Task TP.Error WS.SendWebSocketJson
+openCameraQuery ws name =
+    WS.sendWebSocket ws (encodeOpenCameraJson { name = name })
+
+
+
+-- open : CameraHandler -> String -> T.Task TP.Error Camera
+
+
+open camH name =
+    openCameraQuery camH.ws name
+        |> T.map (\q -> D.decodeValue decodeOpenCameraResponseJson q.message)

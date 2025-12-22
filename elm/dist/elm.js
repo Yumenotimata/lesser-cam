@@ -6435,34 +6435,1300 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $aforemny$material_components_web_elm$Material$Typography$body1 = $elm$html$Html$Attributes$class('mdc-typography--body1');
+var $aforemny$material_components_web_elm$Material$IconButton$Internal$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$IconButton$config = $aforemny$material_components_web_elm$Material$IconButton$Internal$Config(
+	{additionalAttributes: _List_Nil, disabled: false, href: $elm$core$Maybe$Nothing, label: $elm$core$Maybe$Nothing, menu: $elm$core$Maybe$Nothing, onClick: $elm$core$Maybe$Nothing, target: $elm$core$Maybe$Nothing});
+var $aforemny$material_components_web_elm$Material$Select$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$Select$config = $aforemny$material_components_web_elm$Material$Select$Config(
+	{additionalAttributes: _List_Nil, disabled: false, label: $elm$core$Maybe$Nothing, leadingIcon: $elm$core$Maybe$Nothing, onChange: $elm$core$Maybe$Nothing, required: false, selected: $elm$core$Maybe$Nothing, valid: true});
+var $aforemny$material_components_web_elm$Material$Select$Item$Internal$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$Select$Item$config = function (_v0) {
+	var value = _v0.value;
+	return $aforemny$material_components_web_elm$Material$Select$Item$Internal$Config(
+		{additionalAttributes: _List_Nil, disabled: false, value: value});
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $aforemny$material_components_web_elm$Material$Select$Filled = {$: 'Filled'};
+var $aforemny$material_components_web_elm$Material$Select$anchorCs = $elm$html$Html$Attributes$class('mdc-select__anchor');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $aforemny$material_components_web_elm$Material$Select$ariaExpanded = function (value) {
+	return A2(
+		$elm$html$Html$Attributes$attribute,
+		'aria-expanded',
+		value ? 'true' : 'false');
+};
+var $aforemny$material_components_web_elm$Material$Select$ariaHaspopupAttr = function (value) {
+	return A2($elm$html$Html$Attributes$attribute, 'aria-haspopup', value);
+};
+var $aforemny$material_components_web_elm$Material$Select$buttonRole = A2($elm$html$Html$Attributes$attribute, 'role', 'button');
+var $aforemny$material_components_web_elm$Material$Select$anchorElt = F2(
+	function (additionalAttributes, nodes) {
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$aforemny$material_components_web_elm$Material$Select$anchorCs,
+						$aforemny$material_components_web_elm$Material$Select$buttonRole,
+						$aforemny$material_components_web_elm$Material$Select$ariaHaspopupAttr('listbox'),
+						$aforemny$material_components_web_elm$Material$Select$ariaExpanded(false)
+					]),
+				additionalAttributes),
+			nodes);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlJson(value));
+	});
+var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
+var $aforemny$material_components_web_elm$Material$Select$disabledProp = function (_v0) {
+	var disabled = _v0.a.disabled;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'disabled',
+			$elm$json$Json$Encode$bool(disabled)));
+};
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fillRule = _VirtualDom_attribute('fill-rule');
+var $aforemny$material_components_web_elm$Material$Select$focusableAttr = function (value) {
+	return A2(
+		$elm$virtual_dom$VirtualDom$attribute,
+		'focusable',
+		value ? 'true' : 'false');
+};
+var $elm$html$Html$i = _VirtualDom_node('i');
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $aforemny$material_components_web_elm$Material$Select$dropdownIconElt = A2(
+	$elm$html$Html$i,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mdc-select__dropdown-icon')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$svg,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('mdc-select__dropdown-icon-graphic'),
+					$elm$svg$Svg$Attributes$viewBox('7 10 10 5'),
+					$aforemny$material_components_web_elm$Material$Select$focusableAttr(false)
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$polygon,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('mdc-select__dropdown-icon-inactive'),
+							$elm$svg$Svg$Attributes$stroke('none'),
+							$elm$svg$Svg$Attributes$fillRule('evenodd'),
+							$elm$svg$Svg$Attributes$points('7 10 12 15 17 10')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$polygon,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('mdc-select__dropdown-icon-active'),
+							$elm$svg$Svg$Attributes$stroke('none'),
+							$elm$svg$Svg$Attributes$fillRule('evenodd'),
+							$elm$svg$Svg$Attributes$points('7 15 12 10 17 15')
+						]),
+					_List_Nil)
+				]))
+		]));
+var $aforemny$material_components_web_elm$Material$Select$filledCs = function (variant) {
+	return _Utils_eq(variant, $aforemny$material_components_web_elm$Material$Select$Filled) ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-select--filled')) : $elm$core$Maybe$Nothing;
+};
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$view = function (model) {
+var $aforemny$material_components_web_elm$Material$Select$floatingLabelElt = function (_v0) {
+	var label = _v0.a.label;
 	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
+		$elm$core$Maybe$map,
+		function (label_) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mdc-floating-label')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(label_)
+					]));
+		},
+		label);
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $aforemny$material_components_web_elm$Material$Select$leadingIconCs = function (_v0) {
+	var leadingIcon = _v0.a.leadingIcon;
+	return A2(
+		$elm$core$Maybe$map,
+		function (_v1) {
+			return $elm$html$Html$Attributes$class('mdc-select--with-leading-icon');
+		},
+		leadingIcon);
+};
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$not = _Basics_not;
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
+var $aforemny$material_components_web_elm$Material$Select$leadingIconElt = function (_v0) {
+	var leadingIcon = _v0.a.leadingIcon;
+	if (leadingIcon.$ === 'Nothing') {
+		return $elm$html$Html$text('');
+	} else {
+		if (leadingIcon.a.$ === 'Icon') {
+			var node = leadingIcon.a.a.node;
+			var attributes = leadingIcon.a.a.attributes;
+			var nodes = leadingIcon.a.a.nodes;
+			var onInteraction = leadingIcon.a.a.onInteraction;
+			var disabled = leadingIcon.a.a.disabled;
+			return A2(
+				node,
+				A2(
+					$elm$core$List$cons,
+					$elm$html$Html$Attributes$class('mdc-select__icon'),
+					function () {
+						if (onInteraction.$ === 'Just') {
+							var msg = onInteraction.a;
+							return (!disabled) ? A2(
+								$elm$core$List$cons,
+								$elm$html$Html$Attributes$tabindex(0),
+								A2(
+									$elm$core$List$cons,
+									A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+									A2(
+										$elm$core$List$cons,
+										$elm$html$Html$Events$onClick(msg),
+										A2(
+											$elm$core$List$cons,
+											A2(
+												$elm$html$Html$Events$on,
+												'keydown',
+												A2(
+													$elm$json$Json$Decode$andThen,
+													function (keyCode) {
+														return (keyCode === 13) ? $elm$json$Json$Decode$succeed(msg) : $elm$json$Json$Decode$fail('');
+													},
+													$elm$html$Html$Events$keyCode)),
+											attributes)))) : A2(
+								$elm$core$List$cons,
+								$elm$html$Html$Attributes$tabindex(-1),
+								A2(
+									$elm$core$List$cons,
+									A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+									attributes));
+						} else {
+							return attributes;
+						}
+					}()),
+				nodes);
+		} else {
+			var node = leadingIcon.a.a.node;
+			var attributes = leadingIcon.a.a.attributes;
+			var nodes = leadingIcon.a.a.nodes;
+			var onInteraction = leadingIcon.a.a.onInteraction;
+			var disabled = leadingIcon.a.a.disabled;
+			return A2(
+				node,
+				A2(
+					$elm$core$List$cons,
+					$elm$svg$Svg$Attributes$class('mdc-select__icon'),
+					function () {
+						if (onInteraction.$ === 'Just') {
+							var msg = onInteraction.a;
+							return (!disabled) ? A2(
+								$elm$core$List$cons,
+								$elm$html$Html$Attributes$tabindex(0),
+								A2(
+									$elm$core$List$cons,
+									A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+									A2(
+										$elm$core$List$cons,
+										$elm$html$Html$Events$onClick(msg),
+										A2(
+											$elm$core$List$cons,
+											A2(
+												$elm$html$Html$Events$on,
+												'keydown',
+												A2(
+													$elm$json$Json$Decode$andThen,
+													function (keyCode) {
+														return (keyCode === 13) ? $elm$json$Json$Decode$succeed(msg) : $elm$json$Json$Decode$fail('');
+													},
+													$elm$html$Html$Events$keyCode)),
+											attributes)))) : A2(
+								$elm$core$List$cons,
+								$elm$html$Html$Attributes$tabindex(-1),
+								A2(
+									$elm$core$List$cons,
+									A2($elm$html$Html$Attributes$attribute, 'role', 'button'),
+									attributes));
+						} else {
+							return attributes;
+						}
+					}()),
+				nodes);
+		}
+	}
+};
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $aforemny$material_components_web_elm$Material$Select$lineRippleElt = A2(
+	$elm$html$Html$label,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mdc-line-ripple')
+		]),
+	_List_Nil);
+var $aforemny$material_components_web_elm$Material$Menu$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$Menu$config = $aforemny$material_components_web_elm$Material$Menu$Config(
+	{additionalAttributes: _List_Nil, onClose: $elm$core$Maybe$Nothing, open: false, quickOpen: false});
+var $aforemny$material_components_web_elm$Material$List$Item$graphic = F2(
+	function (additionalAttributes, nodes) {
+		return A2(
+			$elm$html$Html$div,
+			A2(
+				$elm$core$List$cons,
+				$elm$html$Html$Attributes$class('mdc-deprecated-list-item__graphic'),
+				additionalAttributes),
+			nodes);
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$Internal$ListItem = F2(
+	function (a, b) {
+		return {$: 'ListItem', a: a, b: b};
+	});
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $aforemny$material_components_web_elm$Material$List$Item$Internal$Activated = {$: 'Activated'};
+var $aforemny$material_components_web_elm$Material$List$Item$activatedCs = function (_v0) {
+	var selection = _v0.a.selection;
+	return _Utils_eq(
+		selection,
+		$elm$core$Maybe$Just($aforemny$material_components_web_elm$Material$List$Item$Internal$Activated)) ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list-item--activated')) : $elm$core$Maybe$Nothing;
+};
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $aforemny$material_components_web_elm$Material$List$Item$ariaSelectedAttr = function (_v0) {
+	var selection = _v0.a.selection;
+	return (!_Utils_eq(selection, $elm$core$Maybe$Nothing)) ? $elm$core$Maybe$Just(
+		A2($elm$html$Html$Attributes$attribute, 'aria-selected', 'true')) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$List$Item$disabledCs = function (_v0) {
+	var disabled = _v0.a.disabled;
+	return disabled ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list-item--disabled')) : $elm$core$Maybe$Nothing;
+};
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $aforemny$material_components_web_elm$Material$List$Item$hrefAttr = function (_v0) {
+	var href = _v0.a.href;
+	return A2($elm$core$Maybe$map, $elm$html$Html$Attributes$href, href);
+};
+var $aforemny$material_components_web_elm$Material$List$Item$interactiveProp = function (_v0) {
+	var interactive = _v0.a.interactive;
+	return A2(
+		$elm$html$Html$Attributes$property,
+		'interactive',
+		$elm$json$Json$Encode$bool(interactive));
+};
+var $aforemny$material_components_web_elm$Material$List$Item$listItemCs = $elm$core$Maybe$Just(
+	$elm$html$Html$Attributes$class('mdc-deprecated-list-item'));
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $aforemny$material_components_web_elm$Material$List$Item$rippleElt = A2(
+	$elm$html$Html$span,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mdc-deprecated-list-item__ripple')
+		]),
+	_List_Nil);
+var $aforemny$material_components_web_elm$Material$List$Item$ripplesProp = function (_v0) {
+	var ripples = _v0.a.ripples;
+	return A2(
+		$elm$html$Html$Attributes$property,
+		'ripples',
+		$elm$json$Json$Encode$bool(ripples));
+};
+var $aforemny$material_components_web_elm$Material$List$Item$Internal$Selected = {$: 'Selected'};
+var $aforemny$material_components_web_elm$Material$List$Item$selectedCs = function (_v0) {
+	var selection = _v0.a.selection;
+	return _Utils_eq(
+		selection,
+		$elm$core$Maybe$Just($aforemny$material_components_web_elm$Material$List$Item$Internal$Selected)) ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list-item--selected')) : $elm$core$Maybe$Nothing;
+};
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $aforemny$material_components_web_elm$Material$List$Item$targetAttr = function (_v0) {
+	var href = _v0.a.href;
+	var target = _v0.a.target;
+	return (!_Utils_eq(href, $elm$core$Maybe$Nothing)) ? A2($elm$core$Maybe$map, $elm$html$Html$Attributes$target, target) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$List$Item$listItemView = F2(
+	function (config_, nodes) {
+		var additionalAttributes = config_.a.additionalAttributes;
+		var href = config_.a.href;
+		return A2(
+			F2(
+				function (attributes, nodes_) {
+					return A3(
+						$elm$html$Html$node,
+						'mdc-list-item',
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$aforemny$material_components_web_elm$Material$List$Item$ripplesProp(config_),
+									$aforemny$material_components_web_elm$Material$List$Item$interactiveProp(config_)
+								]),
+							(!_Utils_eq(href, $elm$core$Maybe$Nothing)) ? _List_Nil : attributes),
+						(!_Utils_eq(href, $elm$core$Maybe$Nothing)) ? _List_fromArray(
+							[
+								A2($elm$html$Html$a, attributes, nodes_)
+							]) : nodes_);
+				}),
+			_Utils_ap(
+				A2(
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$aforemny$material_components_web_elm$Material$List$Item$listItemCs,
+							$aforemny$material_components_web_elm$Material$List$Item$hrefAttr(config_),
+							$aforemny$material_components_web_elm$Material$List$Item$targetAttr(config_),
+							$aforemny$material_components_web_elm$Material$List$Item$disabledCs(config_),
+							$aforemny$material_components_web_elm$Material$List$Item$selectedCs(config_),
+							$aforemny$material_components_web_elm$Material$List$Item$activatedCs(config_),
+							$aforemny$material_components_web_elm$Material$List$Item$ariaSelectedAttr(config_)
+						])),
+				additionalAttributes),
+			A2($elm$core$List$cons, $aforemny$material_components_web_elm$Material$List$Item$rippleElt, nodes));
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$listItem = F2(
+	function (config_, nodes) {
+		return A2(
+			$aforemny$material_components_web_elm$Material$List$Item$Internal$ListItem,
+			function (config__) {
+				return A2($aforemny$material_components_web_elm$Material$List$Item$listItemView, config__, nodes);
+			},
+			config_);
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$activated = $aforemny$material_components_web_elm$Material$List$Item$Internal$Activated;
+var $aforemny$material_components_web_elm$Material$List$Item$Internal$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$List$Item$config = $aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+	{additionalAttributes: _List_Nil, disabled: false, href: $elm$core$Maybe$Nothing, interactive: false, onClick: $elm$core$Maybe$Nothing, ripples: false, selection: $elm$core$Maybe$Nothing, target: $elm$core$Maybe$Nothing});
+var $aforemny$material_components_web_elm$Material$List$Item$setAttributes = F2(
+	function (additionalAttributes, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+			_Utils_update(
+				config_,
+				{additionalAttributes: additionalAttributes}));
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$setDisabled = F2(
+	function (disabled, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+			_Utils_update(
+				config_,
+				{disabled: disabled}));
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$setOnClick = F2(
+	function (onClick, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+			_Utils_update(
+				config_,
+				{
+					onClick: $elm$core$Maybe$Just(onClick)
+				}));
+	});
+var $aforemny$material_components_web_elm$Material$List$Item$setSelected = F2(
+	function (selection, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+			_Utils_update(
+				config_,
+				{selection: selection}));
+	});
+var $aforemny$material_components_web_elm$Material$Select$listItemConfig = F3(
+	function (selectedValue, onChange, config_) {
+		var _v0 = config_;
+		var value = _v0.a.value;
+		var disabled = _v0.a.disabled;
+		var additionalAttributes = _v0.a.additionalAttributes;
+		return function () {
+			if (onChange.$ === 'Just') {
+				var onChange_ = onChange.a;
+				return $aforemny$material_components_web_elm$Material$List$Item$setOnClick(
+					onChange_(value));
+			} else {
+				return $elm$core$Basics$identity;
+			}
+		}()(
+			A2(
+				$aforemny$material_components_web_elm$Material$List$Item$setSelected,
+				_Utils_eq(
+					selectedValue,
+					$elm$core$Maybe$Just(value)) ? $elm$core$Maybe$Just($aforemny$material_components_web_elm$Material$List$Item$activated) : $elm$core$Maybe$Nothing,
+				A2(
+					$aforemny$material_components_web_elm$Material$List$Item$setAttributes,
+					additionalAttributes,
+					A2($aforemny$material_components_web_elm$Material$List$Item$setDisabled, disabled, $aforemny$material_components_web_elm$Material$List$Item$config))));
+	});
+var $aforemny$material_components_web_elm$Material$Select$listItem = F4(
+	function (leadingIcon, selected, onChange, _v0) {
+		var config_ = _v0.a;
+		var label = _v0.b;
+		return A2(
+			$aforemny$material_components_web_elm$Material$List$Item$listItem,
+			A3($aforemny$material_components_web_elm$Material$Select$listItemConfig, selected, onChange, config_),
+			$elm$core$List$concat(
+				_List_fromArray(
+					[
+						(!_Utils_eq(leadingIcon, $elm$core$Maybe$Nothing)) ? _List_fromArray(
+						[
+							A2($aforemny$material_components_web_elm$Material$List$Item$graphic, _List_Nil, _List_Nil)
+						]) : _List_Nil,
+						_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('mdc-deprecated-list-item__text')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(label)
+								]))
+						])
+					])));
+	});
+var $aforemny$material_components_web_elm$Material$Menu$closeHandler = function (_v0) {
+	var onClose = _v0.a.onClose;
+	return A2(
+		$elm$core$Maybe$map,
+		A2(
+			$elm$core$Basics$composeL,
+			$elm$html$Html$Events$on('MDCMenuSurface:close'),
+			$elm$json$Json$Decode$succeed),
+		onClose);
+};
+var $aforemny$material_components_web_elm$Material$List$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $aforemny$material_components_web_elm$Material$List$config = $aforemny$material_components_web_elm$Material$List$Config(
+	{additionalAttributes: _List_Nil, avatarList: false, dense: false, interactive: true, ripples: true, twoLine: false, vertical: false, wrapFocus: false});
+var $aforemny$material_components_web_elm$Material$List$avatarListCs = function (_v0) {
+	var avatarList = _v0.a.avatarList;
+	return avatarList ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list--avatar-list')) : $elm$core$Maybe$Nothing;
+};
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $aforemny$material_components_web_elm$Material$List$clickHandler = function (listItems) {
+	var getOnClick = function (listItem_) {
+		switch (listItem_.$) {
+			case 'ListItem':
+				var onClick = listItem_.b.a.onClick;
+				return $elm$core$Maybe$Just(onClick);
+			case 'ListItemDivider':
+				return $elm$core$Maybe$Nothing;
+			default:
+				return $elm$core$Maybe$Nothing;
+		}
+	};
+	var nthOnClick = function (index) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Basics$identity,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$drop,
+					index,
+					A2(
+						$elm$core$List$filterMap,
+						$elm$core$Basics$identity,
+						A2($elm$core$List$map, getOnClick, listItems)))));
+	};
+	var mergedClickHandler = A2(
+		$elm$json$Json$Decode$andThen,
+		function (index) {
+			var _v0 = nthOnClick(index);
+			if (_v0.$ === 'Just') {
+				var msg_ = _v0.a;
+				return $elm$json$Json$Decode$succeed(msg_);
+			} else {
+				return $elm$json$Json$Decode$fail('');
+			}
+		},
+		A2(
+			$elm$json$Json$Decode$at,
+			_List_fromArray(
+				['detail', 'index']),
+			$elm$json$Json$Decode$int));
+	return $elm$core$Maybe$Just(
+		A2($elm$html$Html$Events$on, 'MDCList:action', mergedClickHandler));
+};
+var $aforemny$material_components_web_elm$Material$List$denseCs = function (_v0) {
+	var dense = _v0.a.dense;
+	return dense ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list--dense')) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$List$interactiveProp = function (_v0) {
+	var interactive = _v0.a.interactive;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'interactive',
+			$elm$json$Json$Encode$bool(interactive)));
+};
+var $aforemny$material_components_web_elm$Material$List$rootCs = $elm$core$Maybe$Just(
+	$elm$html$Html$Attributes$class('mdc-deprecated-list'));
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $aforemny$material_components_web_elm$Material$List$selectedIndexProp = function (listItems) {
+	var selectedIndex = A2(
+		$elm$core$List$filterMap,
+		$elm$core$Basics$identity,
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (index, listItem_) {
+					switch (listItem_.$) {
+						case 'ListItem':
+							var selection = listItem_.b.a.selection;
+							return (!_Utils_eq(selection, $elm$core$Maybe$Nothing)) ? $elm$core$Maybe$Just(index) : $elm$core$Maybe$Nothing;
+						case 'ListItemDivider':
+							return $elm$core$Maybe$Nothing;
+						default:
+							return $elm$core$Maybe$Nothing;
+					}
+				}),
+			A2(
+				$elm$core$List$filter,
+				function (listItem_) {
+					switch (listItem_.$) {
+						case 'ListItem':
+							return true;
+						case 'ListItemDivider':
+							return false;
+						default:
+							return false;
+					}
+				},
+				listItems)));
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'selectedIndex',
+			A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, selectedIndex)));
+};
+var $aforemny$material_components_web_elm$Material$List$twoLineCs = function (_v0) {
+	var twoLine = _v0.a.twoLine;
+	return twoLine ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-deprecated-list--two-line')) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$List$wrapFocusProp = function (_v0) {
+	var wrapFocus = _v0.a.wrapFocus;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'wrapFocus',
+			$elm$json$Json$Encode$bool(wrapFocus)));
+};
+var $aforemny$material_components_web_elm$Material$List$list = F3(
+	function (config_, firstListItem, remainingListItems) {
+		var ripples = config_.a.ripples;
+		var interactive = config_.a.interactive;
+		var additionalAttributes = config_.a.additionalAttributes;
+		var listItems = A2($elm$core$List$cons, firstListItem, remainingListItems);
+		return A3(
+			$elm$html$Html$node,
+			'mdc-list',
+			_Utils_ap(
+				A2(
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$aforemny$material_components_web_elm$Material$List$rootCs,
+							$aforemny$material_components_web_elm$Material$List$denseCs(config_),
+							$aforemny$material_components_web_elm$Material$List$avatarListCs(config_),
+							$aforemny$material_components_web_elm$Material$List$twoLineCs(config_),
+							$aforemny$material_components_web_elm$Material$List$wrapFocusProp(config_),
+							$aforemny$material_components_web_elm$Material$List$clickHandler(listItems),
+							$aforemny$material_components_web_elm$Material$List$selectedIndexProp(listItems),
+							$aforemny$material_components_web_elm$Material$List$interactiveProp(config_)
+						])),
+				additionalAttributes),
+			A2(
+				$elm$core$List$map,
+				function (listItem_) {
+					switch (listItem_.$) {
+						case 'ListItem':
+							var node = listItem_.a;
+							var config__ = listItem_.b.a;
+							return node(
+								$aforemny$material_components_web_elm$Material$List$Item$Internal$Config(
+									_Utils_update(
+										config__,
+										{ripples: ripples && interactive})));
+						case 'ListItemDivider':
+							var node = listItem_.a;
+							return node;
+						default:
+							var node = listItem_.a;
+							return node;
+					}
+				},
+				listItems));
+	});
+var $aforemny$material_components_web_elm$Material$Menu$openProp = function (_v0) {
+	var open = _v0.a.open;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'open',
+			$elm$json$Json$Encode$bool(open)));
+};
+var $aforemny$material_components_web_elm$Material$Menu$quickOpenProp = function (_v0) {
+	var quickOpen = _v0.a.quickOpen;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'quickOpen',
+			$elm$json$Json$Encode$bool(quickOpen)));
+};
+var $aforemny$material_components_web_elm$Material$Menu$rootCs = $elm$core$Maybe$Just(
+	$elm$html$Html$Attributes$class('mdc-menu mdc-menu-surface'));
+var $aforemny$material_components_web_elm$Material$List$setRipples = F2(
+	function (ripples, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Config(
+			_Utils_update(
+				config_,
+				{ripples: ripples}));
+	});
+var $aforemny$material_components_web_elm$Material$List$setWrapFocus = F2(
+	function (wrapFocus, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$List$Config(
+			_Utils_update(
+				config_,
+				{wrapFocus: wrapFocus}));
+	});
+var $aforemny$material_components_web_elm$Material$Menu$menu = F3(
+	function (config_, firstListItem, remainingListItems) {
+		var additionalAttributes = config_.a.additionalAttributes;
+		return A3(
+			$elm$html$Html$node,
+			'mdc-menu',
+			_Utils_ap(
+				A2(
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$aforemny$material_components_web_elm$Material$Menu$rootCs,
+							$aforemny$material_components_web_elm$Material$Menu$openProp(config_),
+							$aforemny$material_components_web_elm$Material$Menu$quickOpenProp(config_),
+							$aforemny$material_components_web_elm$Material$Menu$closeHandler(config_)
+						])),
+				additionalAttributes),
+			_List_fromArray(
+				[
+					A3(
+					$aforemny$material_components_web_elm$Material$List$list,
+					A2(
+						$aforemny$material_components_web_elm$Material$List$setWrapFocus,
+						true,
+						A2($aforemny$material_components_web_elm$Material$List$setRipples, false, $aforemny$material_components_web_elm$Material$List$config)),
+					firstListItem,
+					remainingListItems)
+				]));
+	});
+var $aforemny$material_components_web_elm$Material$Menu$setAttributes = F2(
+	function (additionalAttributes, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$Menu$Config(
+			_Utils_update(
+				config_,
+				{additionalAttributes: additionalAttributes}));
+	});
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $aforemny$material_components_web_elm$Material$Select$menuElt = F5(
+	function (leadingIcon, selected, onChange, firstSelectItem, remainingSelectItems) {
+		return A3(
+			$aforemny$material_components_web_elm$Material$Menu$menu,
+			A2(
+				$aforemny$material_components_web_elm$Material$Menu$setAttributes,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mdc-select__menu'),
+						A2($elm$html$Html$Attributes$style, 'width', '100%')
+					]),
+				$aforemny$material_components_web_elm$Material$Menu$config),
+			A4($aforemny$material_components_web_elm$Material$Select$listItem, leadingIcon, selected, onChange, firstSelectItem),
+			A2(
+				$elm$core$List$map,
+				A3($aforemny$material_components_web_elm$Material$Select$listItem, leadingIcon, selected, onChange),
+				remainingSelectItems));
+	});
+var $aforemny$material_components_web_elm$Material$Select$noLabelCs = function (_v0) {
+	var label = _v0.a.label;
+	return _Utils_eq(label, $elm$core$Maybe$Nothing) ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-select--no-label')) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$Select$notchedOutlineElt = function (config_) {
+	return A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mdc-notched-outline')
+			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$core$Maybe$withDefault,
-				$elm$html$Html$text('no camera'),
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mdc-notched-outline__leading')
+					]),
+				_List_Nil),
 				A2(
-					$elm$core$Maybe$map,
-					function (camH) {
-						return $elm$html$Html$text('has camera');
-					},
-					model.cameraH)),
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mdc-notched-outline__notch')
+					]),
 				A2(
-				$elm$html$Html$ul,
-				_List_Nil,
-				A2($elm$core$List$map, $elm$html$Html$text, model.availableCameraList)),
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$aforemny$material_components_web_elm$Material$Select$floatingLabelElt(config_)
+						]))),
 				A2(
-				$elm$core$Maybe$withDefault,
-				$elm$html$Html$text(''),
-				A2($elm$core$Maybe$map, $elm$html$Html$text, model.error))
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('mdc-notched-outline__trailing')
+					]),
+				_List_Nil)
 			]));
+};
+var $aforemny$material_components_web_elm$Material$Select$Outlined = {$: 'Outlined'};
+var $aforemny$material_components_web_elm$Material$Select$outlinedCs = function (variant) {
+	return _Utils_eq(variant, $aforemny$material_components_web_elm$Material$Select$Outlined) ? $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$class('mdc-select--outlined')) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$Select$requiredProp = function (_v0) {
+	var required = _v0.a.required;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'required',
+			$elm$json$Json$Encode$bool(required)));
+};
+var $aforemny$material_components_web_elm$Material$Select$rippleElt = $elm$core$Maybe$Just(
+	A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('mdc-select__ripple')
+			]),
+		_List_Nil));
+var $aforemny$material_components_web_elm$Material$Select$rootCs = $elm$core$Maybe$Just(
+	$elm$html$Html$Attributes$class('mdc-select'));
+var $aforemny$material_components_web_elm$Material$Select$selectedIndexProp = function (selectedIndex) {
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'selectedIndex',
+			$elm$json$Json$Encode$int(
+				A2($elm$core$Maybe$withDefault, -1, selectedIndex))));
+};
+var $aforemny$material_components_web_elm$Material$Select$selectedTextElt = A2(
+	$elm$html$Html$span,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mdc-select__selected-text')
+		]),
+	_List_Nil);
+var $aforemny$material_components_web_elm$Material$Select$selectedTextContainerElt = A2(
+	$elm$html$Html$span,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mdc-select__selected-text-container')
+		]),
+	_List_fromArray(
+		[$aforemny$material_components_web_elm$Material$Select$selectedTextElt]));
+var $aforemny$material_components_web_elm$Material$Select$validProp = function (_v0) {
+	var valid = _v0.a.valid;
+	return $elm$core$Maybe$Just(
+		A2(
+			$elm$html$Html$Attributes$property,
+			'valid',
+			$elm$json$Json$Encode$bool(valid)));
+};
+var $aforemny$material_components_web_elm$Material$Select$select = F4(
+	function (variant, config_, firstSelectItem, remainingSelectItems) {
+		var _v0 = config_;
+		var leadingIcon = _v0.a.leadingIcon;
+		var selected = _v0.a.selected;
+		var additionalAttributes = _v0.a.additionalAttributes;
+		var onChange = _v0.a.onChange;
+		var selectedIndex = $elm$core$List$head(
+			A2(
+				$elm$core$List$filterMap,
+				$elm$core$Basics$identity,
+				A2(
+					$elm$core$List$indexedMap,
+					F2(
+						function (index, _v1) {
+							var value = _v1.a.a.value;
+							return _Utils_eq(
+								$elm$core$Maybe$Just(value),
+								selected) ? $elm$core$Maybe$Just(index) : $elm$core$Maybe$Nothing;
+						}),
+					A2($elm$core$List$cons, firstSelectItem, remainingSelectItems))));
+		return A3(
+			$elm$html$Html$node,
+			'mdc-select',
+			_Utils_ap(
+				A2(
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$aforemny$material_components_web_elm$Material$Select$rootCs,
+							$aforemny$material_components_web_elm$Material$Select$noLabelCs(config_),
+							$aforemny$material_components_web_elm$Material$Select$filledCs(variant),
+							$aforemny$material_components_web_elm$Material$Select$outlinedCs(variant),
+							$aforemny$material_components_web_elm$Material$Select$leadingIconCs(config_),
+							$aforemny$material_components_web_elm$Material$Select$disabledProp(config_),
+							$aforemny$material_components_web_elm$Material$Select$selectedIndexProp(selectedIndex),
+							$aforemny$material_components_web_elm$Material$Select$validProp(config_),
+							$aforemny$material_components_web_elm$Material$Select$requiredProp(config_)
+						])),
+				additionalAttributes),
+			_List_fromArray(
+				[
+					A2(
+					$aforemny$material_components_web_elm$Material$Select$anchorElt,
+					_List_Nil,
+					$elm$core$List$concat(
+						_List_fromArray(
+							[
+								_Utils_eq(variant, $aforemny$material_components_web_elm$Material$Select$Filled) ? A2(
+								$elm$core$List$filterMap,
+								$elm$core$Basics$identity,
+								_List_fromArray(
+									[
+										$aforemny$material_components_web_elm$Material$Select$rippleElt,
+										$aforemny$material_components_web_elm$Material$Select$floatingLabelElt(config_)
+									])) : _List_fromArray(
+								[
+									$aforemny$material_components_web_elm$Material$Select$notchedOutlineElt(config_)
+								]),
+								_List_fromArray(
+								[
+									$aforemny$material_components_web_elm$Material$Select$leadingIconElt(config_),
+									$aforemny$material_components_web_elm$Material$Select$selectedTextContainerElt,
+									$aforemny$material_components_web_elm$Material$Select$dropdownIconElt
+								]),
+								_Utils_eq(variant, $aforemny$material_components_web_elm$Material$Select$Filled) ? _List_fromArray(
+								[$aforemny$material_components_web_elm$Material$Select$lineRippleElt]) : _List_Nil
+							]))),
+					A5($aforemny$material_components_web_elm$Material$Select$menuElt, leadingIcon, selected, onChange, firstSelectItem, remainingSelectItems)
+				]));
+	});
+var $aforemny$material_components_web_elm$Material$Select$filled = F3(
+	function (config_, firstSelectItem, remainingSelectItems) {
+		return A4($aforemny$material_components_web_elm$Material$Select$select, $aforemny$material_components_web_elm$Material$Select$Filled, config_, firstSelectItem, remainingSelectItems);
+	});
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $aforemny$material_components_web_elm$Material$Typography$headline6 = $elm$html$Html$Attributes$class('mdc-typography--headline6');
+var $aforemny$material_components_web_elm$Material$IconButton$Internal$Icon = function (a) {
+	return {$: 'Icon', a: a};
+};
+var $aforemny$material_components_web_elm$Material$IconButton$customIcon = F3(
+	function (node, attributes, nodes) {
+		return $aforemny$material_components_web_elm$Material$IconButton$Internal$Icon(
+			{attributes: attributes, node: node, nodes: nodes});
+	});
+var $aforemny$material_components_web_elm$Material$IconButton$icon = function (iconName) {
+	return A3(
+		$aforemny$material_components_web_elm$Material$IconButton$customIcon,
+		$elm$html$Html$i,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('material-icons')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(iconName)
+			]));
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $aforemny$material_components_web_elm$Material$IconButton$clickHandler = function (_v0) {
+	var onClick = _v0.a.onClick;
+	return A2($elm$core$Maybe$map, $elm$html$Html$Events$onClick, onClick);
+};
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $aforemny$material_components_web_elm$Material$IconButton$disabledAttr = function (_v0) {
+	var disabled = _v0.a.disabled;
+	return $elm$core$Maybe$Just(
+		$elm$html$Html$Attributes$disabled(disabled));
+};
+var $aforemny$material_components_web_elm$Material$IconButton$hrefAttr = function (_v0) {
+	var href = _v0.a.href;
+	return A2($elm$core$Maybe$map, $elm$html$Html$Attributes$href, href);
+};
+var $aforemny$material_components_web_elm$Material$IconButton$iconButtonCs = $elm$core$Maybe$Just(
+	$elm$html$Html$Attributes$class('mdc-icon-button'));
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $aforemny$material_components_web_elm$Material$Menu$surfaceAnchor = $elm$html$Html$Attributes$class('mdc-menu-surface--anchor');
+var $aforemny$material_components_web_elm$Material$IconButton$targetAttr = function (_v0) {
+	var href = _v0.a.href;
+	var target = _v0.a.target;
+	return (!_Utils_eq(href, $elm$core$Maybe$Nothing)) ? A2($elm$core$Maybe$map, $elm$html$Html$Attributes$target, target) : $elm$core$Maybe$Nothing;
+};
+var $aforemny$material_components_web_elm$Material$IconButton$iconButton = F2(
+	function (config_, icon_) {
+		var innerConfig = config_.a;
+		var additionalAttributes = innerConfig.additionalAttributes;
+		var href = innerConfig.href;
+		var disabled = innerConfig.disabled;
+		var wrapMenu = function (node) {
+			var _v1 = innerConfig.menu;
+			if (_v1.$ === 'Nothing') {
+				return node;
+			} else {
+				var _v2 = _v1.a;
+				var menuConfig = _v2.a;
+				var firstListItem = _v2.b;
+				var remainingListItems = _v2.c;
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[$aforemny$material_components_web_elm$Material$Menu$surfaceAnchor]),
+					_List_fromArray(
+						[
+							node,
+							A3($aforemny$material_components_web_elm$Material$Menu$menu, menuConfig, firstListItem, remainingListItems)
+						]));
+			}
+		};
+		return wrapMenu(
+			A3(
+				$elm$html$Html$node,
+				'mdc-icon-button',
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						((!_Utils_eq(href, $elm$core$Maybe$Nothing)) && (!disabled)) ? $elm$html$Html$a : $elm$html$Html$button,
+						_Utils_ap(
+							A2(
+								$elm$core$List$filterMap,
+								$elm$core$Basics$identity,
+								_List_fromArray(
+									[
+										$aforemny$material_components_web_elm$Material$IconButton$iconButtonCs,
+										$aforemny$material_components_web_elm$Material$IconButton$hrefAttr(config_),
+										$aforemny$material_components_web_elm$Material$IconButton$targetAttr(config_),
+										$aforemny$material_components_web_elm$Material$IconButton$disabledAttr(config_),
+										$aforemny$material_components_web_elm$Material$IconButton$clickHandler(config_)
+									])),
+							additionalAttributes),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$map,
+								$elm$core$Basics$never,
+								function () {
+									if (icon_.$ === 'Icon') {
+										var node = icon_.a.node;
+										var attributes = icon_.a.attributes;
+										var nodes = icon_.a.nodes;
+										return A2(
+											node,
+											A2(
+												$elm$core$List$cons,
+												$elm$html$Html$Attributes$class('mdc-icon-button__icon'),
+												attributes),
+											nodes);
+									} else {
+										var node = icon_.a.node;
+										var attributes = icon_.a.attributes;
+										var nodes = icon_.a.nodes;
+										return A2(
+											node,
+											A2(
+												$elm$core$List$cons,
+												$elm$svg$Svg$Attributes$class('mdc-icon-button__icon'),
+												attributes),
+											nodes);
+									}
+								}())
+							]))
+					])));
+	});
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $aforemny$material_components_web_elm$Material$Select$Item$Internal$SelectItem = F2(
+	function (a, b) {
+		return {$: 'SelectItem', a: a, b: b};
+	});
+var $aforemny$material_components_web_elm$Material$Select$Item$selectItem = $aforemny$material_components_web_elm$Material$Select$Item$Internal$SelectItem;
+var $aforemny$material_components_web_elm$Material$Select$setLabel = F2(
+	function (label, _v0) {
+		var config_ = _v0.a;
+		return $aforemny$material_components_web_elm$Material$Select$Config(
+			_Utils_update(
+				config_,
+				{label: label}));
+	});
+var $elm$core$List$singleton = function (value) {
+	return _List_fromArray(
+		[value]);
+};
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$view = function (model) {
+	var _v0 = model.error;
+	if (_v0.$ === 'Just') {
+		var error = _v0.a;
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text(error)
+				]));
+	} else {
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h1,
+					_List_fromArray(
+						[$aforemny$material_components_web_elm$Material$Typography$headline6]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Hello World')
+						])),
+					A2(
+					$elm$html$Html$ul,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						A2(
+							$elm$core$Basics$composeR,
+							$elm$html$Html$text,
+							A2(
+								$elm$core$Basics$composeR,
+								$elm$core$List$singleton,
+								$elm$html$Html$li(
+									_List_fromArray(
+										[$aforemny$material_components_web_elm$Material$Typography$body1])))),
+						model.availableCameraList)),
+					A3(
+					$aforemny$material_components_web_elm$Material$Select$filled,
+					A2(
+						$aforemny$material_components_web_elm$Material$Select$setLabel,
+						$elm$core$Maybe$Just('Camera Source'),
+						$aforemny$material_components_web_elm$Material$Select$config),
+					A2(
+						$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
+						$aforemny$material_components_web_elm$Material$Select$Item$config(
+							{value: 'None'}),
+						'None'),
+					A2(
+						$elm$core$List$map,
+						function (camera) {
+							return A2(
+								$aforemny$material_components_web_elm$Material$Select$Item$selectItem,
+								$aforemny$material_components_web_elm$Material$Select$Item$config(
+									{value: camera}),
+								camera);
+						},
+						model.availableCameraList)),
+					A2(
+					$aforemny$material_components_web_elm$Material$IconButton$iconButton,
+					$aforemny$material_components_web_elm$Material$IconButton$config,
+					$aforemny$material_components_web_elm$Material$IconButton$icon('launch'))
+				]));
+	}
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
