@@ -1,16 +1,28 @@
 module Main exposing (..)
 
+-- import Css exposing (..)
+-- import Html.Styled
+-- import Material.Icons as MaterialIcons
+
 import Browser
+import Browser.Dom exposing (Element)
 import Browser.Events exposing (onAnimationFrame, onAnimationFrameDelta)
 import CameraHandler exposing (Camera, CameraHandler, GetCameraImageResponseJson, getCameraList)
 import Cmd.Extra as C
+import Css exposing (..)
 import Do.Task as T
+import Element
 import Html as H
 import Html.Attributes as HA
 import Html.Events exposing (onClick)
+import Html.Grid as Grid
+import Html.Styled as HS exposing (toUnstyled)
+import Html.Styled.Attributes as HS
 import Json.Decode as D
 import Json.Encode as E
-import Material.IconButton as IconButton
+import Material.IconButton as IconButton exposing (Icon, icon)
+import Material.Icons.Action
+import Material.LayoutGrid as LayoutGrid
 import Material.Select as Select
 import Material.Select.Item as SelectItem
 import Material.Typography as Typography
@@ -19,17 +31,9 @@ import Result.Extra as R
 import Task as T
 import TaskPort as TP
 import WebSocket exposing (WebSocket)
-
-
-
--- type alias Model =
---     { error : Maybe String
---     , reqS : Maybe RequiredState
---     , availableCameraList : List String
---     , selectedCamera : Maybe String
---     , openedCamera : Maybe Camera
---     , currentImage : List Int
---     }
+import Widget as W
+import Widget.Icon as Icon exposing (Icon)
+import Widget.Material as W
 
 
 type Model
@@ -71,74 +75,71 @@ init _ =
 
 view : Model -> H.Html Msg
 view model_ =
-    case model_ of
-        Init ->
-            H.div [] []
-
-        Normal model ->
-            H.div []
-                [ H.h1 [ Typography.headline6 ] [ H.text "Hello World" ]
-                , H.ul [] (List.map (H.text >> List.singleton >> H.li [ Typography.body1 ]) model.availableCameraList)
-                , Select.filled
-                    (Select.config
-                        |> Select.setLabel (Just "Camera Source")
-                        |> Select.setSelected model.selectedCamera
-                        |> Select.setOnChange CameraSelect
-                    )
-                    (SelectItem.selectItem (SelectItem.config { value = "None" }) "None")
-                    (model.availableCameraList
-                        |> List.map (\camera -> SelectItem.selectItem (SelectItem.config { value = camera }) camera)
-                    )
-                , IconButton.iconButton
-                    (IconButton.config |> IconButton.setOnClick OpenCameraClick)
-                    (IconButton.icon "launch")
-                , model.openedCamera
-                    |> Maybe.map (\camera -> H.text ("Opened Camera: " ++ String.fromInt camera.uuid))
-                    |> Maybe.withDefault (H.text "No camera opened")
-                , canvas model.currentImage
-                ]
-
-        FatalError error ->
-            H.div [] [ H.text error ]
-
-        UnreachableS error ->
-            H.div [] [ H.text error ]
+    Element.layout [ Element.padding 0 ]
+        (W.button
+            (W.containedButton W.defaultPalette)
+            { text = "Open Camera"
+            , onPress = Just OpenCameraClick
+            , icon =
+                Material.Icons.Action.done
+                    |> Icon.materialIcons
+            }
+        )
 
 
 
--- case model.error of
---     Just error ->
---         H.div [] [ H.text error ]
---     Nothing ->
---         H.div []
---             [ H.h1 [ Typography.headline6 ] [ H.text "Hello World" ]
---             , H.ul [] (List.map (H.text >> List.singleton >> H.li [ Typography.body1 ]) model.availableCameraList)
---             , Select.filled
---                 (Select.config
---                     |> Select.setLabel (Just "Camera Source")
---                     |> Select.setSelected model.selectedCamera
---                     |> Select.setOnChange CameraSelect
---                 )
---                 (SelectItem.selectItem (SelectItem.config { value = "None" }) "None")
---                 (model.availableCameraList
---                     |> List.map (\camera -> SelectItem.selectItem (SelectItem.config { value = camera }) camera)
---                 )
---             , IconButton.iconButton
---                 (IconButton.config |> IconButton.setOnClick OpenCameraClick)
---                 (IconButton.icon "launch")
---             , model.openedCamera
---                 |> Maybe.map (\camera -> H.text ("Opened Camera: " ++ String.fromInt camera.uuid))
---                 |> Maybe.withDefault (H.text "No camera opened")
---             , canvas model.currentImage
---             ]
+-- view : Model -> H.Html Msg
+-- view model_ =
+--     case model_ of
+--         Init ->
+--             H.div [] [ W.button (W.containedButton W.defaultPalette) { text = "Open Camera", onPress = Nothing, icon = Just "launch" } ]
+--         Normal model ->
+--             H.div [ HA.style "width" "100%", HA.style "height" "100vh", HA.style "display" "block", HA.style "overflow" "hidden" ]
+--                 [ Select.filled
+--                     (Select.config
+--                         |> Select.setLabel (Just "Camera Source")
+--                         |> Select.setSelected model.selectedCamera
+--                         |> Select.setOnChange CameraSelect
+--                     )
+--                     (SelectItem.selectItem (SelectItem.config { value = "None" }) "None")
+--                     (model.availableCameraList
+--                         |> List.map (\camera -> SelectItem.selectItem (SelectItem.config { value = camera }) camera)
+--                     )
+--                 , IconButton.iconButton
+--                     (IconButton.config |> IconButton.setOnClick OpenCameraClick)
+--                     (IconButton.icon "launch")
+--                 , Grid.box
+--                     [ width (pct 100), height (pct 100) ]
+--                     [ Grid.row
+--                         [ width (pct 100), height (pct 100) ]
+--                         [ Grid.col
+--                             [ Grid.exactWidthCol (pct 70), height (pct 100) ]
+--                             [ canvas model.currentImage ]
+--                         , Grid.col
+--                             []
+--                             [ HS.text "2" ]
+--                         ]
+--                     ]
+--                     |> toUnstyled
+--                 ]
+--         FatalError error ->
+--             H.div [] [ H.text error ]
+--         UnreachableS error ->
+--             H.div [] [ H.text error ]
 
 
 canvas bytes =
-    H.node "elm-canvas" [ HA.property "bytes" (E.list E.int bytes), HA.attribute "text" "test" ] []
+    HS.node "elm-canvas"
+        [ HS.property "bytes" (E.list E.int bytes)
 
-
-
---  H.canvas [ HA.id "elm-canvas" ] []
+        -- , HS.attribute "width" "100%"
+        -- , HS.attribute "height" "100%"
+        , HS.attribute "style" "width: 100%; height: 100%; display: block;"
+        ]
+        [ HS.div [ HS.attribute "style" "width: 100%; height: 100%; display: block;" ]
+            [ HS.canvas [ HS.id "canvas" ] []
+            ]
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -200,7 +201,7 @@ update msg model_ =
                     ( Normal { model | currentImage = res.image }, C.perform GetCameraImage )
 
                 InitCameraH _ ->
-                    ( Normal model, C.perform (FatalException "CameraHandler not initialized, but this should never happen") )
+                    ( Normal model, C.perform (Unreachable "camera handler is already initialized") )
 
                 GetAvailableCameraList ->
                     let

@@ -116,7 +116,3 @@ getCameraImageQuery ws uuid =
 getCameraImage camH camera =
     getCameraImageQuery camH.ws camera.uuid
         |> T.map (.message >> D.decodeValue decodeGetCameraImageResponseJson)
-
-
-
--- |> T.map (R.map (\r -> r.image))

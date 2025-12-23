@@ -120,12 +120,12 @@ fn launch_web_view() {
         </body>
     </html>
     "#,
-        css = r#"body { background: #ffffff; }"#,
         elmjs = include_str!("../elm/dist/elm.js"),
         mainjs = include_str!("../js/main.js"),
         runtimejs = include_str!("../js/runtime.js"),
         websocketjs = include_str!("../js/web_socket.js"),
         canvasjs = include_str!("../js/canvas.js"),
+        css = include_str!("../css/main.css"),
     );
 
     std::fs::write("index.html", html.clone()).unwrap();
