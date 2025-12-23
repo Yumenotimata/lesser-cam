@@ -6539,7 +6539,10 @@ var $author$project$Main$update = F2(
 									A2($author$project$CameraHandler$open, model.cameraH, cameraName)));
 							return _Utils_Tuple2(model_, task);
 						} else {
-							return _Utils_Tuple2(model_, $elm$core$Platform$Cmd$none);
+							return _Utils_Tuple2(
+								model_,
+								$GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+									$author$project$Main$Unreachable('failed to open camera')));
 						}
 					case 'CameraSelect':
 						var cameraName = msg.a;

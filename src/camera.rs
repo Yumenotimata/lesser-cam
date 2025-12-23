@@ -29,16 +29,16 @@ impl Camera {
         }
 
         // BGR to RGB
-        let mut rgb_frame = Mat::default();
-        imgproc::cvt_color(
-            &frame,
-            &mut rgb_frame,
-            imgproc::COLOR_BGR2RGB,
-            0,
-            opencv::core::AlgorithmHint::ALGO_HINT_DEFAULT,
-        )
-        .map_err(|_| "can not convert frame".to_owned())?;
+        // let mut rgb_frame = Mat::default();
+        // imgproc::cvt_color(
+        //     &frame,
+        //     &mut rgb_frame,
+        //     imgproc::COLOR_BGR2RGB,
+        //     0,
+        //     opencv::core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        // )
+        // .map_err(|_| "can not convert frame".to_owned())?;
 
-        Ok(rgb_frame)
+        Ok(frame)
     }
 }

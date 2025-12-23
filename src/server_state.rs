@@ -111,11 +111,12 @@ fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Res
                 camera.read().unwrap()
             };
 
-            // let mut buffer = Vector::new();
-            // imgcodecs::imencode_def(".bmp", &frame, &mut buffer).unwrap();
+            let mut frame_vec = Vector::new();
+            imgcodecs::imencode_def(".jpeg", &frame, &mut frame_vec).unwrap();
+            let frame_vec: Vec<u8> = frame_vec.into_iter().collect();
 
-            let frame_bytes = frame.data_bytes().unwrap();
-            let frame_vec: Vec<u8> = frame_bytes.into_iter().map(|s| *s).collect();
+            // let frame_bytes = frame.data_bytes().unwrap();
+            // let frame_vec: Vec<u8> = frame_bytes.into_iter().map(|s| *s).collect();
             // let frame_vec: Vec<Vec<u8>> = frame.to_vec_2d().unwrap();
             // let frame_vec: Vec<u8> = frame_vec.into_iter().flatten().collect();
             // let frame_vec = vec![];
