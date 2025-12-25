@@ -8,6 +8,7 @@
         "direct": {
             "Chadtech/elm-css-grid": "3.0.0",
             "GlobalWebIndex/cmd-extra": "1.4.0",
+            "Orasund/elm-ui-framework": "1.6.1",
             "Orasund/elm-ui-widgets": "3.4.0",
             "TSFoster/elm-uuid": "4.2.0",
             "aforemny/material-components-web-elm": "9.1.0",

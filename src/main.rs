@@ -16,12 +16,40 @@ use axum::{
     routing::get,
 };
 use lesser_cam::{
-    Request, RuntimeRequest, RuntimeResponse, ServerState, SharedServerState,
+    PyVirtualCam, Request, RuntimeRequest, RuntimeResponse, ServerState, SharedServerState,
     handle_runtime_request,
 };
 use web_view::*;
 
+// use virtualcam::{Camera, PixelFormat};
+
+fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
+    let i = (h * 6.0) as i32;
+    let f = h * 6.0 - i as f32;
+    let p = v * (1.0 - s);
+    let q = v * (1.0 - f * s);
+    let t = v * (1.0 - (1.0 - f) * s);
+
+    let (r, g, b) = match i % 6 {
+        0 => (v, t, p),
+        1 => (q, v, p),
+        2 => (p, v, t),
+        3 => (p, q, v),
+        4 => (t, p, v),
+        _ => (v, p, q),
+    };
+
+    ((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
+}
+
 fn main() {
+    let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
+
+    let mut c: u32 = 0;
+    while true {
+        pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
+        c += 1;
+    }
     let runtime_message = RuntimeRequest {
         uuid: 4,
         message: Request::GetCameraList {},

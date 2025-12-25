@@ -65,6 +65,7 @@ pub enum Request {
     OpenCamera { name: String },
     GetCameraList {},
     GetCameraImage { uuid: i32 },
+    Publish { name: String, resolution: i32 },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -117,5 +118,6 @@ fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Res
 
             Some(Response::CameraImage(frame_vec))
         }
+        Request::Publish { name, resolution } => None,
     }
 }
