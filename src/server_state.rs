@@ -1,28 +1,33 @@
+use opencv::core::Mat;
+use opencv::core::Size;
+use opencv::imgcodecs;
+use opencv::imgproc;
+use opencv::prelude::*;
+use opencv::videoio::{VideoCapture, VideoCaptureTrait};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
 
 use axum::extract::ws::{Message, WebSocket};
-use opencv::{
-    core::{MatTraitConstManual, VecN, Vector, VectorToVec},
-    imgcodecs,
-};
+use opencv::core::{MatTraitConstManual, VecN, Vector, VectorToVec};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{Camera, python_utils};
+use crate::{Camera, PyVirtualCam, python_utils};
 
 pub type SharedServerState = Arc<Mutex<ServerState>>;
 
 pub struct ServerState {
     opened_cameras: HashMap<i32, Camera>,
+    vcam: PyVirtualCam,
 }
 
 impl Default for ServerState {
     fn default() -> Self {
         Self {
             opened_cameras: HashMap::new(),
+            vcam: PyVirtualCam::new(320, 240, 60).unwrap(),
         }
     }
 }
@@ -65,7 +70,7 @@ pub enum Request {
     OpenCamera { name: String },
     GetCameraList {},
     GetCameraImage { uuid: i32 },
-    Publish { name: String, resolution: i32 },
+    Publish { uuid: i32, resolution: i32 },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -118,6 +123,37 @@ fn handle_request(request: Request, state: &mut SharedServerState) -> Option<Res
 
             Some(Response::CameraImage(frame_vec))
         }
-        Request::Publish { name, resolution } => None,
+        Request::Publish { uuid, resolution } => {
+            let mut lock = state.lock().unwrap();
+            let camera = lock.opened_cameras.get_mut(&uuid).unwrap();
+            let frame = camera.read().unwrap();
+            let w = frame.size().unwrap().width;
+            let h = frame.size().unwrap().height;
+            let new_w = ((w * resolution) as f64 / 1080.0) as i32;
+            let new_h = ((h * resolution) as f64 / 1080.0) as i32;
+
+            let mut dst = Mat::default();
+            // resize
+            let resized_frame = imgproc::resize(
+                &frame,
+                &mut dst,
+                Size::new(new_w, new_h),
+                0.0,
+                0.0,
+                imgproc::INTER_AREA,
+            )
+            .unwrap();
+
+            let dst = dst
+                .data_bytes()
+                .unwrap()
+                .into_iter()
+                .map(|b| *b)
+                .collect::<Vec<_>>();
+
+            lock.vcam.send(dst);
+
+            None
+        }
     }
 }

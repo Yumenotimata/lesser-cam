@@ -43,13 +43,6 @@ fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
 }
 
 fn main() {
-    let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
-
-    let mut c: u32 = 0;
-    while true {
-        pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
-        c += 1;
-    }
     let runtime_message = RuntimeRequest {
         uuid: 4,
         message: Request::GetCameraList {},
