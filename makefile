@@ -9,7 +9,9 @@ node_modules: package.json bun.lockb
 
 .PHONY: dev
 dev: node_modules
-	bun x tauri dev
+	npx concurrently \
+		"npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --watch" \
+		"bun x tauri dev"
 
 
 .PHONY: dev-elm
@@ -30,7 +32,10 @@ build: node_modules
 	rm -rf dist/main.js
 	bun x tauri build
 
-
+# protobufからelmのクライアントコードを生成
+.PHONY: protoc
+protoc:
+	protoc --elm_out=src proto/camera.proto
 
 .PHONY: clean
 clean:

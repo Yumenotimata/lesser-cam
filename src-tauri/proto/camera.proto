@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package camera;
+
+service CameraService {
+    rpc GetCameraList (GetCameraListRequest) returns (GetCameraListResponse);
+}
+
+message GetCameraListRequest {
+}
+
+message GetCameraListResponse {
+    repeated string camera_list = 1;
+}

@@ -1,17 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- shadcn/uiのダークモード有効化 -->
+<html lang="en" class="dark">
+
 <head>
   <meta charset="UTF-8">
   <title>Tauri Elm App</title>
   <script src="/main.js"></script>
+  <link href="./output.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/basecoat.cdn.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/basecoat.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/dropdown-menu.min.js" defer></script>
 </head>
+
 <body>
-  <noscript>
-    You need to enable JavaScript to run this app.
-  </noscript>
-  <div id="root"></div>
-  <script>
-    Elm.Main.init({ node: document.getElementById("root") })
-  </script>
+  <div class="bg-white dark:bg-black">
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+    <script>
+      Elm.Main.init({ node: document.getElementById("root") })
+    </script>
+  </div>
 </body>
+
 </html>
