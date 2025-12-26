@@ -21,92 +21,9 @@ use lesser_cam::{
 };
 use web_view::*;
 
-// use virtualcam::{Camera, PixelFormat};
-
-fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
-    let i = (h * 6.0) as i32;
-    let f = h * 6.0 - i as f32;
-    let p = v * (1.0 - s);
-    let q = v * (1.0 - f * s);
-    let t = v * (1.0 - (1.0 - f) * s);
-
-    let (r, g, b) = match i % 6 {
-        0 => (v, t, p),
-        1 => (q, v, p),
-        2 => (p, v, t),
-        3 => (p, q, v),
-        4 => (t, p, v),
-        _ => (v, p, q),
-    };
-
-    ((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
-}
-
 fn main() {
-    let runtime_message = RuntimeRequest {
-        uuid: 4,
-        message: Request::GetCameraList {},
-    };
-
-    println!(
-        "runtime_message: {:#?}",
-        serde_json::to_string(&runtime_message).unwrap()
-    );
-
-    // WebViewがメインスレッドじゃないと動かないのでaxumは別スレッド
-    thread::spawn(|| {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        rt.block_on(async {
-            let state = Arc::new(Mutex::new(ServerState::default()));
-
-            let app = Router::new()
-                .route("/ws", get(ws_handler))
-                .with_state(state);
-
-            let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
-            println!("Listening on http://{}", addr);
-            axum::Server::bind(&addr)
-                .serve(app.into_make_service())
-                .await
-                .unwrap();
-        });
-    });
-
     // Elmで生成されたJsをWebViewで表示
     launch_web_view();
-}
-
-async fn ws_handler(ws: WebSocketUpgrade, State(state): State<SharedServerState>) -> Response {
-    ws.on_upgrade(|socket| handle_socket(socket, state))
-}
-
-async fn handle_socket(mut ws: WebSocket, mut state: SharedServerState) {
-    while let Some(msg) = ws.recv().await {
-        if let Ok(msg) = msg {
-            match msg {
-                Message::Text(json_str) => {
-                    println!("Received: {}", json_str);
-                    let msg: RuntimeRequest = serde_json::from_str(&json_str).unwrap();
-                    println!("Received: {:#?}", msg);
-
-                    // もしレスポンスがあるなら、送り元のuuidを付けて返す
-                    if let Some(response) = handle_runtime_request(&msg, &mut state) {
-                        let response_msg = RuntimeResponse::new(msg.uuid, response);
-                        ws.send(Message::Text(serde_json::to_string(&response_msg).unwrap()))
-                            .await
-                            .unwrap();
-                        // println!("Response: {:#?}", response_msg);
-                    }
-                }
-                Message::Close(_) => {
-                    break;
-                }
-                _ => {}
-            }
-        } else {
-            break;
-        }
-    }
 }
 
 fn launch_web_view() {
@@ -128,9 +45,6 @@ fn launch_web_view() {
         <script src="https://unpkg.com/elm-taskport@2.0.1/dist/taskport.min.js"></script>
         <script>
         {elmjs}
-        {runtimejs}
-        {websocketjs}
-        {canvasjs}
         </script>
         </head>
         <body>
@@ -143,9 +57,6 @@ fn launch_web_view() {
     "#,
         elmjs = include_str!("../elm/dist/elm.js"),
         mainjs = include_str!("../js/main.js"),
-        runtimejs = include_str!("../js/runtime.js"),
-        websocketjs = include_str!("../js/web_socket.js"),
-        canvasjs = include_str!("../js/canvas.js"),
         css = include_str!("../css/main.css"),
     );
 
