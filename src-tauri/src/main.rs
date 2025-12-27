@@ -5,10 +5,7 @@ mod camera {
 }
 use std::thread;
 
-// use http::Response;
-use tokio::sync::mpsc;
-use tokio::sync::Mutex;
-// use tokio_stream::{StreamExt, wrappers::ReceiverStream};
+use tauri_elm_app::enumerate_cameras;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 use tonic_web::GrpcWebLayer;
@@ -34,11 +31,15 @@ impl CameraService for MyCameraService {
         _request: Request<GetCameraListRequest>,
     ) -> Result<Response<GetCameraListResponse>, Status> {
         Ok(Response::new(GetCameraListResponse {
-            camera_list: vec!["A", "B"].into_iter().map(|s| s.to_string()).collect(),
+            camera_list: enumerate_cameras()
+                .unwrap()
+                .into_iter()
+                .map(|(_, name)| name)
+                .collect(),
         }))
     }
 }
-use tonic::service::LayerExt;
+
 fn main() {
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
@@ -52,16 +53,11 @@ fn main() {
                 .allow_headers(tower_http::cors::Any)
                 .allow_methods(tower_http::cors::Any);
 
-            // .into_inner();
-            // .named_layer(CameraServiceServer::new(greeter));
-
             Server::builder()
                 .accept_http1(true)
                 .layer(allow_cors)
                 .layer(GrpcWebLayer::new())
-                // .add_service(greeter)
                 .add_service(CameraServiceServer::new(camera_service))
-                // .add_service(greeter)
                 .serve(addr)
                 .await
                 .unwrap();

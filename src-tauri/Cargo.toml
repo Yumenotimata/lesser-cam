@@ -25,9 +25,15 @@ tonic = "0.14.2"
 tonic-web = "0.14.2"
 tower-http = { version = "0.6.8", features = ["full"] }
 tonic-prost = "0.14.2"
+opencv = "0.97.2"
 
 [features]
 # This feature is used for production builds
 # or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies.pyo3]
+version = "0.27.1"
+# this is necessary to automatically initialize the Python interpreter
+features = ["auto-initialize"]

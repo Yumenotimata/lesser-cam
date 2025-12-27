@@ -37,8 +37,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "Tauri Elm App",
-        "width": 600,
-        "height": 200
+        "width": 1200,
+        "height": 700
       }
     ]
   }
