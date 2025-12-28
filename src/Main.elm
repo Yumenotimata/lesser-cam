@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 -- import Css
 
@@ -14,13 +14,16 @@ import Svg.Attributes as SA
 import Task
 
 
+port testReceiver : (String -> msg) -> Sub msg
+
+
 main : Program () Model Msg
 main =
     Browser.element
         { init = init
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -34,6 +37,7 @@ type alias Model =
 type Msg
     = Select String
     | GotCameraList (Result Grpc.Error Proto.Camera.GetCameraListResponse)
+    | Recv String
 
 
 init : () -> ( Model, Cmd Msg )
@@ -62,6 +66,9 @@ update msg model =
                 Err error ->
                     ( { model | message = "some error" }, Cmd.none )
 
+        Recv recv ->
+            ( { model | message = recv }, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -83,7 +90,8 @@ view model =
         --         ]
         --     ]
         -- ]
-        [ div [ class "flex gap-2 p-2 h-screen" ]
+        [ text model.message
+        , div [ class "flex gap-2 p-2 h-screen" ]
             [ --     selectView model.cameraList |> Html.map Select
               -- , buttonView ()
               div [ class "card w-3/4 p-6 flex flex-col items-center" ]
@@ -121,6 +129,11 @@ view model =
                 ]
             ]
         ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    testReceiver Recv
 
 
 selectView : List String -> Html String

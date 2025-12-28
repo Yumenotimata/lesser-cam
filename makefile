@@ -2,29 +2,27 @@
 help: makefile
 	@tail -n +4 makefile | grep ".PHONY"
 
-
 node_modules: package.json bun.lockb
 	bun install
 
+tauri_js: src/js/webrtc.js
+	bun build src/js/webrtc.js --outfile dist/webrtc.js
 
 .PHONY: dev
-dev: node_modules
+dev: node_modules tauri_js
 	npx concurrently \
 		"npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --watch" \
 		"bun x tauri dev"
 
-
 .PHONY: dev-elm
 dev-elm:
 	bun x elm-watch hot
-
 
 dist/main.js: src/Main.elm | node_modules
 	# Use bun if available
 	command -v bun >/dev/null \
 		&& bun x elm-watch make --optimize \
 		|| npx elm-watch make --optimize
-
 
 .PHONY: build
 # Prerequisites are built by Tauri
