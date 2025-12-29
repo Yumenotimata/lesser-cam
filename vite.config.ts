@@ -1,5 +1,9 @@
 import { defineConfig } from "vite";
 
+// Viteの挙動
+// https://zenn.dev/sykmhmh/articles/ff09bea2cf7026
+// デフォルトでこのconfigと同じ階層にあるindex.htmlをエントリポイントとし、そこで依存しているリソースをバンドルしてくれる
+
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
@@ -17,10 +21,10 @@ export default defineConfig(async () => ({
     host: host || false,
     hmr: host
       ? {
-          protocol: "ws",
-          host,
-          port: 1421,
-        }
+        protocol: "ws",
+        host,
+        port: 1421,
+      }
       : undefined,
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
