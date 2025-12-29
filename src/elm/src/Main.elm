@@ -1,7 +1,8 @@
 port module Main exposing (..)
 
 import Browser
-import Html exposing (Html, text)
+import Html exposing (Html, text, div)
+import Html.Attributes exposing (class)
 
 port tauri : String -> Cmd msg
 
@@ -30,7 +31,7 @@ main =
 
 view : Model -> Html Msg
 view model =
-    text "Hello Elm"
+    div [ class "text-3xl" ] [ text "Hello Elm" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
