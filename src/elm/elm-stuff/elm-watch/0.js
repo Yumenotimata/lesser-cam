@@ -5201,7 +5201,7 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('text-3xl')
+				$elm$html$Html$Attributes$class('btn')
 			]),
 		_List_fromArray(
 			[

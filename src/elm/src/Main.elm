@@ -31,7 +31,7 @@ main =
 
 view : Model -> Html Msg
 view model =
-    div [ class "text-3xl" ] [ text "Hello Elm" ]
+    div [ class "btn" ] [ text "Hello Elm" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
