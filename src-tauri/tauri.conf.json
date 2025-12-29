@@ -3,7 +3,8 @@
     "beforeDevCommand": "make dev-elm",
     "beforeBuildCommand": "make dist/main.js",
     "devPath": "http://localhost:53023",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "tauri-elm-app",

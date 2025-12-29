@@ -1,11 +1,13 @@
-import { listen } from '@tauri-apps/api/event';
-import { invoke } from "@tauri-apps/api/core";
+// import { listen } from '@tauri-apps/api/event';
+// import { invoke } from "@tauri-apps/api/core";
+const { invoke } = window.__TAURI__.tauri;
+
 
 // listen('sdp-offer', (event) => {
 
 // });
 setInterval(() => {
-    app.ports.testReceiver.send("ff" + JSON.stringify(window.__TAURI_INTERNALS__));
+    app.ports.testReceiver.send("ff" + JSON.stringify(window.__TAURI__));
 }, 1000);
 
 
