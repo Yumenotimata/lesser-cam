@@ -1,24 +1,27 @@
 <!doctype html>
-<html lang="en">
+<!-- shadcn/uiのダークモード有効化 -->
+<html lang="en" class="dark">
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="/src/styles.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>less-i-cam</title>
-
-  <script type="module" src="/src/js/main.ts" defer></script>
+  <link rel="stylesheet" href="/output.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/basecoat.cdn.min.css">
   <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/basecoat.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/dropdown-menu.min.js" defer></script>
+  <script type="module" src="/src/ts/main.ts" defer></script>
   <script src="elm.js"></script>
 </head>
 
 <body>
-  <div id="root"></div>
-  <script>
-    let app = Elm.Main.init({ node: document.getElementById("root") });
-  </script>
+  <div class="dark:bg-black h-screen">
+    <div id="root"></div>
+    <script>
+      let app = Elm.Main.init({ node: document.getElementById("root") });
+      console.log('here');
+    </script>
+  </div>
 </body>
 
 </html>

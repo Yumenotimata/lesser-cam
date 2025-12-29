@@ -5167,24 +5167,46 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$tauri = _Platform_outgoingPort('tauri', $elm$json$Json$Encode$string);
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		_Utils_Tuple0,
-		$author$project$Main$tauri('Hello, Elm'));
-};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (model) {
-	return $elm$core$Platform$Sub$none;
-};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$init = function (_v0) {
+	var task = $elm$core$Platform$Cmd$none;
+	return _Utils_Tuple2(
+		{cameraList: _List_Nil, counter: 0, message: ''},
+		task);
+};
+var $author$project$Main$Recv = function (a) {
+	return {$: 'Recv', a: a};
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$testReceiver = _Platform_incomingPort('testReceiver', $elm$json$Json$Decode$string);
+var $author$project$Main$subscriptions = function (model) {
+	return $author$project$Main$testReceiver($author$project$Main$Recv);
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		if (msg.$ === 'Select') {
+			var value = msg.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{message: value}),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var recv = msg.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{message: recv}),
+				$elm$core$Platform$Cmd$none);
+		}
 	});
+var $author$project$Main$Select = function (a) {
+	return {$: 'Select', a: a};
+};
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5193,19 +5215,242 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$html$Html$section = _VirtualDom_node('section');
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$core$List$singleton = function (value) {
+	return _List_fromArray(
+		[value]);
+};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$selectView = function (options) {
+	return A2(
+		$elm$html$Html$select,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('select w-full'),
+				$elm$html$Html$Events$onInput($elm$core$Basics$identity)
+			]),
+		A2(
+			$elm$core$List$map,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$html$Html$text,
+				A2(
+					$elm$core$Basics$composeR,
+					$elm$core$List$singleton,
+					$elm$html$Html$option(_List_Nil))),
+			options));
+};
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$xmlBase = A2(_VirtualDom_attributeNS, 'http://www.w3.org/XML/1998/namespace', 'xml:base');
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('btn')
+				$elm$html$Html$Attributes$class('overflow-hidden')
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text('Hello Elm')
+				$elm$html$Html$text(model.message),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('flex gap-2 p-2 h-screen')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card w-3/4 p-6 flex flex-col items-center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('text-xs mt-1')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('カメラソースを選択してください')
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('card w-1/4 px-4 pb-4 pt-4 flex flex-col')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('flex items-center gap-2')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$svg,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xmlBase('http://www.w3.org/2000/svg'),
+												$elm$svg$Svg$Attributes$width('24'),
+												$elm$svg$Svg$Attributes$height('24'),
+												$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+												$elm$svg$Svg$Attributes$fill('none'),
+												$elm$svg$Svg$Attributes$stroke('currentColor'),
+												$elm$svg$Svg$Attributes$strokeWidth('2'),
+												$elm$svg$Svg$Attributes$strokeLinecap('round'),
+												$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+												$elm$svg$Svg$Attributes$class('lucide lucide-settings2-icon lucide-settings-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$svg$Svg$circle,
+												_List_fromArray(
+													[
+														$elm$svg$Svg$Attributes$cx('17'),
+														$elm$svg$Svg$Attributes$cy('17'),
+														$elm$svg$Svg$Attributes$r('3')
+													]),
+												_List_Nil),
+												A2(
+												$elm$svg$Svg$circle,
+												_List_fromArray(
+													[
+														$elm$svg$Svg$Attributes$cx('7'),
+														$elm$svg$Svg$Attributes$cy('7'),
+														$elm$svg$Svg$Attributes$r('3')
+													]),
+												_List_Nil),
+												A2(
+												$elm$svg$Svg$path,
+												_List_fromArray(
+													[
+														$elm$svg$Svg$Attributes$d('M14 17H5')
+													]),
+												_List_Nil),
+												A2(
+												$elm$svg$Svg$path,
+												_List_fromArray(
+													[
+														$elm$svg$Svg$Attributes$d('M19 7h-9')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$h2,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('text-left text-lg font-semibold')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('設定')
+											]))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('w-full grid gap-2')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$section,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('flex flex-col gap-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$label,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('label')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('入力デバイス')
+													])),
+												A2(
+												$elm$html$Html$map,
+												$author$project$Main$Select,
+												$author$project$Main$selectView(model.cameraList))
+											]))
+									]))
+							]))
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
