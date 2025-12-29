@@ -1,8 +1,9 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Html exposing (Html, text)
 
+port tauri : String -> Cmd msg
 
 type alias Model =
     ()
@@ -14,7 +15,7 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( (), Cmd.none )
+    ( (), tauri "Hello, Elm" )
 
 
 main : Program () Model Msg
@@ -29,7 +30,7 @@ main =
 
 view : Model -> Html Msg
 view model =
-    text "Hello World"
+    text "Hello Elm"
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
