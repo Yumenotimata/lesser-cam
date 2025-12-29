@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "7593e59a-aad6-401d-a6b3-2c0bafd97d1e";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1766987579663"
+    "1767007426209"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7852,7 +7852,397 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $elm$core$Basics$EQ = {$: 'EQ'};
+
+
+// BYTES
+
+function _Bytes_width(bytes)
+{
+	return bytes.byteLength;
+}
+
+var _Bytes_getHostEndianness = F2(function(le, be)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(new Uint8Array(new Uint32Array([1]))[0] === 1 ? le : be));
+	});
+});
+
+
+// ENCODERS
+
+function _Bytes_encode(encoder)
+{
+	var mutableBytes = new DataView(new ArrayBuffer($elm$bytes$Bytes$Encode$getWidth(encoder)));
+	$elm$bytes$Bytes$Encode$write(encoder)(mutableBytes)(0);
+	return mutableBytes;
+}
+
+
+// SIGNED INTEGERS
+
+var _Bytes_write_i8  = F3(function(mb, i, n) { mb.setInt8(i, n); return i + 1; });
+var _Bytes_write_i16 = F4(function(mb, i, n, isLE) { mb.setInt16(i, n, isLE); return i + 2; });
+var _Bytes_write_i32 = F4(function(mb, i, n, isLE) { mb.setInt32(i, n, isLE); return i + 4; });
+
+
+// UNSIGNED INTEGERS
+
+var _Bytes_write_u8  = F3(function(mb, i, n) { mb.setUint8(i, n); return i + 1 ;});
+var _Bytes_write_u16 = F4(function(mb, i, n, isLE) { mb.setUint16(i, n, isLE); return i + 2; });
+var _Bytes_write_u32 = F4(function(mb, i, n, isLE) { mb.setUint32(i, n, isLE); return i + 4; });
+
+
+// FLOATS
+
+var _Bytes_write_f32 = F4(function(mb, i, n, isLE) { mb.setFloat32(i, n, isLE); return i + 4; });
+var _Bytes_write_f64 = F4(function(mb, i, n, isLE) { mb.setFloat64(i, n, isLE); return i + 8; });
+
+
+// BYTES
+
+var _Bytes_write_bytes = F3(function(mb, offset, bytes)
+{
+	for (var i = 0, len = bytes.byteLength, limit = len - 4; i <= limit; i += 4)
+	{
+		mb.setUint32(offset + i, bytes.getUint32(i));
+	}
+	for (; i < len; i++)
+	{
+		mb.setUint8(offset + i, bytes.getUint8(i));
+	}
+	return offset + len;
+});
+
+
+// STRINGS
+
+function _Bytes_getStringWidth(string)
+{
+	for (var width = 0, i = 0; i < string.length; i++)
+	{
+		var code = string.charCodeAt(i);
+		width +=
+			(code < 0x80) ? 1 :
+			(code < 0x800) ? 2 :
+			(code < 0xD800 || 0xDBFF < code) ? 3 : (i++, 4);
+	}
+	return width;
+}
+
+var _Bytes_write_string = F3(function(mb, offset, string)
+{
+	for (var i = 0; i < string.length; i++)
+	{
+		var code = string.charCodeAt(i);
+		offset +=
+			(code < 0x80)
+				? (mb.setUint8(offset, code)
+				, 1
+				)
+				:
+			(code < 0x800)
+				? (mb.setUint16(offset, 0xC080 /* 0b1100000010000000 */
+					| (code >>> 6 & 0x1F /* 0b00011111 */) << 8
+					| code & 0x3F /* 0b00111111 */)
+				, 2
+				)
+				:
+			(code < 0xD800 || 0xDBFF < code)
+				? (mb.setUint16(offset, 0xE080 /* 0b1110000010000000 */
+					| (code >>> 12 & 0xF /* 0b00001111 */) << 8
+					| code >>> 6 & 0x3F /* 0b00111111 */)
+				, mb.setUint8(offset + 2, 0x80 /* 0b10000000 */
+					| code & 0x3F /* 0b00111111 */)
+				, 3
+				)
+				:
+			(code = (code - 0xD800) * 0x400 + string.charCodeAt(++i) - 0xDC00 + 0x10000
+			, mb.setUint32(offset, 0xF0808080 /* 0b11110000100000001000000010000000 */
+				| (code >>> 18 & 0x7 /* 0b00000111 */) << 24
+				| (code >>> 12 & 0x3F /* 0b00111111 */) << 16
+				| (code >>> 6 & 0x3F /* 0b00111111 */) << 8
+				| code & 0x3F /* 0b00111111 */)
+			, 4
+			);
+	}
+	return offset;
+});
+
+
+// DECODER
+
+var _Bytes_decode = F2(function(decoder, bytes)
+{
+	try {
+		return $elm$core$Maybe$Just(A2(decoder, bytes, 0).b);
+	} catch(e) {
+		return $elm$core$Maybe$Nothing;
+	}
+});
+
+var _Bytes_read_i8  = F2(function(      bytes, offset) { return _Utils_Tuple2(offset + 1, bytes.getInt8(offset)); });
+var _Bytes_read_i16 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 2, bytes.getInt16(offset, isLE)); });
+var _Bytes_read_i32 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 4, bytes.getInt32(offset, isLE)); });
+var _Bytes_read_u8  = F2(function(      bytes, offset) { return _Utils_Tuple2(offset + 1, bytes.getUint8(offset)); });
+var _Bytes_read_u16 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 2, bytes.getUint16(offset, isLE)); });
+var _Bytes_read_u32 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 4, bytes.getUint32(offset, isLE)); });
+var _Bytes_read_f32 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 4, bytes.getFloat32(offset, isLE)); });
+var _Bytes_read_f64 = F3(function(isLE, bytes, offset) { return _Utils_Tuple2(offset + 8, bytes.getFloat64(offset, isLE)); });
+
+var _Bytes_read_bytes = F3(function(len, bytes, offset)
+{
+	return _Utils_Tuple2(offset + len, new DataView(bytes.buffer, bytes.byteOffset + offset, len));
+});
+
+var _Bytes_read_string = F3(function(len, bytes, offset)
+{
+	var string = '';
+	var end = offset + len;
+	for (; offset < end;)
+	{
+		var byte = bytes.getUint8(offset++);
+		string +=
+			(byte < 128)
+				? String.fromCharCode(byte)
+				:
+			((byte & 0xE0 /* 0b11100000 */) === 0xC0 /* 0b11000000 */)
+				? String.fromCharCode((byte & 0x1F /* 0b00011111 */) << 6 | bytes.getUint8(offset++) & 0x3F /* 0b00111111 */)
+				:
+			((byte & 0xF0 /* 0b11110000 */) === 0xE0 /* 0b11100000 */)
+				? String.fromCharCode(
+					(byte & 0xF /* 0b00001111 */) << 12
+					| (bytes.getUint8(offset++) & 0x3F /* 0b00111111 */) << 6
+					| bytes.getUint8(offset++) & 0x3F /* 0b00111111 */
+				)
+				:
+				(byte =
+					((byte & 0x7 /* 0b00000111 */) << 18
+						| (bytes.getUint8(offset++) & 0x3F /* 0b00111111 */) << 12
+						| (bytes.getUint8(offset++) & 0x3F /* 0b00111111 */) << 6
+						| bytes.getUint8(offset++) & 0x3F /* 0b00111111 */
+					) - 0x10000
+				, String.fromCharCode(Math.floor(byte / 0x400) + 0xD800, byte % 0x400 + 0xDC00)
+				);
+	}
+	return _Utils_Tuple2(offset, string);
+});
+
+var _Bytes_decodeFailure = F2(function() { throw 0; });
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+
+
+
+// SEND REQUEST
+
+var _Http_toTask = F3(function(router, toTask, request)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		function done(response) {
+			callback(toTask(request.expect.a(response)));
+		}
+
+		var xhr = new XMLHttpRequest();
+		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
+		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.expect.b, xhr)); });
+		$elm$core$Maybe$isJust(request.tracker) && _Http_track(router, xhr, request.tracker.a);
+
+		try {
+			xhr.open(request.method, request.url, true);
+		} catch (e) {
+			return done($elm$http$Http$BadUrl_(request.url));
+		}
+
+		_Http_configureRequest(xhr, request);
+
+		request.body.a && xhr.setRequestHeader('Content-Type', request.body.a);
+		xhr.send(request.body.b);
+
+		return function() { xhr.c = true; xhr.abort(); };
+	});
+});
+
+
+// CONFIGURE
+
+function _Http_configureRequest(xhr, request)
+{
+	for (var headers = request.headers; headers.b; headers = headers.b) // WHILE_CONS
+	{
+		xhr.setRequestHeader(headers.a.a, headers.a.b);
+	}
+	xhr.timeout = request.timeout.a || 0;
+	xhr.responseType = request.expect.d;
+	xhr.withCredentials = request.allowCookiesFromOtherDomains;
+}
+
+
+// RESPONSES
+
+function _Http_toResponse(toBody, xhr)
+{
+	return A2(
+		200 <= xhr.status && xhr.status < 300 ? $elm$http$Http$GoodStatus_ : $elm$http$Http$BadStatus_,
+		_Http_toMetadata(xhr),
+		toBody(xhr.response)
+	);
+}
+
+
+// METADATA
+
+function _Http_toMetadata(xhr)
+{
+	return {
+		url: xhr.responseURL,
+		statusCode: xhr.status,
+		statusText: xhr.statusText,
+		headers: _Http_parseHeaders(xhr.getAllResponseHeaders())
+	};
+}
+
+
+// HEADERS
+
+function _Http_parseHeaders(rawHeaders)
+{
+	if (!rawHeaders)
+	{
+		return $elm$core$Dict$empty;
+	}
+
+	var headers = $elm$core$Dict$empty;
+	var headerPairs = rawHeaders.split('\r\n');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf(': ');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3($elm$core$Dict$update, key, function(oldValue) {
+				return $elm$core$Maybe$Just($elm$core$Maybe$isJust(oldValue)
+					? value + ', ' + oldValue.a
+					: value
+				);
+			}, headers);
+		}
+	}
+	return headers;
+}
+
+
+// EXPECT
+
+var _Http_expect = F3(function(type, toBody, toValue)
+{
+	return {
+		$: 0,
+		d: type,
+		b: toBody,
+		a: toValue
+	};
+});
+
+var _Http_mapExpect = F2(function(func, expect)
+{
+	return {
+		$: 0,
+		d: expect.d,
+		b: expect.b,
+		a: function(x) { return func(expect.a(x)); }
+	};
+});
+
+function _Http_toDataView(arrayBuffer)
+{
+	return new DataView(arrayBuffer);
+}
+
+
+// BODY and PARTS
+
+var _Http_emptyBody = { $: 0 };
+var _Http_pair = F2(function(a, b) { return { $: 0, a: a, b: b }; });
+
+function _Http_toFormData(parts)
+{
+	for (var formData = new FormData(); parts.b; parts = parts.b) // WHILE_CONS
+	{
+		var part = parts.a;
+		formData.append(part.a, part.b);
+	}
+	return formData;
+}
+
+var _Http_bytesToBlob = F2(function(mime, bytes)
+{
+	return new Blob([bytes], { type: mime });
+});
+
+
+// PROGRESS
+
+function _Http_track(router, xhr, tracker)
+{
+	// TODO check out lengthComputable on loadstart event
+
+	xhr.upload.addEventListener('progress', function(event) {
+		if (xhr.c) { return; }
+		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
+			sent: event.loaded,
+			size: event.total
+		}))));
+	});
+	xhr.addEventListener('progress', function(event) {
+		if (xhr.c) { return; }
+		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
+			received: event.loaded,
+			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+		}))));
+	});
+}var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
@@ -8641,10 +9031,1774 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$GotCameraList = function (a) {
+	return {$: 'GotCameraList', a: a};
+};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetCameraListRequest = {};
+var $author$project$Proto$Camera$defaultGetCameraListRequest = $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetCameraListRequest;
+var $anmolitor$elm_grpc$Grpc$Internal$Rpc = function (a) {
+	return {$: 'Rpc', a: a};
+};
+var $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetCameraListResponse = {cameraList: _List_Nil};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$Decoder = function (a) {
+	return {$: 'Decoder', a: a};
+};
+var $elm$bytes$Bytes$Encode$getWidth = function (builder) {
+	switch (builder.$) {
+		case 'I8':
+			return 1;
+		case 'I16':
+			return 2;
+		case 'I32':
+			return 4;
+		case 'U8':
+			return 1;
+		case 'U16':
+			return 2;
+		case 'U32':
+			return 4;
+		case 'F32':
+			return 4;
+		case 'F64':
+			return 8;
+		case 'Seq':
+			var w = builder.a;
+			return w;
+		case 'Utf8':
+			var w = builder.a;
+			return w;
+		default:
+			var bs = builder.a;
+			return _Bytes_width(bs);
+	}
+};
+var $elm$bytes$Bytes$LE = {$: 'LE'};
+var $elm$bytes$Bytes$Encode$write = F3(
+	function (builder, mb, offset) {
+		switch (builder.$) {
+			case 'I8':
+				var n = builder.a;
+				return A3(_Bytes_write_i8, mb, offset, n);
+			case 'I16':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_i16,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'I32':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_i32,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'U8':
+				var n = builder.a;
+				return A3(_Bytes_write_u8, mb, offset, n);
+			case 'U16':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_u16,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'U32':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_u32,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'F32':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_f32,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'F64':
+				var e = builder.a;
+				var n = builder.b;
+				return A4(
+					_Bytes_write_f64,
+					mb,
+					offset,
+					n,
+					_Utils_eq(e, $elm$bytes$Bytes$LE));
+			case 'Seq':
+				var bs = builder.b;
+				return A3($elm$bytes$Bytes$Encode$writeSequence, bs, mb, offset);
+			case 'Utf8':
+				var s = builder.b;
+				return A3(_Bytes_write_string, mb, offset, s);
+			default:
+				var bs = builder.a;
+				return A3(_Bytes_write_bytes, mb, offset, bs);
+		}
+	});
+var $elm$bytes$Bytes$Encode$writeSequence = F3(
+	function (builders, mb, offset) {
+		writeSequence:
+		while (true) {
+			if (!builders.b) {
+				return offset;
+			} else {
+				var b = builders.a;
+				var bs = builders.b;
+				var $temp$builders = bs,
+					$temp$mb = mb,
+					$temp$offset = A3($elm$bytes$Bytes$Encode$write, b, mb, offset);
+				builders = $temp$builders;
+				mb = $temp$mb;
+				offset = $temp$offset;
+				continue writeSequence;
+			}
+		}
+	});
+var $elm$bytes$Bytes$Decode$Decoder = function (a) {
+	return {$: 'Decoder', a: a};
+};
+var $elm$bytes$Bytes$Decode$fail = $elm$bytes$Bytes$Decode$Decoder(_Bytes_decodeFailure);
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$core$Set$Set_elm_builtin = function (a) {
+	return {$: 'Set_elm_builtin', a: a};
+};
+var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return $elm$core$Set$Set_elm_builtin(
+			A3($elm$core$Dict$insert, key, _Utils_Tuple0, dict));
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $elm$bytes$Bytes$Decode$loopHelp = F4(
+	function (state, callback, bites, offset) {
+		loopHelp:
+		while (true) {
+			var _v0 = callback(state);
+			var decoder = _v0.a;
+			var _v1 = A2(decoder, bites, offset);
+			var newOffset = _v1.a;
+			var step = _v1.b;
+			if (step.$ === 'Loop') {
+				var newState = step.a;
+				var $temp$state = newState,
+					$temp$callback = callback,
+					$temp$bites = bites,
+					$temp$offset = newOffset;
+				state = $temp$state;
+				callback = $temp$callback;
+				bites = $temp$bites;
+				offset = $temp$offset;
+				continue loopHelp;
+			} else {
+				var result = step.a;
+				return _Utils_Tuple2(newOffset, result);
+			}
+		}
+	});
+var $elm$bytes$Bytes$Decode$loop = F2(
+	function (state, callback) {
+		return $elm$bytes$Bytes$Decode$Decoder(
+			A2($elm$bytes$Bytes$Decode$loopHelp, state, callback));
+	});
+var $elm$core$Tuple$mapFirst = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			func(x),
+			y);
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
+	});
+var $elm$bytes$Bytes$Decode$Done = function (a) {
+	return {$: 'Done', a: a};
+};
+var $elm$bytes$Bytes$Decode$Loop = function (a) {
+	return {$: 'Loop', a: a};
+};
+var $elm$bytes$Bytes$Decode$andThen = F2(
+	function (callback, _v0) {
+		var decodeA = _v0.a;
+		return $elm$bytes$Bytes$Decode$Decoder(
+			F2(
+				function (bites, offset) {
+					var _v1 = A2(decodeA, bites, offset);
+					var newOffset = _v1.a;
+					var a = _v1.b;
+					var _v2 = callback(a);
+					var decodeB = _v2.a;
+					return A2(decodeB, bites, newOffset);
+				}));
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === 'RBEmpty_elm_builtin') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$Set$isEmpty = function (_v0) {
+	var dict = _v0.a;
+	return $elm$core$Dict$isEmpty(dict);
+};
+var $elm$bytes$Bytes$Decode$map = F2(
+	function (func, _v0) {
+		var decodeA = _v0.a;
+		return $elm$bytes$Bytes$Decode$Decoder(
+			F2(
+				function (bites, offset) {
+					var _v1 = A2(decodeA, bites, offset);
+					var aOffset = _v1.a;
+					var a = _v1.b;
+					return _Utils_Tuple2(
+						aOffset,
+						func(a));
+				}));
+	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_elm_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_elm_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_elm_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_elm_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_elm_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Set$remove = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return $elm$core$Set$Set_elm_builtin(
+			A2($elm$core$Dict$remove, key, dict));
+	});
+var $elm$bytes$Bytes$Decode$succeed = function (a) {
+	return $elm$bytes$Bytes$Decode$Decoder(
+		F2(
+			function (_v0, offset) {
+				return _Utils_Tuple2(offset, a);
+			}));
+};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$Bit32 = {$: 'Bit32'};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$Bit64 = {$: 'Bit64'};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$EndGroup = {$: 'EndGroup'};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited = function (a) {
+	return {$: 'LengthDelimited', a: a};
+};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$StartGroup = {$: 'StartGroup'};
+var $eriktim$elm_protocol_buffers$Internal$Protobuf$VarInt = {$: 'VarInt'};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Basics$pow = _Basics_pow;
+var $eriktim$elm_protocol_buffers$Internal$Int32$fromSigned = function (value) {
+	return (value < 0) ? (value + A2($elm$core$Basics$pow, 2, 32)) : value;
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $eriktim$elm_protocol_buffers$Internal$Int32$fromZigZag = function (value) {
+	return (value >>> 1) ^ ((-1) * (1 & value));
+};
+var $eriktim$elm_protocol_buffers$Internal$Int32$popBase128 = function (value) {
+	var higherBits = value >>> 7;
+	var base128 = 127 & value;
+	return _Utils_Tuple2(base128, higherBits);
+};
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $eriktim$elm_protocol_buffers$Internal$Int32$pushBase128 = F2(
+	function (base128, _int) {
+		return base128 + (_int << 7);
+	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $eriktim$elm_protocol_buffers$Internal$Int32$toSigned = function (value) {
+	return (_Utils_cmp(
+		value,
+		A2($elm$core$Basics$pow, 2, 31)) > -1) ? (value - A2($elm$core$Basics$pow, 2, 32)) : value;
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $eriktim$elm_protocol_buffers$Internal$Int32$toZigZag = function (value) {
+	return (value >> 31) ^ (value << 1);
+};
+var $eriktim$elm_protocol_buffers$Internal$Int32$operations = {fromBase128: $elm$core$Basics$identity, fromSigned: $eriktim$elm_protocol_buffers$Internal$Int32$fromSigned, fromZigZag: $eriktim$elm_protocol_buffers$Internal$Int32$fromZigZag, popBase128: $eriktim$elm_protocol_buffers$Internal$Int32$popBase128, pushBase128: $eriktim$elm_protocol_buffers$Internal$Int32$pushBase128, toSigned: $eriktim$elm_protocol_buffers$Internal$Int32$toSigned, toZigZag: $eriktim$elm_protocol_buffers$Internal$Int32$toZigZag};
+var $elm$bytes$Bytes$Decode$unsignedInt8 = $elm$bytes$Bytes$Decode$Decoder(_Bytes_read_u8);
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$varIntDecoder = function (config) {
+	return A2(
+		$elm$bytes$Bytes$Decode$andThen,
+		function (octet) {
+			return ((128 & octet) === 128) ? A2(
+				$elm$bytes$Bytes$Decode$map,
+				function (_v0) {
+					var usedBytes = _v0.a;
+					var value = _v0.b;
+					return _Utils_Tuple2(
+						usedBytes + 1,
+						A2(config.pushBase128, 127 & octet, value));
+				},
+				$eriktim$elm_protocol_buffers$Protobuf$Decode$varIntDecoder(config)) : $elm$bytes$Bytes$Decode$succeed(
+				_Utils_Tuple2(
+					1,
+					config.fromBase128(octet)));
+		},
+		$elm$bytes$Bytes$Decode$unsignedInt8);
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$tagDecoder = A2(
+	$elm$bytes$Bytes$Decode$andThen,
+	function (_v0) {
+		var usedBytes = _v0.a;
+		var value = _v0.b;
+		var fieldNumber = value >>> 3;
+		return A2(
+			$elm$bytes$Bytes$Decode$map,
+			function (_v1) {
+				var n = _v1.a;
+				var wireType = _v1.b;
+				return _Utils_Tuple2(
+					usedBytes + n,
+					_Utils_Tuple2(fieldNumber, wireType));
+			},
+			function () {
+				var _v2 = 7 & value;
+				switch (_v2) {
+					case 0:
+						return $elm$bytes$Bytes$Decode$succeed(
+							_Utils_Tuple2(0, $eriktim$elm_protocol_buffers$Internal$Protobuf$VarInt));
+					case 1:
+						return $elm$bytes$Bytes$Decode$succeed(
+							_Utils_Tuple2(0, $eriktim$elm_protocol_buffers$Internal$Protobuf$Bit64));
+					case 2:
+						return A2(
+							$elm$bytes$Bytes$Decode$map,
+							$elm$core$Tuple$mapSecond($eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited),
+							$eriktim$elm_protocol_buffers$Protobuf$Decode$varIntDecoder($eriktim$elm_protocol_buffers$Internal$Int32$operations));
+					case 3:
+						return $elm$bytes$Bytes$Decode$succeed(
+							_Utils_Tuple2(0, $eriktim$elm_protocol_buffers$Internal$Protobuf$StartGroup));
+					case 4:
+						return $elm$bytes$Bytes$Decode$succeed(
+							_Utils_Tuple2(0, $eriktim$elm_protocol_buffers$Internal$Protobuf$EndGroup));
+					case 5:
+						return $elm$bytes$Bytes$Decode$succeed(
+							_Utils_Tuple2(0, $eriktim$elm_protocol_buffers$Internal$Protobuf$Bit32));
+					default:
+						return $elm$bytes$Bytes$Decode$fail;
+				}
+			}());
+	},
+	$eriktim$elm_protocol_buffers$Protobuf$Decode$varIntDecoder($eriktim$elm_protocol_buffers$Internal$Int32$operations));
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $elm$bytes$Bytes$Decode$bytes = function (n) {
+	return $elm$bytes$Bytes$Decode$Decoder(
+		_Bytes_read_bytes(n));
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$unknownFieldDecoder = function (wireType) {
+	switch (wireType.$) {
+		case 'VarInt':
+			return A2(
+				$elm$bytes$Bytes$Decode$map,
+				$elm$core$Tuple$first,
+				$eriktim$elm_protocol_buffers$Protobuf$Decode$varIntDecoder($eriktim$elm_protocol_buffers$Internal$Int32$operations));
+		case 'Bit64':
+			return A2(
+				$elm$bytes$Bytes$Decode$map,
+				$elm$core$Basics$always(8),
+				$elm$bytes$Bytes$Decode$bytes(8));
+		case 'LengthDelimited':
+			var width = wireType.a;
+			return A2(
+				$elm$bytes$Bytes$Decode$map,
+				$elm$core$Basics$always(width),
+				$elm$bytes$Bytes$Decode$bytes(width));
+		case 'StartGroup':
+			return $elm$bytes$Bytes$Decode$fail;
+		case 'EndGroup':
+			return $elm$bytes$Bytes$Decode$fail;
+		default:
+			return A2(
+				$elm$bytes$Bytes$Decode$map,
+				$elm$core$Basics$always(4),
+				$elm$bytes$Bytes$Decode$bytes(4));
+	}
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$stepMessage = F2(
+	function (width, state) {
+		return (state.width <= 0) ? ($elm$core$Set$isEmpty(state.requiredFieldNumbers) ? $elm$bytes$Bytes$Decode$succeed(
+			$elm$bytes$Bytes$Decode$Done(
+				_Utils_Tuple2(width, state.model))) : $elm$bytes$Bytes$Decode$fail) : A2(
+			$elm$bytes$Bytes$Decode$andThen,
+			function (_v0) {
+				var usedBytes = _v0.a;
+				var _v1 = _v0.b;
+				var fieldNumber = _v1.a;
+				var wireType = _v1.b;
+				var _v2 = A2($elm$core$Dict$get, fieldNumber, state.dict);
+				if (_v2.$ === 'Just') {
+					var decoder = _v2.a.a;
+					return A2(
+						$elm$bytes$Bytes$Decode$map,
+						function (_v3) {
+							var n = _v3.a;
+							var fn = _v3.b;
+							return $elm$bytes$Bytes$Decode$Loop(
+								_Utils_update(
+									state,
+									{
+										model: fn(state.model),
+										requiredFieldNumbers: A2($elm$core$Set$remove, fieldNumber, state.requiredFieldNumbers),
+										width: (state.width - usedBytes) - n
+									}));
+						},
+						decoder(wireType));
+				} else {
+					return A2(
+						$elm$bytes$Bytes$Decode$map,
+						function (n) {
+							return $elm$bytes$Bytes$Decode$Loop(
+								_Utils_update(
+									state,
+									{width: (state.width - usedBytes) - n}));
+						},
+						$eriktim$elm_protocol_buffers$Protobuf$Decode$unknownFieldDecoder(wireType));
+				}
+			},
+			$eriktim$elm_protocol_buffers$Protobuf$Decode$tagDecoder);
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$message = F2(
+	function (v, fieldDecoders) {
+		var _v0 = A2(
+			$elm$core$Tuple$mapSecond,
+			$elm$core$Dict$fromList,
+			A2(
+				$elm$core$Tuple$mapFirst,
+				$elm$core$Set$fromList,
+				A3(
+					$elm$core$List$foldr,
+					F2(
+						function (_v1, _v2) {
+							var isRequired = _v1.a;
+							var items = _v1.b;
+							var numbers = _v2.a;
+							var decoders = _v2.b;
+							var numbers_ = isRequired ? _Utils_ap(
+								numbers,
+								A2($elm$core$List$map, $elm$core$Tuple$first, items)) : numbers;
+							return _Utils_Tuple2(
+								numbers_,
+								_Utils_ap(items, decoders));
+						}),
+					_Utils_Tuple2(_List_Nil, _List_Nil),
+					fieldDecoders)));
+		var requiredSet = _v0.a;
+		var dict = _v0.b;
+		return $eriktim$elm_protocol_buffers$Protobuf$Decode$Decoder(
+			function (wireType) {
+				if (wireType.$ === 'LengthDelimited') {
+					var width = wireType.a;
+					return A2(
+						$elm$bytes$Bytes$Decode$loop,
+						{dict: dict, model: v, requiredFieldNumbers: requiredSet, width: width},
+						$eriktim$elm_protocol_buffers$Protobuf$Decode$stepMessage(width));
+				} else {
+					return $elm$bytes$Bytes$Decode$fail;
+				}
+			});
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$FieldDecoder = F2(
+	function (a, b) {
+		return {$: 'FieldDecoder', a: a, b: b};
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$map = F2(
+	function (fn, _v0) {
+		var decoder = _v0.a;
+		return $eriktim$elm_protocol_buffers$Protobuf$Decode$Decoder(
+			function (wireType) {
+				return A2(
+					$elm$bytes$Bytes$Decode$map,
+					$elm$core$Tuple$mapSecond(fn),
+					decoder(wireType));
+			});
+	});
+var $elm$core$List$singleton = function (value) {
+	return _List_fromArray(
+		[value]);
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$stepPackedField = F3(
+	function (fullWidth, decoder, _v0) {
+		var width = _v0.a;
+		var values = _v0.b;
+		return A2(
+			$elm$bytes$Bytes$Decode$map,
+			function (_v1) {
+				var w = _v1.a;
+				var value = _v1.b;
+				var values_ = A2($elm$core$List$cons, value, values);
+				var bytesRemaining = width - w;
+				return (bytesRemaining <= 0) ? $elm$bytes$Bytes$Decode$Done(
+					_Utils_Tuple2(
+						fullWidth,
+						$elm$core$List$reverse(values_))) : $elm$bytes$Bytes$Decode$Loop(
+					_Utils_Tuple2(bytesRemaining, values_));
+			},
+			decoder);
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$repeated = F4(
+	function (fieldNumber, _v0, get, set) {
+		var decoder = _v0.a;
+		var update = F2(
+			function (value, model) {
+				return A2(
+					set,
+					_Utils_ap(
+						get(model),
+						value),
+					model);
+			});
+		var listDecoder = $eriktim$elm_protocol_buffers$Protobuf$Decode$Decoder(
+			function (wireType) {
+				if (wireType.$ === 'LengthDelimited') {
+					var width = wireType.a;
+					return A2(
+						$elm$bytes$Bytes$Decode$loop,
+						_Utils_Tuple2(width, _List_Nil),
+						A2(
+							$eriktim$elm_protocol_buffers$Protobuf$Decode$stepPackedField,
+							width,
+							decoder(wireType)));
+				} else {
+					return A2(
+						$elm$bytes$Bytes$Decode$map,
+						$elm$core$Tuple$mapSecond($elm$core$List$singleton),
+						decoder(wireType));
+				}
+			});
+		return A2(
+			$eriktim$elm_protocol_buffers$Protobuf$Decode$FieldDecoder,
+			false,
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					fieldNumber,
+					A2($eriktim$elm_protocol_buffers$Protobuf$Decode$map, update, listDecoder))
+				]));
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$lengthDelimitedDecoder = function (decoder) {
+	return $eriktim$elm_protocol_buffers$Protobuf$Decode$Decoder(
+		function (wireType) {
+			if (wireType.$ === 'LengthDelimited') {
+				var width = wireType.a;
+				return A2(
+					$elm$bytes$Bytes$Decode$map,
+					$elm$core$Tuple$pair(width),
+					decoder(width));
+			} else {
+				return $elm$bytes$Bytes$Decode$fail;
+			}
+		});
+};
+var $elm$bytes$Bytes$Decode$string = function (n) {
+	return $elm$bytes$Bytes$Decode$Decoder(
+		_Bytes_read_string(n));
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$string = $eriktim$elm_protocol_buffers$Protobuf$Decode$lengthDelimitedDecoder($elm$bytes$Bytes$Decode$string);
+var $author$project$Proto$Camera$Internals_$decodeProto__Camera__GetCameraListResponse = A2(
+	$eriktim$elm_protocol_buffers$Protobuf$Decode$message,
+	$author$project$Proto$Camera$Internals_$defaultProto__Camera__GetCameraListResponse,
+	_List_fromArray(
+		[
+			A4(
+			$eriktim$elm_protocol_buffers$Protobuf$Decode$repeated,
+			1,
+			$eriktim$elm_protocol_buffers$Protobuf$Decode$string,
+			function ($) {
+				return $.cameraList;
+			},
+			F2(
+				function (a, r) {
+					return _Utils_update(
+						r,
+						{cameraList: a});
+				}))
+		]));
+var $author$project$Proto$Camera$decodeGetCameraListResponse = $author$project$Proto$Camera$Internals_$decodeProto__Camera__GetCameraListResponse;
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$Encoder = F2(
+	function (a, b) {
+		return {$: 'Encoder', a: a, b: b};
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$bytes$Bytes$Encode$Seq = F2(
+	function (a, b) {
+		return {$: 'Seq', a: a, b: b};
+	});
+var $elm$bytes$Bytes$Encode$getWidths = F2(
+	function (width, builders) {
+		getWidths:
+		while (true) {
+			if (!builders.b) {
+				return width;
+			} else {
+				var b = builders.a;
+				var bs = builders.b;
+				var $temp$width = width + $elm$bytes$Bytes$Encode$getWidth(b),
+					$temp$builders = bs;
+				width = $temp$width;
+				builders = $temp$builders;
+				continue getWidths;
+			}
+		}
+	});
+var $elm$bytes$Bytes$Encode$sequence = function (builders) {
+	return A2(
+		$elm$bytes$Bytes$Encode$Seq,
+		A2($elm$bytes$Bytes$Encode$getWidths, 0, builders),
+		builders);
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence = function (items) {
+	var width = $elm$core$List$sum(
+		A2($elm$core$List$map, $elm$core$Tuple$first, items));
+	return _Utils_Tuple2(
+		width,
+		$elm$bytes$Bytes$Encode$sequence(
+			A2($elm$core$List$map, $elm$core$Tuple$second, items)));
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$Bitwise$or = _Bitwise_or;
+var $elm$bytes$Bytes$Encode$U8 = function (a) {
+	return {$: 'U8', a: a};
+};
+var $elm$bytes$Bytes$Encode$unsignedInt8 = $elm$bytes$Bytes$Encode$U8;
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$toVarIntEncoders = F2(
+	function (config, value) {
+		var _v0 = config.popBase128(value);
+		var base128 = _v0.a;
+		var higherBits = _v0.b;
+		return _Utils_eq(
+			higherBits,
+			config.fromBase128(0)) ? _List_fromArray(
+			[
+				$elm$bytes$Bytes$Encode$unsignedInt8(base128)
+			]) : A2(
+			$elm$core$List$cons,
+			$elm$bytes$Bytes$Encode$unsignedInt8(128 | base128),
+			A2($eriktim$elm_protocol_buffers$Protobuf$Encode$toVarIntEncoders, config, higherBits));
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$varInt = F2(
+	function (config, value) {
+		var encoders = A2($eriktim$elm_protocol_buffers$Protobuf$Encode$toVarIntEncoders, config, value);
+		return _Utils_Tuple2(
+			$elm$core$List$length(encoders),
+			$elm$bytes$Bytes$Encode$sequence(encoders));
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$varInt32 = $eriktim$elm_protocol_buffers$Protobuf$Encode$varInt($eriktim$elm_protocol_buffers$Internal$Int32$operations);
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$tag = F2(
+	function (fieldNumber, wireType) {
+		var encodeTag = function (base4) {
+			return $eriktim$elm_protocol_buffers$Protobuf$Encode$varInt32((fieldNumber << 3) | base4);
+		};
+		switch (wireType.$) {
+			case 'VarInt':
+				return encodeTag(0);
+			case 'Bit64':
+				return encodeTag(1);
+			case 'LengthDelimited':
+				var width = wireType.a;
+				return $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+					_List_fromArray(
+						[
+							encodeTag(2),
+							$eriktim$elm_protocol_buffers$Protobuf$Encode$varInt32(width)
+						]));
+			case 'StartGroup':
+				return encodeTag(3);
+			case 'EndGroup':
+				return encodeTag(4);
+			default:
+				return encodeTag(5);
+		}
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$unwrap = function (encoder) {
+	if (encoder.$ === 'Encoder') {
+		var encoder_ = encoder.b;
+		return $elm$core$Maybe$Just(encoder_);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$toPackedEncoder = function (encoders) {
+	if (encoders.b && (encoders.a.$ === 'Encoder')) {
+		var _v1 = encoders.a;
+		var wireType = _v1.a;
+		var encoder = _v1.b;
+		var others = encoders.b;
+		if (wireType.$ === 'LengthDelimited') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			return $elm$core$Maybe$Just(
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+					A2(
+						$elm$core$List$cons,
+						encoder,
+						A2($elm$core$List$filterMap, $eriktim$elm_protocol_buffers$Protobuf$Encode$unwrap, others))));
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$toKeyValuePairEncoder = function (_v0) {
+	var fieldNumber = _v0.a;
+	var encoder = _v0.b;
+	switch (encoder.$) {
+		case 'Encoder':
+			var wireType = encoder.a;
+			var encoder_ = encoder.b;
+			return $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+				_List_fromArray(
+					[
+						A2($eriktim$elm_protocol_buffers$Protobuf$Encode$tag, fieldNumber, wireType),
+						encoder_
+					]));
+		case 'ListEncoder':
+			var encoders = encoder.a;
+			var _v2 = $eriktim$elm_protocol_buffers$Protobuf$Encode$toPackedEncoder(encoders);
+			if (_v2.$ === 'Just') {
+				var encoder_ = _v2.a;
+				return $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+					_List_fromArray(
+						[
+							A2(
+							$eriktim$elm_protocol_buffers$Protobuf$Encode$tag,
+							fieldNumber,
+							$eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited(encoder_.a)),
+							encoder_
+						]));
+			} else {
+				return $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+					A2(
+						$elm$core$List$map,
+						A2(
+							$elm$core$Basics$composeL,
+							$eriktim$elm_protocol_buffers$Protobuf$Encode$toKeyValuePairEncoder,
+							$elm$core$Tuple$pair(fieldNumber)),
+						encoders));
+			}
+		default:
+			return $eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(_List_Nil);
+	}
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$message = function (items) {
+	return function (e) {
+		return A2(
+			$eriktim$elm_protocol_buffers$Protobuf$Encode$Encoder,
+			$eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited(e.a),
+			e);
+	}(
+		$eriktim$elm_protocol_buffers$Protobuf$Encode$sequence(
+			A2(
+				$elm$core$List$map,
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$toKeyValuePairEncoder,
+				A2($elm$core$List$sortBy, $elm$core$Tuple$first, items))));
+};
+var $author$project$Proto$Camera$Internals_$encodeProto__Camera__GetCameraListRequest = function (_v0) {
+	return $eriktim$elm_protocol_buffers$Protobuf$Encode$message(_List_Nil);
+};
+var $author$project$Proto$Camera$encodeGetCameraListRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__GetCameraListRequest;
+var $author$project$Proto$Camera$CameraService$getCameraList = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
+	{decoder: $author$project$Proto$Camera$decodeGetCameraListResponse, encoder: $author$project$Proto$Camera$encodeGetCameraListRequest, _package: 'camera', rpcName: 'GetCameraList', service: 'CameraService'});
+var $anmolitor$elm_grpc$Grpc$InternalRpcRequest = function (a) {
+	return {$: 'InternalRpcRequest', a: a};
+};
+var $anmolitor$elm_grpc$Grpc$grpcContentType = 'application/grpc-web+proto';
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $anmolitor$elm_grpc$Grpc$new = F2(
+	function (rpc, req) {
+		return $anmolitor$elm_grpc$Grpc$InternalRpcRequest(
+			{
+				body: req,
+				headers: _List_fromArray(
+					[
+						A2($elm$http$Http$header, 'accept', $anmolitor$elm_grpc$Grpc$grpcContentType)
+					]),
+				host: '',
+				risky: false,
+				rpc: rpc,
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing
+			});
+	});
+var $anmolitor$elm_grpc$Grpc$setHost = F2(
+	function (host, _v0) {
+		var req = _v0.a;
+		return $anmolitor$elm_grpc$Grpc$InternalRpcRequest(
+			_Utils_update(
+				req,
+				{host: host}));
+	});
+var $elm$http$Http$BadStatus_ = F2(
+	function (a, b) {
+		return {$: 'BadStatus_', a: a, b: b};
+	});
+var $elm$http$Http$BadUrl_ = function (a) {
+	return {$: 'BadUrl_', a: a};
+};
+var $elm$http$Http$GoodStatus_ = F2(
+	function (a, b) {
+		return {$: 'GoodStatus_', a: a, b: b};
+	});
+var $elm$http$Http$NetworkError_ = {$: 'NetworkError_'};
+var $elm$http$Http$Receiving = function (a) {
+	return {$: 'Receiving', a: a};
+};
+var $elm$http$Http$Sending = function (a) {
+	return {$: 'Sending', a: a};
+};
+var $elm$http$Http$Timeout_ = {$: 'Timeout_'};
+var $elm$core$Maybe$isJust = function (maybe) {
+	if (maybe.$ === 'Just') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$core$Dict$update = F3(
+	function (targetKey, alter, dictionary) {
+		var _v0 = alter(
+			A2($elm$core$Dict$get, targetKey, dictionary));
+		if (_v0.$ === 'Just') {
+			var value = _v0.a;
+			return A3($elm$core$Dict$insert, targetKey, value, dictionary);
+		} else {
+			return A2($elm$core$Dict$remove, targetKey, dictionary);
+		}
+	});
+var $elm$http$Http$bytesBody = _Http_pair;
+var $elm$http$Http$bytesResolver = A2(_Http_expect, 'arraybuffer', _Http_toDataView);
+var $elm$bytes$Bytes$Encode$Bytes = function (a) {
+	return {$: 'Bytes', a: a};
+};
+var $elm$bytes$Bytes$Encode$bytes = $elm$bytes$Bytes$Encode$Bytes;
+var $elm$bytes$Bytes$Encode$encode = _Bytes_encode;
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$encode = function (encoder) {
+	switch (encoder.$) {
+		case 'Encoder':
+			var _v1 = encoder.b;
+			var encoder_ = _v1.b;
+			return $elm$bytes$Bytes$Encode$encode(encoder_);
+		case 'ListEncoder':
+			var encoders = encoder.a;
+			return $elm$bytes$Bytes$Encode$encode(
+				$elm$bytes$Bytes$Encode$sequence(
+					A2(
+						$elm$core$List$map,
+						A2($elm$core$Basics$composeL, $elm$bytes$Bytes$Encode$bytes, $eriktim$elm_protocol_buffers$Protobuf$Encode$encode),
+						encoders)));
+		default:
+			return $elm$bytes$Bytes$Encode$encode(
+				$elm$bytes$Bytes$Encode$sequence(_List_Nil));
+	}
+};
+var $elm$bytes$Bytes$BE = {$: 'BE'};
+var $elm$bytes$Bytes$Encode$U32 = F2(
+	function (a, b) {
+		return {$: 'U32', a: a, b: b};
+	});
+var $elm$bytes$Bytes$Encode$unsignedInt32 = $elm$bytes$Bytes$Encode$U32;
+var $elm$bytes$Bytes$width = _Bytes_width;
+var $anmolitor$elm_grpc$Grpc$requestEncoder = function (message) {
+	var messageLength = $elm$bytes$Bytes$width(message);
+	return $elm$bytes$Bytes$Encode$sequence(
+		_List_fromArray(
+			[
+				$elm$bytes$Bytes$Encode$unsignedInt8(0),
+				A2($elm$bytes$Bytes$Encode$unsignedInt32, $elm$bytes$Bytes$BE, messageLength),
+				$elm$bytes$Bytes$Encode$bytes(message)
+			]));
+};
+var $anmolitor$elm_grpc$Grpc$frameRequest = function (binaryData) {
+	return $elm$bytes$Bytes$Encode$encode(
+		$anmolitor$elm_grpc$Grpc$requestEncoder(binaryData));
+};
+var $anmolitor$elm_grpc$Grpc$BadBody = function (a) {
+	return {$: 'BadBody', a: a};
+};
+var $anmolitor$elm_grpc$Grpc$BadStatus = function (a) {
+	return {$: 'BadStatus', a: a};
+};
+var $anmolitor$elm_grpc$Grpc$BadUrl = function (a) {
+	return {$: 'BadUrl', a: a};
+};
+var $anmolitor$elm_grpc$Grpc$NetworkError = {$: 'NetworkError'};
+var $anmolitor$elm_grpc$Grpc$Ok_ = {$: 'Ok_'};
+var $anmolitor$elm_grpc$Grpc$Timeout = {$: 'Timeout'};
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$bytes$Bytes$Decode$decode = F2(
+	function (_v0, bs) {
+		var decoder = _v0.a;
+		return A2(_Bytes_decode, decoder, bs);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $eriktim$elm_protocol_buffers$Protobuf$Decode$decode = F2(
+	function (_v0, bs) {
+		var decoder = _v0.a;
+		var wireType = $eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited(
+			$elm$bytes$Bytes$width(bs));
+		return A2(
+			$elm$core$Maybe$map,
+			$elm$core$Tuple$second,
+			A2(
+				$elm$bytes$Bytes$Decode$decode,
+				decoder(wireType),
+				bs));
+	});
+var $anmolitor$elm_grpc$Grpc$Aborted = {$: 'Aborted'};
+var $anmolitor$elm_grpc$Grpc$AlreadyExists = {$: 'AlreadyExists'};
+var $anmolitor$elm_grpc$Grpc$Cancelled = {$: 'Cancelled'};
+var $anmolitor$elm_grpc$Grpc$DataLoss = {$: 'DataLoss'};
+var $anmolitor$elm_grpc$Grpc$DeadlineExceeded = {$: 'DeadlineExceeded'};
+var $anmolitor$elm_grpc$Grpc$FailedPrecondition = {$: 'FailedPrecondition'};
+var $anmolitor$elm_grpc$Grpc$Internal = {$: 'Internal'};
+var $anmolitor$elm_grpc$Grpc$InvalidArgument = {$: 'InvalidArgument'};
+var $anmolitor$elm_grpc$Grpc$NotFound = {$: 'NotFound'};
+var $anmolitor$elm_grpc$Grpc$OutOfRange = {$: 'OutOfRange'};
+var $anmolitor$elm_grpc$Grpc$PermissionDenied = {$: 'PermissionDenied'};
+var $anmolitor$elm_grpc$Grpc$ResourceExhausted = {$: 'ResourceExhausted'};
+var $anmolitor$elm_grpc$Grpc$Unauthenticated = {$: 'Unauthenticated'};
+var $anmolitor$elm_grpc$Grpc$Unavailable = {$: 'Unavailable'};
+var $anmolitor$elm_grpc$Grpc$Unimplemented = {$: 'Unimplemented'};
+var $anmolitor$elm_grpc$Grpc$Unknown = {$: 'Unknown'};
+var $anmolitor$elm_grpc$Grpc$errCodeFromInt = function (n) {
+	switch (n) {
+		case 0:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Ok_);
+		case 1:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Cancelled);
+		case 2:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Unknown);
+		case 3:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$InvalidArgument);
+		case 4:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$DeadlineExceeded);
+		case 5:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$NotFound);
+		case 6:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$AlreadyExists);
+		case 7:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$PermissionDenied);
+		case 8:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$ResourceExhausted);
+		case 9:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$FailedPrecondition);
+		case 10:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Aborted);
+		case 11:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$OutOfRange);
+		case 12:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Unimplemented);
+		case 13:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Internal);
+		case 14:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Unavailable);
+		case 15:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$DataLoss);
+		case 16:
+			return $elm$core$Maybe$Just($anmolitor$elm_grpc$Grpc$Unauthenticated);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Result$fromMaybe = F2(
+	function (err, maybe) {
+		if (maybe.$ === 'Just') {
+			var v = maybe.a;
+			return $elm$core$Result$Ok(v);
+		} else {
+			return $elm$core$Result$Err(err);
+		}
+	});
+var $anmolitor$elm_grpc$Grpc$httpBadStatusToGrpcStatus = function (statusCode) {
+	switch (statusCode) {
+		case 400:
+			return $anmolitor$elm_grpc$Grpc$Internal;
+		case 401:
+			return $anmolitor$elm_grpc$Grpc$Unauthenticated;
+		case 403:
+			return $anmolitor$elm_grpc$Grpc$PermissionDenied;
+		case 404:
+			return $anmolitor$elm_grpc$Grpc$Unimplemented;
+		case 429:
+			return $anmolitor$elm_grpc$Grpc$Unavailable;
+		case 502:
+			return $anmolitor$elm_grpc$Grpc$Unavailable;
+		case 503:
+			return $anmolitor$elm_grpc$Grpc$Unavailable;
+		case 504:
+			return $anmolitor$elm_grpc$Grpc$Unavailable;
+		default:
+			return $anmolitor$elm_grpc$Grpc$Unknown;
+	}
+};
+var $anmolitor$elm_grpc$Grpc$Response = function (message) {
+	return {message: message};
+};
+var $elm$bytes$Bytes$Decode$map2 = F3(
+	function (func, _v0, _v1) {
+		var decodeA = _v0.a;
+		var decodeB = _v1.a;
+		return $elm$bytes$Bytes$Decode$Decoder(
+			F2(
+				function (bites, offset) {
+					var _v2 = A2(decodeA, bites, offset);
+					var aOffset = _v2.a;
+					var a = _v2.b;
+					var _v3 = A2(decodeB, bites, aOffset);
+					var bOffset = _v3.a;
+					var b = _v3.b;
+					return _Utils_Tuple2(
+						bOffset,
+						A2(func, a, b));
+				}));
+	});
+var $elm$bytes$Bytes$Decode$unsignedInt32 = function (endianness) {
+	return $elm$bytes$Bytes$Decode$Decoder(
+		_Bytes_read_u32(
+			_Utils_eq(endianness, $elm$bytes$Bytes$LE)));
+};
+var $anmolitor$elm_grpc$Grpc$responseDecoder = A3(
+	$elm$bytes$Bytes$Decode$map2,
+	function (_v0) {
+		return $anmolitor$elm_grpc$Grpc$Response;
+	},
+	$elm$bytes$Bytes$Decode$bytes(1),
+	A2(
+		$elm$bytes$Bytes$Decode$andThen,
+		$elm$bytes$Bytes$Decode$bytes,
+		$elm$bytes$Bytes$Decode$unsignedInt32($elm$bytes$Bytes$BE)));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $anmolitor$elm_grpc$Grpc$handleResponse = F2(
+	function (decoder, httpResponse) {
+		var parseResponse = F3(
+			function (isGoodStatus, metadata, bytes) {
+				var defaultGrpcStatus = isGoodStatus ? $anmolitor$elm_grpc$Grpc$Ok_ : $anmolitor$elm_grpc$Grpc$httpBadStatusToGrpcStatus(metadata.statusCode);
+				var grpcStatus = A2(
+					$elm$core$Maybe$withDefault,
+					defaultGrpcStatus,
+					A2(
+						$elm$core$Maybe$andThen,
+						$anmolitor$elm_grpc$Grpc$errCodeFromInt,
+						A2(
+							$elm$core$Maybe$andThen,
+							$elm$core$String$toInt,
+							A2($elm$core$Dict$get, 'grpc-status', metadata.headers))));
+				if (grpcStatus.$ === 'Ok_') {
+					return A2(
+						$elm$core$Result$fromMaybe,
+						$anmolitor$elm_grpc$Grpc$BadBody(bytes),
+						A2(
+							$elm$core$Maybe$andThen,
+							function (response) {
+								return A2($eriktim$elm_protocol_buffers$Protobuf$Decode$decode, decoder, response.message);
+							},
+							A2($elm$bytes$Bytes$Decode$decode, $anmolitor$elm_grpc$Grpc$responseDecoder, bytes)));
+				} else {
+					var errMessage = A2(
+						$elm$core$Maybe$withDefault,
+						metadata.statusText,
+						A2($elm$core$Dict$get, 'grpc-message', metadata.headers));
+					return $elm$core$Result$Err(
+						$anmolitor$elm_grpc$Grpc$BadStatus(
+							{errMessage: errMessage, metadata: metadata, response: bytes, status: grpcStatus}));
+				}
+			});
+		switch (httpResponse.$) {
+			case 'GoodStatus_':
+				var metadata = httpResponse.a;
+				var bytes = httpResponse.b;
+				return A3(parseResponse, true, metadata, bytes);
+			case 'BadUrl_':
+				var badUrl = httpResponse.a;
+				return $elm$core$Result$Err(
+					$anmolitor$elm_grpc$Grpc$BadUrl(badUrl));
+			case 'Timeout_':
+				return $elm$core$Result$Err($anmolitor$elm_grpc$Grpc$Timeout);
+			case 'NetworkError_':
+				return $elm$core$Result$Err($anmolitor$elm_grpc$Grpc$NetworkError);
+			default:
+				var metadata = httpResponse.a;
+				var bytes = httpResponse.b;
+				return A3(parseResponse, false, metadata, bytes);
+		}
+	});
+var $elm$core$Task$fail = _Scheduler_fail;
+var $elm$http$Http$resultToTask = function (result) {
+	if (result.$ === 'Ok') {
+		var a = result.a;
+		return $elm$core$Task$succeed(a);
+	} else {
+		var x = result.a;
+		return $elm$core$Task$fail(x);
+	}
+};
+var $elm$http$Http$riskyTask = function (r) {
+	return A3(
+		_Http_toTask,
+		_Utils_Tuple0,
+		$elm$http$Http$resultToTask,
+		{allowCookiesFromOtherDomains: true, body: r.body, expect: r.resolver, headers: r.headers, method: r.method, timeout: r.timeout, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $anmolitor$elm_grpc$Grpc$rpcPath = function (_v0) {
+	var service = _v0.a.service;
+	var _package = _v0.a._package;
+	var rpcName = _v0.a.rpcName;
+	return '/' + (($elm$core$String$isEmpty(_package) ? '' : (_package + '.')) + (service + ('/' + rpcName)));
+};
+var $elm$http$Http$task = function (r) {
+	return A3(
+		_Http_toTask,
+		_Utils_Tuple0,
+		$elm$http$Http$resultToTask,
+		{allowCookiesFromOtherDomains: false, body: r.body, expect: r.resolver, headers: r.headers, method: r.method, timeout: r.timeout, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $anmolitor$elm_grpc$Grpc$toTask = function (_v0) {
+	var req = _v0.a;
+	var toHttpTask = req.risky ? $elm$http$Http$riskyTask : $elm$http$Http$task;
+	var _v1 = req.rpc;
+	var rpc = _v1.a;
+	var body = A2(
+		$elm$http$Http$bytesBody,
+		$anmolitor$elm_grpc$Grpc$grpcContentType,
+		$anmolitor$elm_grpc$Grpc$frameRequest(
+			$eriktim$elm_protocol_buffers$Protobuf$Encode$encode(
+				rpc.encoder(req.body))));
+	return toHttpTask(
+		{
+			body: body,
+			headers: req.headers,
+			method: 'POST',
+			resolver: $elm$http$Http$bytesResolver(
+				$anmolitor$elm_grpc$Grpc$handleResponse(rpc.decoder)),
+			timeout: req.timeout,
+			url: _Utils_ap(
+				req.host,
+				$anmolitor$elm_grpc$Grpc$rpcPath(req.rpc))
+		});
+};
 var $author$project$Main$init = function (_v0) {
-	var task = $elm$core$Platform$Cmd$none;
+	var task = A2(
+		$elm$core$Task$attempt,
+		$author$project$Main$GotCameraList,
+		$anmolitor$elm_grpc$Grpc$toTask(
+			A2(
+				$anmolitor$elm_grpc$Grpc$setHost,
+				'http://localhost:50051',
+				A2($anmolitor$elm_grpc$Grpc$new, $author$project$Proto$Camera$CameraService$getCameraList, $author$project$Proto$Camera$defaultGetCameraListRequest))));
 	return _Utils_Tuple2(
 		{cameraList: _List_Nil, counter: 0, message: ''},
 		task);
@@ -8657,22 +10811,42 @@ var $author$project$Main$testReceiver = _Platform_incomingPort('testReceiver', $
 var $author$project$Main$subscriptions = function (model) {
 	return $author$project$Main$testReceiver($author$project$Main$Recv);
 };
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Select') {
-			var value = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{message: value}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var recv = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{message: recv}),
-				$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'Select':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{message: value}),
+					$elm$core$Platform$Cmd$none);
+			case 'GotCameraList':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var response = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{cameraList: response.cameraList}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{message: 'some error'}),
+						$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var recv = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{message: recv}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$Select = function (a) {
@@ -8744,10 +10918,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$html$Html$select = _VirtualDom_node('select');
-var $elm$core$List$singleton = function (value) {
-	return _List_fromArray(
-		[value]);
-};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$selectView = function (options) {

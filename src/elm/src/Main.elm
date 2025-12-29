@@ -3,12 +3,12 @@ port module Main exposing (..)
 -- import Css
 
 import Browser
--- import Grpc
+import Grpc
 import Html exposing (Html, button, div, form, h1, h2, h3, header, label, optgroup, option, p, section, select, text)
 import Html.Attributes as Attribute exposing (class, selected, style)
 import Html.Events exposing (onInput)
--- import Proto.Camera exposing (defaultGetCameraListRequest)
--- import Proto.Camera.CameraService exposing (getCameraList)
+import Proto.Camera exposing (defaultGetCameraListRequest)
+import Proto.Camera.CameraService exposing (getCameraList)
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -36,18 +36,18 @@ type alias Model =
 
 type Msg
     = Select String
-    -- | GotCameraList (Result Grpc.Error Proto.Camera.GetCameraListResponse)
+    | GotCameraList (Result Grpc.Error Proto.Camera.GetCameraListResponse)
     | Recv String
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
     let
-        task = Cmd.none
-            -- Grpc.new getCameraList defaultGetCameraListRequest
-            --     |> Grpc.setHost "http://localhost:50051"
-            --     |> Grpc.toTask
-            --     |> Task.attempt GotCameraList
+        task = 
+            Grpc.new getCameraList defaultGetCameraListRequest
+                |> Grpc.setHost "http://localhost:50051"
+                |> Grpc.toTask
+                |> Task.attempt GotCameraList
     in
     ( { counter = 0, message = "", cameraList = [] }, task )
 
@@ -58,13 +58,13 @@ update msg model =
         Select value ->
             ( { model | message = value }, Cmd.none )
 
-        -- GotCameraList result ->
-        --     case result of
-        --         Ok response ->
-        --             ( { model | cameraList = response.cameraList }, Cmd.none )
+        GotCameraList result ->
+            case result of
+                Ok response ->
+                    ( { model | cameraList = response.cameraList }, Cmd.none )
 
-        --         Err error ->
-        --             ( { model | message = "some error" }, Cmd.none )
+                Err error ->
+                    ( { model | message = "some error" }, Cmd.none )
 
         Recv recv ->
             ( { model | message = recv }, Cmd.none )

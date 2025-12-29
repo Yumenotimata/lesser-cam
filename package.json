@@ -17,6 +17,7 @@
     "@tauri-apps/plugin-opener": "^2",
     "elm-live": "^4.0.2",
     "elm-watch": "^1.2.3",
+    "protoc-gen-elm": "^4.0.4",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

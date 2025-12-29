@@ -6,3 +6,8 @@
     - https://ja.vite.dev/guide/assets#the-public-directory
 - 依存関係を除くのではなく、生成した後にディレクトリごと除去するという方法もあるらしい。なんにせよviteの依存関係除去はうまく動作させられないようだ
     - https://cofus.blog/posts/exclude-directories-under-public-when-building-with-vite
+
+## in project root, execute the following commands in terminal separatedly
+    - protoc --elm_out=src/elm/src proto/camera.proto
+    - npx elm-watch hot
+    - npm run tauri dev
