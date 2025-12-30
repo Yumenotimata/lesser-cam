@@ -7,9 +7,10 @@ import Bytes exposing (Endianness(..))
 import Bytes.Decode as Decode
 import Cmd.Extra as Cmd
 import Grpc
-import Html exposing (Html, button, canvas, div, form, h1, h2, h3, header, label, node, optgroup, option, p, section, select, text)
-import Html.Attributes as Attribute exposing (attribute, class, id, property, selected, style)
+import Html exposing (Html, button, canvas, div, form, h1, h2, h3, header, input, label, node, optgroup, option, p, section, select, text)
+import Html.Attributes as Attr exposing (attribute, class, id, property, selected, style)
 import Html.Events exposing (onInput)
+import Json.Decode exposing (map)
 import Json.Encode as E
 import Maybe exposing (withDefault)
 import Proto.Camera exposing (GetCameraListResponse, GetLatestCameraFrameResponse, defaultGetCameraListRequest, defaultGetLatestCameraFrameRequest)
@@ -36,12 +37,14 @@ type alias Model =
     , message : String
     , cameraList : List String
     , selectedCamera : Maybe String
+    , resolution : Float
     }
 
 
 type Msg
     = Select String
     | GotCameraList (Result Grpc.Error GetCameraListResponse)
+    | OnResolutionChange Float
 
 
 init : () -> ( Model, Cmd Msg )
@@ -53,7 +56,14 @@ init () =
                 |> Grpc.toTask
                 |> Task.attempt GotCameraList
     in
-    ( { counter = 0, message = "", cameraList = [], selectedCamera = Nothing }, task )
+    ( { counter = 0
+      , message = ""
+      , cameraList = []
+      , selectedCamera = Nothing
+      , resolution = 100
+      }
+    , task
+    )
 
 
 rpcCameraViewer rpcUrl cameraName =
@@ -65,9 +75,49 @@ rpcCameraViewer rpcUrl cameraName =
         , attribute "style" "width: 100%; height: 100%; display: block;"
         ]
         [ div [ class "w-full h-full" ]
-            [ canvas [ id "canvas", Attribute.style "width" "100%", Attribute.style "height" "100%" ] []
+            [ canvas [ id "canvas", style "width" "100%", style "height" "100%" ] []
             ]
         ]
+
+
+onFloatEvent : String -> (Float -> msg) -> Html.Attribute msg
+onFloatEvent eventName floatMsg =
+    let
+        inputText2FloatMsg : String -> msg
+        inputText2FloatMsg inputText =
+            floatMsg <| Maybe.withDefault 0.0 <| String.toFloat <| inputText
+    in
+    Html.Events.targetValue
+        |> map inputText2FloatMsg
+        |> Html.Events.on eventName
+
+
+onFloatChange : (Float -> msg) -> Html.Attribute msg
+onFloatChange floatMsg =
+    onFloatEvent "change" floatMsg
+
+
+onFloatInput : (Float -> msg) -> Html.Attribute msg
+onFloatInput floatMsg =
+    onFloatEvent "input" floatMsg
+
+
+sliderFloatView min max step value change =
+    Html.input
+        [ Attr.type_ "range"
+        , Attr.min <| String.fromFloat min
+        , Attr.max <| String.fromFloat max
+        , Attr.step <| String.fromFloat step
+
+        -- , Attr.value <| String.fromFloat value
+        -- , style "--slider-value" ("60" ++ "%")
+        , onFloatChange change
+        , onFloatInput change
+
+        -- , property "--slider-value" (E.string ("60" ++ "%"))
+        , class "input w-full"
+        ]
+        []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -97,6 +147,9 @@ update msg model =
                 Err error ->
                     ( { model | message = "some error" }, Cmd.none )
 
+        OnResolutionChange value ->
+            ( { model | resolution = value }, Cmd.none )
+
 
 sizedString : Decode.Decoder String
 sizedString =
@@ -107,7 +160,7 @@ sizedString =
 view : Model -> Html Msg
 view model =
     div [ class "flex w-screen h-screen overflow-hidden" ]
-        [ --     text (withDefault "no camera" model.selectedCamera)
+        [ --  text (String.fromFloat model.resolution)
           -- ,
           div [ class "flex w-full h-full gap-2 p-2" ]
             [ div
@@ -143,10 +196,16 @@ view model =
                         [ text "設定"
                         ]
                     ]
-                , div [ class "w-full grid gap-2" ]
+                , div [ class "w-ful flex flex-col gap-4" ]
                     [ section [ class "flex flex-col gap-2" ]
                         [ label [ class "label" ] [ text "入力デバイス" ]
                         , selectView model.cameraList |> Html.map Select
+                        ]
+                    , section [ class "flex flex-col gap-2" ]
+                        [ label [ class "label" ] [ text "解像度" ]
+
+                        -- , input [ class "input w-full", attribute "type" "range", attribute "min" "0", attribute "max" "100", attribute "value" (String.fromInt model.resolution) ] []
+                        , form [ class "form" ] [ sliderFloatView 0.0 100.0 1.0 model.resolution OnResolutionChange ]
                         ]
                     ]
                 ]

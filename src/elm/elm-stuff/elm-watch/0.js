@@ -7326,7 +7326,7 @@ var $author$project$Main$init = function (_v0) {
 				'http://localhost:50051',
 				A2($anmolitor$elm_grpc$Grpc$new, $author$project$Proto$Camera$CameraService$getCameraList, $author$project$Proto$Camera$defaultGetCameraListRequest))));
 	return _Utils_Tuple2(
-		{cameraList: _List_Nil, counter: 0, message: '', selectedCamera: $elm$core$Maybe$Nothing},
+		{cameraList: _List_Nil, counter: 0, message: '', resolution: 100, selectedCamera: $elm$core$Maybe$Nothing},
 		task);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -7354,48 +7354,59 @@ var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
 	$elm$core$Task$succeed);
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Select') {
-			var value = msg.a;
-			return $elm$core$String$isEmpty(value) ? _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{selectedCamera: $elm$core$Maybe$Nothing}),
-				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						selectedCamera: $elm$core$Maybe$Just(value)
-					}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var result = msg.a;
-			if (result.$ === 'Ok') {
-				var response = result.a;
-				var task = function () {
-					var _v2 = $elm$core$List$head(response.cameraList);
-					if (_v2.$ === 'Just') {
-						var cameraName = _v2.a;
-						return $GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
-							$author$project$Main$Select(cameraName));
-					} else {
-						return $elm$core$Platform$Cmd$none;
-					}
-				}();
-				return _Utils_Tuple2(
+		switch (msg.$) {
+			case 'Select':
+				var value = msg.a;
+				return $elm$core$String$isEmpty(value) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{cameraList: response.cameraList}),
-					task);
-			} else {
-				var error = result.a;
-				return _Utils_Tuple2(
+						{selectedCamera: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{message: 'some error'}),
+						{
+							selectedCamera: $elm$core$Maybe$Just(value)
+						}),
 					$elm$core$Platform$Cmd$none);
-			}
+			case 'GotCameraList':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var response = result.a;
+					var task = function () {
+						var _v2 = $elm$core$List$head(response.cameraList);
+						if (_v2.$ === 'Just') {
+							var cameraName = _v2.a;
+							return $GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+								$author$project$Main$Select(cameraName));
+						} else {
+							return $elm$core$Platform$Cmd$none;
+						}
+					}();
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{cameraList: response.cameraList}),
+						task);
+				} else {
+					var error = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{message: 'some error'}),
+						$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{resolution: value}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$OnResolutionChange = function (a) {
+	return {$: 'OnResolutionChange', a: a};
+};
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7413,6 +7424,7 @@ var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$html$Html$label = _VirtualDom_node('label');
@@ -7548,6 +7560,64 @@ var $author$project$Main$selectView = function (options) {
 					$elm$html$Html$option(_List_Nil))),
 			options));
 };
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
+var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Main$onFloatEvent = F2(
+	function (eventName, floatMsg) {
+		var inputText2FloatMsg = function (inputText) {
+			return floatMsg(
+				A2(
+					$elm$core$Maybe$withDefault,
+					0.0,
+					$elm$core$String$toFloat(inputText)));
+		};
+		return A2(
+			$elm$html$Html$Events$on,
+			eventName,
+			A2($elm$json$Json$Decode$map, inputText2FloatMsg, $elm$html$Html$Events$targetValue));
+	});
+var $author$project$Main$onFloatChange = function (floatMsg) {
+	return A2($author$project$Main$onFloatEvent, 'change', floatMsg);
+};
+var $author$project$Main$onFloatInput = function (floatMsg) {
+	return A2($author$project$Main$onFloatEvent, 'input', floatMsg);
+};
+var $elm$html$Html$Attributes$step = function (n) {
+	return A2($elm$html$Html$Attributes$stringProperty, 'step', n);
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$sliderFloatView = F5(
+	function (min, max, step, value, change) {
+		return A2(
+			$elm$html$Html$input,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$type_('range'),
+					$elm$html$Html$Attributes$min(
+					$elm$core$String$fromFloat(min)),
+					$elm$html$Html$Attributes$max(
+					$elm$core$String$fromFloat(max)),
+					$elm$html$Html$Attributes$step(
+					$elm$core$String$fromFloat(step)),
+					$author$project$Main$onFloatChange(change),
+					$author$project$Main$onFloatInput(change),
+					$elm$html$Html$Attributes$class('input w-full')
+				]),
+			_List_Nil);
+	});
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
 var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
@@ -7690,7 +7760,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('w-full grid gap-2')
+										$elm$html$Html$Attributes$class('w-ful flex flex-col gap-4')
 									]),
 								_List_fromArray(
 									[
@@ -7716,6 +7786,35 @@ var $author$project$Main$view = function (model) {
 												$elm$html$Html$map,
 												$author$project$Main$Select,
 												$author$project$Main$selectView(model.cameraList))
+											])),
+										A2(
+										$elm$html$Html$section,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('flex flex-col gap-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$label,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('label')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('解像度')
+													])),
+												A2(
+												$elm$html$Html$form,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('form')
+													]),
+												_List_fromArray(
+													[
+														A5($author$project$Main$sliderFloatView, 0.0, 100.0, 1.0, model.resolution, $author$project$Main$OnResolutionChange)
+													]))
 											]))
 									]))
 							]))

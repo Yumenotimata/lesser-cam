@@ -30,8 +30,16 @@ use tower_http::cors::CorsLayer;
 use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera};
 use ws::{connect, CloseCode};
 
+use crate::camera::{SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse};
+
+#[derive(Debug)]
+struct VirtualCameraConfig {
+    resolution_ratio: f32,
+}
+
 struct MyCameraServiceState {
     opend_camera_map: HashMap<String, Camera, BuildHasherDefault<FxHasher>>,
+    virtual_camera_configs: HashMap<String, VirtualCameraConfig>,
     available_camera_list: Vec<(i32, String)>,
 }
 
@@ -39,6 +47,7 @@ impl MyCameraServiceState {
     fn new() -> Self {
         Self {
             opend_camera_map: HashMap::default(),
+            virtual_camera_configs: HashMap::default(),
             available_camera_list: Vec::new(),
         }
     }
@@ -111,6 +120,29 @@ impl CameraService for MyCameraService {
         } else {
             Err(Status::not_found("camera not found"))
         }
+    }
+
+    async fn set_virtual_camera_config(
+        &self,
+        request: Request<SetVirtualCameraConfigRequest>,
+    ) -> Result<Response<SetVirtualCameraConfigResponse>, Status> {
+        let target_camera_name = request.get_ref().camera_name.clone();
+
+        let mut state = self.state.lock().await;
+        state
+            .virtual_camera_configs
+            .entry(target_camera_name)
+            .and_modify(|config| config.resolution_ratio = request.get_ref().resolution_ratio)
+            .or_insert_with(|| VirtualCameraConfig {
+                resolution_ratio: request.get_ref().resolution_ratio,
+            });
+
+        println!(
+            "set virtual camera config: {:?}",
+            state.virtual_camera_configs
+        );
+
+        Ok(Response::new(SetVirtualCameraConfigResponse {}))
     }
 }
 
