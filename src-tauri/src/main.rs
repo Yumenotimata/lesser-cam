@@ -11,7 +11,10 @@ use camera::{
 };
 use opencv::{core::Vector, imgcodecs};
 
-use std::{collections::HashMap, sync::mpsc, thread::sleep};
+use rustc_hash::FxHasher;
+use std::{collections::HashMap, hash::BuildHasherDefault, time::Instant};
+use std::{sync::mpsc, thread::sleep};
+
 use std::{sync::Arc, thread, time::Duration};
 
 use tauri::Event;
@@ -28,14 +31,14 @@ use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera};
 use ws::{connect, CloseCode};
 
 struct MyCameraServiceState {
-    opend_camera_map: HashMap<String, Camera>,
+    opend_camera_map: HashMap<String, Camera, BuildHasherDefault<FxHasher>>,
     available_camera_list: Vec<(i32, String)>,
     // camera: Camera,
 }
 
 impl MyCameraServiceState {
     fn new() -> Self {
-        let mut opend_camera_map = HashMap::new();
+        let mut opend_camera_map = HashMap::default();
         // opend_camera_map.insert("MacBook Air Camera".to_owned(), Camera::new(0).unwrap());
 
         Self {
