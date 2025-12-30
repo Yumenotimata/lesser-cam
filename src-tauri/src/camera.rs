@@ -7,6 +7,7 @@ use opencv::videoio::{VideoCapture, VideoCaptureTrait};
 use std::fs::File;
 use std::path::Path;
 
+#[derive(Debug)]
 pub struct Camera {
     vcap: VideoCapture,
 }

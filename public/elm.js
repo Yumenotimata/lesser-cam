@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "7593e59a-aad6-401d-a6b3-2c0bafd97d1e";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1767068691895"
+    "1767069423526"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10887,6 +10887,14 @@ var $elm$virtual_dom$VirtualDom$node = function (tag) {
 		_VirtualDom_noScript(tag));
 };
 var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $elm$virtual_dom$VirtualDom$property = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_property,
+			_VirtualDom_noInnerHtmlOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlJson(value));
+	});
+var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$rpcCameraViewer = F2(
@@ -10896,8 +10904,14 @@ var $author$project$Main$rpcCameraViewer = F2(
 			'elm-canvas',
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$attribute, 'rpcUrl', rpcUrl),
-					A2($elm$html$Html$Attributes$attribute, 'cameraName', cameraName),
+					A2(
+					$elm$html$Html$Attributes$property,
+					'rpcUrl',
+					$elm$json$Json$Encode$string(rpcUrl)),
+					A2(
+					$elm$html$Html$Attributes$property,
+					'cameraName',
+					$elm$json$Json$Encode$string(cameraName)),
 					A2($elm$html$Html$Attributes$attribute, 'style', 'width: 100%; height: 100%; display: block;')
 				]),
 			_List_fromArray(
@@ -11002,8 +11016,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(
-				A2($elm$core$Maybe$withDefault, 'no camera', model.selectedCamera)),
+				$elm$html$Html$text(model.message),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
