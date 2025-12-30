@@ -106,19 +106,19 @@ impl CameraService for MyCameraService {
         // show time stamp
         println!("{:?} {:?}", state.opend_camera_map, now);
 
-        // let camera = state
-        //     .opend_camera_map
-        //     .entry(target_camera_name)
-        //     .or_insert(Camera::new(0).unwrap());
+        let camera = state
+            .opend_camera_map
+            .entry(target_camera_name.clone())
+            .or_insert_with(|| Camera::new(0).unwrap());
 
         // let mut camera = &mut state.camera;
         // let camera = state.opend_camera_map.get_mut(&target_camera_name).unwrap();
 
-        if !state.opend_camera_map.contains_key(&target_camera_name) {
-            state
-                .opend_camera_map
-                .insert(target_camera_name.clone(), Camera::new(0).unwrap());
-        }
+        // if !state.opend_camera_map.contains_key(&target_camera_name) {
+        //     state
+        //         .opend_camera_map
+        //         .insert(target_camera_name.clone(), Camera::new(0).unwrap());
+        // }
 
         let camera = state.opend_camera_map.get_mut(&target_camera_name).unwrap();
 
