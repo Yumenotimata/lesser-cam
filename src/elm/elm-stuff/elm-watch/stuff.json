@@ -5,7 +5,7 @@
         "My target name": {
             "compilationMode": "standard",
             "browserUiPosition": "BottomLeft",
-            "openErrorOverlay": false
+            "openErrorOverlay": true
         }
     }
 }

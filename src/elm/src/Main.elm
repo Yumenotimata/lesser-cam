@@ -3,15 +3,20 @@ port module Main exposing (..)
 -- import Css
 
 import Browser
+import Bytes exposing (Endianness(..))
+import Bytes.Decode as Decode
 import Grpc
-import Html exposing (Html, button, div, form, h1, h2, h3, header, label, optgroup, option, p, section, select, text)
-import Html.Attributes as Attribute exposing (class, selected, style)
+import Html exposing (Html, button, canvas, div, form, h1, h2, h3, header, label, node, optgroup, option, p, section, select, text)
+import Html.Attributes as Attribute exposing (attribute, class, id, property, selected, style)
 import Html.Events exposing (onInput)
-import Proto.Camera exposing (defaultGetCameraListRequest)
-import Proto.Camera.CameraService exposing (getCameraList)
+import Json.Encode as E
+import Proto.Camera exposing (GetCameraListResponse, GetLatestCameraFrameResponse, defaultGetCameraListRequest, defaultGetLatestCameraFrameRequest)
+import Proto.Camera.CameraService exposing (getCameraList, getLatestCameraFrame)
+import String exposing (isEmpty)
 import Svg as S
 import Svg.Attributes as SA
 import Task
+import Time
 
 
 port testReceiver : (String -> msg) -> Sub msg
@@ -31,32 +36,48 @@ type alias Model =
     { counter : Int
     , message : String
     , cameraList : List String
+    , selectedCamera : Maybe String
     }
 
 
 type Msg
     = Select String
-    | GotCameraList (Result Grpc.Error Proto.Camera.GetCameraListResponse)
-    | Recv String
+    | GotCameraList (Result Grpc.Error GetCameraListResponse)
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
     let
-        task = 
+        task =
             Grpc.new getCameraList defaultGetCameraListRequest
                 |> Grpc.setHost "http://localhost:50051"
                 |> Grpc.toTask
                 |> Task.attempt GotCameraList
     in
-    ( { counter = 0, message = "", cameraList = [] }, task )
+    ( { counter = 0, message = "", cameraList = [], selectedCamera = Nothing }, task )
+
+
+rpcCameraViewer rpcUrl cameraName =
+    node "elm-canvas"
+        [ property "rpcUrl" (E.string rpcUrl)
+        , property "cameraName" (E.string cameraName)
+        , attribute "style" "width: 100%; height: 100%; display: block;"
+        ]
+        [ div [ class "w-full h-full" ]
+            [ canvas [ id "canvas", Attribute.style "width" "100%", Attribute.style "height" "100%" ] []
+            ]
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Select value ->
-            ( { model | message = value }, Cmd.none )
+            if isEmpty value then
+                ( { model | selectedCamera = Nothing }, Cmd.none )
+
+            else
+                ( { model | selectedCamera = Just value }, Cmd.none )
 
         GotCameraList result ->
             case result of
@@ -66,36 +87,29 @@ update msg model =
                 Err error ->
                     ( { model | message = "some error" }, Cmd.none )
 
-        Recv recv ->
-            ( { model | message = recv }, Cmd.none )
+
+sizedString : Decode.Decoder String
+sizedString =
+    Decode.unsignedInt8
+        |> Decode.andThen Decode.string
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "overflow-hidden" ]
-        -- [ div [ class "flex  h-screen overflow-hidden" ]
-        --     [ --     selectView model.cameraList |> Html.map Select
-        --       -- , buttonView ()
-        --       div [ class "card w-3/4 p-6 m-3 flex flex-col items-center" ]
-        --         [ p [ class "text-xs mt-1" ] [ text "カメラソースを選択してください" ] ]
-        --     , div [ class "card w-1/4 px-4 pb-4 pt-4 m-3 flex flex-col" ]
-        --         [ h2 [ class "text-left text-lg font-semibold" ] [ text "設定" ]
-        --         , -- ,
-        --           div [ class "w-full grid gap-2" ]
-        --             [ section [ class "flex flex-col gap-2" ]
-        --                 [ label [ class "label" ] [ text "入力デバイス" ]
-        --                 , selectView model.cameraList |> Html.map Select
-        --                 ]
-        --             ]
-        --         ]
-        --     ]
-        -- ]
+    div [ class "flex w-screen h-screen overflow-hidden" ]
         [ text model.message
-        , div [ class "flex gap-2 p-2 h-screen" ]
-            [ --     selectView model.cameraList |> Html.map Select
-              -- , buttonView ()
-              div [ class "card w-3/4 p-6 flex flex-col items-center" ]
-                [ p [ class "text-xs mt-1" ] [ text "カメラソースを選択してください" ] ]
+        , div [ class "flex w-full h-full gap-2 p-2" ]
+            [ -- , buttonView ()
+              div
+                [ class "card flex w-3/4 h-full p-6 items-center justify-center" ]
+                [ case model.selectedCamera of
+                    Nothing ->
+                        p [ class "text-xs" ] [ text "カメラソースを選択してください" ]
+
+                    Just cameraName ->
+                        div [ class "w-full h-full flex items-center justify-center" ]
+                            [ rpcCameraViewer "http://localhost:50051" cameraName ]
+                ]
             , div [ class "card w-1/4 px-4 pb-4 pt-4 flex flex-col" ]
                 [ div [ class "flex items-center gap-2" ]
                     [ S.svg
@@ -119,8 +133,7 @@ view model =
                         [ text "設定"
                         ]
                     ]
-                , -- ,
-                  div [ class "w-full grid gap-2" ]
+                , div [ class "w-full grid gap-2" ]
                     [ section [ class "flex flex-col gap-2" ]
                         [ label [ class "label" ] [ text "入力デバイス" ]
                         , selectView model.cameraList |> Html.map Select
@@ -133,7 +146,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    testReceiver Recv
+    Sub.none
 
 
 selectView : List String -> Html String

@@ -4,6 +4,7 @@ package camera;
 
 service CameraService {
     rpc GetCameraList (GetCameraListRequest) returns (GetCameraListResponse);
+    rpc GetLatestCameraFrame (GetLatestCameraFrameRequest) returns (GetLatestCameraFrameResponse);
 }
 
 message GetCameraListRequest {
@@ -11,4 +12,12 @@ message GetCameraListRequest {
 
 message GetCameraListResponse {
     repeated string camera_list = 1;
+}
+
+message GetLatestCameraFrameRequest {
+    string camera_name = 1;
+}
+
+message GetLatestCameraFrameResponse {
+    bytes frame = 1;
 }
