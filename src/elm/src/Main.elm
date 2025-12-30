@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 -- import Css
 
@@ -10,6 +10,7 @@ import Html exposing (Html, button, canvas, div, form, h1, h2, h3, header, label
 import Html.Attributes as Attribute exposing (attribute, class, id, property, selected, style)
 import Html.Events exposing (onInput)
 import Json.Encode as E
+import Maybe exposing (withDefault)
 import Proto.Camera exposing (GetCameraListResponse, GetLatestCameraFrameResponse, defaultGetCameraListRequest, defaultGetLatestCameraFrameRequest)
 import Proto.Camera.CameraService exposing (getCameraList, getLatestCameraFrame)
 import String exposing (isEmpty)
@@ -17,9 +18,6 @@ import Svg as S
 import Svg.Attributes as SA
 import Task
 import Time
-
-
-port testReceiver : (String -> msg) -> Sub msg
 
 
 main : Program () Model Msg
@@ -59,8 +57,11 @@ init () =
 
 rpcCameraViewer rpcUrl cameraName =
     node "elm-canvas"
-        [ property "rpcUrl" (E.string rpcUrl)
-        , property "cameraName" (E.string cameraName)
+        [ attribute "rpcUrl" rpcUrl
+        , attribute "cameraName" cameraName
+
+        --     property "rpcUrl" (E.string rpcUrl)
+        -- , property "cameraName" (E.string cameraName)
         , attribute "style" "width: 100%; height: 100%; display: block;"
         ]
         [ div [ class "w-full h-full" ]
@@ -97,10 +98,9 @@ sizedString =
 view : Model -> Html Msg
 view model =
     div [ class "flex w-screen h-screen overflow-hidden" ]
-        [ text model.message
+        [ text (withDefault "no camera" model.selectedCamera)
         , div [ class "flex w-full h-full gap-2 p-2" ]
-            [ -- , buttonView ()
-              div
+            [ div
                 [ class "card flex w-3/4 h-full p-6 items-center justify-center" ]
                 [ case model.selectedCamera of
                     Nothing ->

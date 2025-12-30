@@ -11,7 +11,7 @@ use camera::{
 };
 use opencv::{core::Vector, imgcodecs};
 
-use std::{sync::mpsc, thread::sleep};
+use std::{collections::HashMap, sync::mpsc, thread::sleep};
 use std::{sync::Arc, thread, time::Duration};
 
 use tauri::Event;
@@ -28,7 +28,15 @@ use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera};
 use ws::{connect, CloseCode};
 
 struct MyCameraServiceState {
-    camera: Camera,
+    opend_camera_map: HashMap<String, Camera>,
+}
+
+impl MyCameraServiceState {
+    fn new() -> Self {
+        Self {
+            opend_camera_map: HashMap::new(),
+        }
+    }
 }
 
 struct MyCameraService {
@@ -40,9 +48,7 @@ impl MyCameraService {
     fn new() -> Self {
         Self {
             stream_thread: None,
-            state: Arc::new(Mutex::new(MyCameraServiceState {
-                camera: Camera::new(0).unwrap(),
-            })),
+            state: Arc::new(Mutex::new(MyCameraServiceState::new())),
         }
     }
 }
@@ -68,36 +74,37 @@ impl CameraService for MyCameraService {
     ) -> Result<Response<GetLatestCameraFrameResponse>, Status> {
         let target_camera_name = request.get_ref().camera_name.clone();
 
+        println!("target_camera_name: {}", target_camera_name);
+
         let target_camera_id = enumerate_cameras()
             .unwrap()
             .into_iter()
             .find(|(_, name)| *name == target_camera_name)
             .map(|(id, _)| id);
 
-        let target_camera_id = Some("test".to_owned());
+        if let Some(target_camera_id) = target_camera_id {
+            let mut state = self.state.lock().await;
 
-        // let frame = Camera::new(0).unwrap().read().unwrap();
-        let frame = self.state.lock().await.camera.read().unwrap();
+            // 指定されたカメラが開いていない場合は開いてキャッシュしておく
+            let camera = state
+                .opend_camera_map
+                .entry(target_camera_name)
+                .or_insert(Camera::new(target_camera_id).unwrap());
 
-        let mut frame_vec = Vector::new();
-        imgcodecs::imencode_def(".jpeg", &frame, &mut frame_vec).unwrap();
-        let frame_vec: Vec<u8> = frame_vec.into_iter().collect();
+            let mat = camera.read().unwrap();
 
-        Ok(Response::new(GetLatestCameraFrameResponse {
-            frame: frame_vec,
-        }))
-        // if let Some(target_camera_id) = target_camera_id {
-        //     let camera = Camera::new(target_camera_id).unwrap();
-        //     let frame = camera.read().unwrap();
-        //     Ok(Response::new(GetLatestCameraFrameResponse { frame }))
-        // } else {
-        //     Err(Status::not_found("camera not found"))
-        // }
+            let mut frame = Vector::new();
+            imgcodecs::imencode_def(".jpeg", &mat, &mut frame).unwrap();
+            let frame: Vec<u8> = frame.into_iter().collect();
+
+            Ok(Response::new(GetLatestCameraFrameResponse { frame }))
+        } else {
+            Err(Status::not_found("camera not found"))
+        }
     }
 }
-use tonic::service::LayerExt;
 
-// webviewが読み込むリソース
+// webviewが読み込むリソースについてのdoc
 // https://v2.tauri.app/ja/reference/config/
 // tauri.conf.jsonのfrontendDistが読み込まれ、エントリポイントにはディレクトリ内に存在するindex.htmlが検索され指定される
 // いやviteの開発サーバーから取得されてるっぽい？

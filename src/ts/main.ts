@@ -2,7 +2,6 @@ import { Client, createClient } from "@connectrpc/connect";
 import { createConnectTransport, createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CameraService } from "./camera_pb";
 import { trace, info, error, attachConsole } from '@tauri-apps/plugin-log'
-
 const detach = await attachConsole()
 
 // setTimeout(async () => {
@@ -26,13 +25,17 @@ customElements.define("elm-canvas", class extends HTMLElement {
     private ctx!: CanvasRenderingContext2D;
     private rpcClient!: Client<typeof CameraService>;
     private cameraName!: string;
-    // private rpcUrl!: string;
+    private rpcUrl!: string;
+
+    static observedAttributes = ["cameraname", "rpcurl"];
 
     constructor() {
         super();
     }
 
     connectedCallback() {
+        // trace("connectedCallback");
+
         this.canvas = this.querySelector("canvas")!;
         this.div = this.querySelector("div")!;
 
@@ -45,7 +48,7 @@ customElements.define("elm-canvas", class extends HTMLElement {
             setTimeout(() => {
                 this.render();
                 requestAnimationFrame(loop);
-            }, 1000 / 60);
+            }, 1000 / 120);
         }
 
         const resizeObserver = new ResizeObserver(() => {
@@ -58,25 +61,38 @@ customElements.define("elm-canvas", class extends HTMLElement {
         loop();
     }
 
-    // なぜか動作しない人たち
-    // static get observedAttributes() {
-    //     return ["cameraName", "rpcUrl"];
-    // }
+    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+        // trace("attributeChangedCallback");
+        if (name === "cameraname") {
+            this.cameraName = newValue;
+        }
 
-    // attributeChangedCallback() {
-
-    // }
-
-    set rpcUrl(rpcUrl: string) {
-        info("set rpcUrl" + rpcUrl);
-        const transport = createGrpcWebTransport({
-            baseUrl: rpcUrl,
-        });
-        this.rpcClient = createClient(CameraService, transport);
+        if (name === "rpcurl") {
+            this.rpcUrl = newValue;
+            const transport = createGrpcWebTransport({
+                baseUrl: this.rpcUrl,
+            });
+            this.rpcClient = createClient(CameraService, transport);
+        }
     }
 
+    // set rpcUrl(rpcUrl: string) {
+    //     info("set rpcUrl" + rpcUrl);
+    //     const transport = createGrpcWebTransport({
+    //         baseUrl: rpcUrl,
+    //     });
+    //     this.rpcClient = createClient(CameraService, transport);
+    // }
+
+    // set cameraName(cameraName: string) {
+    //     this._cameraName = cameraName;
+    // }
+
     render() {
+        info("render");
         if (!this.rpcClient || !this.cameraName) return;
+        info("rpcClient: " + this.rpcClient);
+        info("cameraName: " + this.cameraName);
 
         this.rpcClient.getLatestCameraFrame({ cameraName: this.cameraName }).then((response) => {
             const frame = new Uint8Array(response.frame);

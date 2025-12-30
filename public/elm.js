@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "7593e59a-aad6-401d-a6b3-2c0bafd97d1e";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1767063014072"
+    "1767068691895"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8242,53 +8242,7 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
-}
-
-
-function _Time_now(millisToPosix)
-{
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(millisToPosix(Date.now())));
-	});
-}
-
-var _Time_setInterval = F2(function(interval, task)
-{
-	return _Scheduler_binding(function(callback)
-	{
-		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
-		return function() { clearInterval(id); };
-	});
-});
-
-function _Time_here()
-{
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(
-			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
-		));
-	});
-}
-
-
-function _Time_getZoneName()
-{
-	return _Scheduler_binding(function(callback)
-	{
-		try
-		{
-			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
-		}
-		catch (e)
-		{
-			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
-		}
-		callback(_Scheduler_succeed(name));
-	});
-}
-var $elm$core$Basics$EQ = {$: 'EQ'};
+}var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
@@ -10849,422 +10803,45 @@ var $author$project$Main$init = function (_v0) {
 		{cameraList: _List_Nil, counter: 0, message: '', selectedCamera: $elm$core$Maybe$Nothing},
 		task);
 };
-var $author$project$Main$Recv = function (a) {
-	return {$: 'Recv', a: a};
-};
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 'Every', a: a, b: b};
-	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {processes: processes, taggers: taggers};
-	});
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 'Nothing') {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3($elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
-		}
-	});
-var $elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _v0) {
-				stepState:
-				while (true) {
-					var list = _v0.a;
-					var result = _v0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _v2 = list.a;
-						var lKey = _v2.a;
-						var lValue = _v2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_v0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_v0 = $temp$_v0;
-							continue stepState;
-						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
-						}
-					}
-				}
-			});
-		var _v3 = A3(
-			$elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				$elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _v3.a;
-		var intermediateResult = _v3.b;
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v4, result) {
-					var k = _v4.a;
-					var v = _v4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$setInterval = _Time_setInterval;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$time$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		if (!intervals.b) {
-			return $elm$core$Task$succeed(processes);
-		} else {
-			var interval = intervals.a;
-			var rest = intervals.b;
-			var spawnTimer = $elm$core$Process$spawn(
-				A2(
-					$elm$time$Time$setInterval,
-					interval,
-					A2($elm$core$Platform$sendToSelf, router, interval)));
-			var spawnRest = function (id) {
-				return A3(
-					$elm$time$Time$spawnHelp,
-					router,
-					rest,
-					A3($elm$core$Dict$insert, interval, id, processes));
-			};
-			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
-		}
-	});
-var $elm$time$Time$onEffects = F3(
-	function (router, subs, _v0) {
-		var processes = _v0.processes;
-		var rightStep = F3(
-			function (_v6, id, _v7) {
-				var spawns = _v7.a;
-				var existing = _v7.b;
-				var kills = _v7.c;
-				return _Utils_Tuple3(
-					spawns,
-					existing,
-					A2(
-						$elm$core$Task$andThen,
-						function (_v5) {
-							return kills;
-						},
-						$elm$core$Process$kill(id)));
-			});
-		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
-		var leftStep = F3(
-			function (interval, taggers, _v4) {
-				var spawns = _v4.a;
-				var existing = _v4.b;
-				var kills = _v4.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, interval, spawns),
-					existing,
-					kills);
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _v3) {
-				var spawns = _v3.a;
-				var existing = _v3.b;
-				var kills = _v3.c;
-				return _Utils_Tuple3(
-					spawns,
-					A3($elm$core$Dict$insert, interval, id, existing),
-					kills);
-			});
-		var _v1 = A6(
-			$elm$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			processes,
-			_Utils_Tuple3(
-				_List_Nil,
-				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(_Utils_Tuple0)));
-		var spawnList = _v1.a;
-		var existingDict = _v1.b;
-		var killTask = _v1.c;
-		return A2(
-			$elm$core$Task$andThen,
-			function (newProcesses) {
-				return $elm$core$Task$succeed(
-					A2($elm$time$Time$State, newTaggers, newProcesses));
-			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
-	});
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
-		if (_v0.$ === 'Nothing') {
-			return $elm$core$Task$succeed(state);
-		} else {
-			var taggers = _v0.a;
-			var tellTaggers = function (time) {
-				return $elm$core$Task$sequence(
-					A2(
-						$elm$core$List$map,
-						function (tagger) {
-							return A2(
-								$elm$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						taggers));
-			};
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$succeed(state);
-				},
-				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
-		}
-	});
-var $elm$time$Time$subMap = F2(
-	function (f, _v0) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		return A2(
-			$elm$time$Time$Every,
-			interval,
-			A2($elm$core$Basics$composeL, f, tagger));
-	});
-_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
-var $elm$time$Time$subscription = _Platform_leaf('Time');
-var $elm$time$Time$every = F2(
-	function (interval, tagger) {
-		return $elm$time$Time$subscription(
-			A2($elm$time$Time$Every, interval, tagger));
-	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	return A2(
-		$elm$time$Time$every,
-		1000 / 60,
-		function (_v0) {
-			return $author$project$Main$Recv('');
-		});
+	return $elm$core$Platform$Sub$none;
 };
-var $author$project$Main$GotLatestCameraFrame = function (a) {
-	return {$: 'GotLatestCameraFrame', a: a};
-};
-var $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetLatestCameraFrameRequest = {cameraName: ''};
-var $author$project$Proto$Camera$defaultGetLatestCameraFrameRequest = $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetLatestCameraFrameRequest;
-var $eriktim$elm_protocol_buffers$Protobuf$Decode$bytes = $eriktim$elm_protocol_buffers$Protobuf$Decode$lengthDelimitedDecoder($elm$bytes$Bytes$Decode$bytes);
-var $elm$bytes$Bytes$Encode$getStringWidth = _Bytes_getStringWidth;
-var $elm$bytes$Bytes$Encode$Utf8 = F2(
-	function (a, b) {
-		return {$: 'Utf8', a: a, b: b};
-	});
-var $elm$bytes$Bytes$Encode$string = function (str) {
-	return A2(
-		$elm$bytes$Bytes$Encode$Utf8,
-		_Bytes_getStringWidth(str),
-		str);
-};
-var $eriktim$elm_protocol_buffers$Protobuf$Encode$string = function (v) {
-	var width = $elm$bytes$Bytes$Encode$getStringWidth(v);
-	return A2(
-		$eriktim$elm_protocol_buffers$Protobuf$Encode$Encoder,
-		$eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited(width),
-		_Utils_Tuple2(
-			width,
-			$elm$bytes$Bytes$Encode$string(v)));
-};
-var $author$project$Proto$Camera$Internals_$defaultProto__Camera__GetLatestCameraFrameResponse = {
-	frame: $eriktim$elm_protocol_buffers$Protobuf$Encode$encode(
-		$eriktim$elm_protocol_buffers$Protobuf$Encode$string(''))
-};
-var $eriktim$elm_protocol_buffers$Protobuf$Decode$optional = F3(
-	function (fieldNumber, decoder, set) {
-		return A2(
-			$eriktim$elm_protocol_buffers$Protobuf$Decode$FieldDecoder,
-			false,
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					fieldNumber,
-					A2($eriktim$elm_protocol_buffers$Protobuf$Decode$map, set, decoder))
-				]));
-	});
-var $author$project$Proto$Camera$Internals_$decodeProto__Camera__GetLatestCameraFrameResponse = A2(
-	$eriktim$elm_protocol_buffers$Protobuf$Decode$message,
-	$author$project$Proto$Camera$Internals_$defaultProto__Camera__GetLatestCameraFrameResponse,
-	_List_fromArray(
-		[
-			A3(
-			$eriktim$elm_protocol_buffers$Protobuf$Decode$optional,
-			1,
-			$eriktim$elm_protocol_buffers$Protobuf$Decode$bytes,
-			F2(
-				function (a, r) {
-					return _Utils_update(
-						r,
-						{frame: a});
-				}))
-		]));
-var $author$project$Proto$Camera$decodeGetLatestCameraFrameResponse = $author$project$Proto$Camera$Internals_$decodeProto__Camera__GetLatestCameraFrameResponse;
-var $author$project$Proto$Camera$Internals_$encodeProto__Camera__GetLatestCameraFrameRequest = function (value) {
-	return $eriktim$elm_protocol_buffers$Protobuf$Encode$message(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				1,
-				$eriktim$elm_protocol_buffers$Protobuf$Encode$string(value.cameraName))
-			]));
-};
-var $author$project$Proto$Camera$encodeGetLatestCameraFrameRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__GetLatestCameraFrameRequest;
-var $author$project$Proto$Camera$CameraService$getLatestCameraFrame = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
-	{decoder: $author$project$Proto$Camera$decodeGetLatestCameraFrameResponse, encoder: $author$project$Proto$Camera$encodeGetLatestCameraFrameRequest, _package: 'camera', rpcName: 'GetLatestCameraFrame', service: 'CameraService'});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'Select':
-				var value = msg.a;
-				return $elm$core$String$isEmpty(value) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{selectedCamera: $elm$core$Maybe$Nothing}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							selectedCamera: $elm$core$Maybe$Just(value)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'GotCameraList':
-				var result = msg.a;
-				if (result.$ === 'Ok') {
-					var response = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{cameraList: response.cameraList}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var error = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{message: 'some error'}),
-						$elm$core$Platform$Cmd$none);
-				}
-			case 'GotLatestCameraFrame':
-				var result = msg.a;
-				if (result.$ === 'Ok') {
-					var response = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{message: ''}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var error = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{message: 'some error'}),
-						$elm$core$Platform$Cmd$none);
-				}
-			default:
-				var recv = msg.a;
-				var task = A2(
-					$elm$core$Task$attempt,
-					$author$project$Main$GotLatestCameraFrame,
-					$anmolitor$elm_grpc$Grpc$toTask(
-						A2(
-							$anmolitor$elm_grpc$Grpc$setHost,
-							'http://localhost:50051',
-							A2($anmolitor$elm_grpc$Grpc$new, $author$project$Proto$Camera$CameraService$getLatestCameraFrame, $author$project$Proto$Camera$defaultGetLatestCameraFrameRequest))));
+		if (msg.$ === 'Select') {
+			var value = msg.a;
+			return $elm$core$String$isEmpty(value) ? _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{selectedCamera: $elm$core$Maybe$Nothing}),
+				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						selectedCamera: $elm$core$Maybe$Just(value)
+					}),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var result = msg.a;
+			if (result.$ === 'Ok') {
+				var response = result.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{message: recv}),
+						{cameraList: response.cameraList}),
 					$elm$core$Platform$Cmd$none);
+			} else {
+				var error = result.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{message: 'some error'}),
+					$elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var $author$project$Main$Select = function (a) {
@@ -11310,14 +10887,6 @@ var $elm$virtual_dom$VirtualDom$node = function (tag) {
 		_VirtualDom_noScript(tag));
 };
 var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
-var $elm$virtual_dom$VirtualDom$property = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_property,
-			_VirtualDom_noInnerHtmlOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlJson(value));
-	});
-var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$rpcCameraViewer = F2(
@@ -11327,14 +10896,8 @@ var $author$project$Main$rpcCameraViewer = F2(
 			'elm-canvas',
 			_List_fromArray(
 				[
-					A2(
-					$elm$html$Html$Attributes$property,
-					'rpcUrl',
-					$elm$json$Json$Encode$string(rpcUrl)),
-					A2(
-					$elm$html$Html$Attributes$property,
-					'cameraName',
-					$elm$json$Json$Encode$string(cameraName)),
+					A2($elm$html$Html$Attributes$attribute, 'rpcUrl', rpcUrl),
+					A2($elm$html$Html$Attributes$attribute, 'cameraName', cameraName),
 					A2($elm$html$Html$Attributes$attribute, 'style', 'width: 100%; height: 100%; display: block;')
 				]),
 			_List_fromArray(
@@ -11439,7 +11002,8 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(model.message),
+				$elm$html$Html$text(
+				A2($elm$core$Maybe$withDefault, 'no camera', model.selectedCamera)),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
