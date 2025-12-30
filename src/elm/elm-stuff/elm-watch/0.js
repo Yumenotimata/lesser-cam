@@ -7334,8 +7334,24 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Main$Select = function (a) {
+	return {$: 'Select', a: a};
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
+	$elm$core$Basics$composeL,
+	$elm$core$Task$perform($elm$core$Basics$identity),
+	$elm$core$Task$succeed);
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'Select') {
@@ -7355,11 +7371,21 @@ var $author$project$Main$update = F2(
 			var result = msg.a;
 			if (result.$ === 'Ok') {
 				var response = result.a;
+				var task = function () {
+					var _v2 = $elm$core$List$head(response.cameraList);
+					if (_v2.$ === 'Just') {
+						var cameraName = _v2.a;
+						return $GlobalWebIndex$cmd_extra$Cmd$Extra$perform(
+							$author$project$Main$Select(cameraName));
+					} else {
+						return $elm$core$Platform$Cmd$none;
+					}
+				}();
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{cameraList: response.cameraList}),
-					$elm$core$Platform$Cmd$none);
+					task);
 			} else {
 				var error = result.a;
 				return _Utils_Tuple2(
@@ -7370,9 +7396,6 @@ var $author$project$Main$update = F2(
 			}
 		}
 	});
-var $author$project$Main$Select = function (a) {
-	return {$: 'Select', a: a};
-};
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7542,7 +7565,6 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(model.message),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(

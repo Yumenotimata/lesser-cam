@@ -33,18 +33,13 @@ use ws::{connect, CloseCode};
 struct MyCameraServiceState {
     opend_camera_map: HashMap<String, Camera, BuildHasherDefault<FxHasher>>,
     available_camera_list: Vec<(i32, String)>,
-    // camera: Camera,
 }
 
 impl MyCameraServiceState {
     fn new() -> Self {
-        let mut opend_camera_map = HashMap::default();
-        // opend_camera_map.insert("MacBook Air Camera".to_owned(), Camera::new(0).unwrap());
-
         Self {
-            opend_camera_map,
+            opend_camera_map: HashMap::default(),
             available_camera_list: Vec::new(),
-            // camera: Camera::new(0).unwrap(),
         }
     }
 }
@@ -74,16 +69,13 @@ impl CameraService for MyCameraService {
         let mut state = self.state.lock().await;
         state.available_camera_list = available_camera_list;
 
-        let mut test = vec!["test".to_owned()];
-        test.append(
-            &mut state
+        Ok(Response::new(GetCameraListResponse {
+            camera_list: state
                 .available_camera_list
                 .iter()
                 .map(|(_, name)| name.clone())
                 .collect(),
-        );
-
-        Ok(Response::new(GetCameraListResponse { camera_list: test }))
+        }))
     }
 
     async fn get_latest_camera_frame(
@@ -92,60 +84,33 @@ impl CameraService for MyCameraService {
     ) -> Result<Response<GetLatestCameraFrameResponse>, Status> {
         let target_camera_name = request.get_ref().camera_name.clone();
 
+        println!("cameraName: {}", target_camera_name);
+
         let mut state = self.state.lock().await;
 
-        // let target_camera_id = state
-        //     .available_camera_list
-        //     .iter()
-        //     .find(|(_, name)| **name == target_camera_name)
-        //     .map(|(id, _)| *id);
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs_f64();
-        // show time stamp
-        println!("{:?} {:?}", state.opend_camera_map, now);
+        let target_camera_id = state
+            .available_camera_list
+            .iter()
+            .find(|(_, name)| **name == target_camera_name)
+            .map(|(id, _)| *id);
 
-        let camera = state
-            .opend_camera_map
-            .entry(target_camera_name.clone())
-            .or_insert_with(|| Camera::new(0).unwrap());
+        if let Some(target_camera_id) = target_camera_id {
+            // 指定されたカメラが開いていない場合は開いてキャッシュしておく
+            let camera = state
+                .opend_camera_map
+                .entry(target_camera_name.clone())
+                .or_insert_with(|| Camera::new(target_camera_id).unwrap());
 
-        // let mut camera = &mut state.camera;
-        // let camera = state.opend_camera_map.get_mut(&target_camera_name).unwrap();
+            let mat = camera.read().unwrap();
 
-        // if !state.opend_camera_map.contains_key(&target_camera_name) {
-        //     state
-        //         .opend_camera_map
-        //         .insert(target_camera_name.clone(), Camera::new(0).unwrap());
-        // }
+            let mut frame = Vector::new();
+            imgcodecs::imencode_def(".jpeg", &mat, &mut frame).unwrap();
+            let frame: Vec<u8> = frame.into_iter().collect();
 
-        let camera = state.opend_camera_map.get_mut(&target_camera_name).unwrap();
-
-        let mat = camera.read().unwrap();
-
-        let mut frame = Vector::new();
-        imgcodecs::imencode_def(".jpeg", &mat, &mut frame).unwrap();
-        let frame: Vec<u8> = frame.into_iter().collect();
-        Ok(Response::new(GetLatestCameraFrameResponse { frame }))
-
-        // if let Some(target_camera_id) = target_camera_id {
-        //     // 指定されたカメラが開いていない場合は開いてキャッシュしておく
-        //     let camera = state
-        //         .opend_camera_map
-        //         .entry(target_camera_name)
-        //         .or_insert(Camera::new(target_camera_id).unwrap());
-
-        //     let mat = camera.read().unwrap();
-
-        //     let mut frame = Vector::new();
-        //     imgcodecs::imencode_def(".jpeg", &mat, &mut frame).unwrap();
-        //     let frame: Vec<u8> = frame.into_iter().collect();
-
-        //     Ok(Response::new(GetLatestCameraFrameResponse { frame }))
-        // } else {
-        //     Err(Status::not_found("camera not found"))
-        // }
+            Ok(Response::new(GetLatestCameraFrameResponse { frame }))
+        } else {
+            Err(Status::not_found("camera not found"))
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- shadcn/uiのダークモード有効化 -->
-<html lang="en" class="dark">
+<html lang="en" class="white">
 
 <head>
   <meta charset="UTF-8" />
@@ -11,15 +11,16 @@
   <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/basecoat.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/dropdown-menu.min.js" defer></script>
   <script type="module" src="/src/ts/main.ts" defer></script>
+  <script type="module" src="/src/ts/sync_view.ts" defer></script>
   <script src="elm.js"></script>
 </head>
 
 <body>
-  <div class="flex dark:bg-black h-screen">
+  <!-- <div class="flex dark:bg-black h-screen"> -->
+  <div class="flex bg-gray-50 h-screen">
     <div id="root"></div>
     <script>
       let app = Elm.Main.init({ node: document.getElementById("root") });
-      console.log('here');
     </script>
   </div>
 </body>
