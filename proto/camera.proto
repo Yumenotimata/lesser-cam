@@ -5,6 +5,7 @@ package camera;
 service CameraService {
     rpc GetCameraList (GetCameraListRequest) returns (GetCameraListResponse);
     rpc GetLatestCameraFrame (GetLatestCameraFrameRequest) returns (GetLatestCameraFrameResponse);
+    rpc SetVirtualCameraConfig (SetVirtualCameraConfigRequest) returns (SetVirtualCameraConfigResponse);
 }
 
 message GetCameraListRequest {
@@ -20,4 +21,12 @@ message GetLatestCameraFrameRequest {
 
 message GetLatestCameraFrameResponse {
     bytes frame = 1;
+}
+
+message SetVirtualCameraConfigRequest {
+    string camera_name = 1;
+    float resolution_ratio = 2;
+}
+
+message SetVirtualCameraConfigResponse {
 }

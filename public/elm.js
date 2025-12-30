@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "7593e59a-aad6-401d-a6b3-2c0bafd97d1e";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1767074840868"
+    "1767075776205"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -11051,7 +11051,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('card flex w-3/4 h-full p-6 items-center justify-center')
+								$elm$html$Html$Attributes$class('card bg-black w-3/4 h-full p-0 flex items-center justify-center')
 							]),
 						_List_fromArray(
 							[

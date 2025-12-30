@@ -111,7 +111,7 @@ view model =
           -- ,
           div [ class "flex w-full h-full gap-2 p-2" ]
             [ div
-                [ class "card flex w-3/4 h-full p-6 items-center justify-center" ]
+                [ class "card bg-black w-3/4 h-full p-0 flex items-center justify-center" ]
                 [ case model.selectedCamera of
                     Nothing ->
                         p [ class "text-xs" ] [ text "カメラソースを選択してください" ]

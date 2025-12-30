@@ -7577,7 +7577,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('card flex w-3/4 h-full p-6 items-center justify-center')
+								$elm$html$Html$Attributes$class('card bg-black w-3/4 h-full p-0 flex items-center justify-center')
 							]),
 						_List_fromArray(
 							[
