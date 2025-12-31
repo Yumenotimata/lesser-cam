@@ -9,14 +9,14 @@ import Cmd.Extra as Cmd
 import Grpc
 import Html exposing (Html, button, canvas, div, form, h1, h2, h3, header, input, label, node, optgroup, option, p, section, select, text)
 import Html.Attributes as Attr exposing (attribute, class, id, property, selected, style)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 import Json.Decode exposing (map)
 import Json.Encode as E
 import Maybe exposing (withDefault)
-import Proto.Camera exposing (GetCameraListResponse, GetLatestCameraFrameResponse, defaultGetCameraListRequest, defaultGetLatestCameraFrameRequest)
-import Proto.Camera.CameraService exposing (getCameraList, getLatestCameraFrame)
+import Proto.Camera exposing (GetCameraListResponse, GetLatestCameraFrameResponse, SetVirtualCameraConfigRequest, defaultGetCameraListRequest, defaultGetLatestCameraFrameRequest, defaultSetVirtualCameraConfigRequest)
+import Proto.Camera.CameraService exposing (getCameraList, getLatestCameraFrame, publishVirtualCamera, setVirtualCameraConfig, unpublishVirtualCamera)
 import String exposing (isEmpty)
-import Svg as S
+import Svg as S exposing (svg)
 import Svg.Attributes as SA
 import Task
 import Time
@@ -32,12 +32,19 @@ main =
         }
 
 
+type alias VirtualCameraConfig =
+    { resolution : Float
+    }
+
+
 type alias Model =
     { counter : Int
     , message : String
     , cameraList : List String
     , selectedCamera : Maybe String
-    , resolution : Float
+    , virtualCameraConfig : VirtualCameraConfig
+    , isVirtualCamera : Bool
+    , publishVirtualCamera : Bool
     }
 
 
@@ -45,6 +52,10 @@ type Msg
     = Select String
     | GotCameraList (Result Grpc.Error GetCameraListResponse)
     | OnResolutionChange Float
+    | SetVirtualCameraConfig
+    | ToggleIsVirtualCamera
+    | TogglePublishVirtualCamera
+    | NoOp
 
 
 init : () -> ( Model, Cmd Msg )
@@ -60,18 +71,19 @@ init () =
       , message = ""
       , cameraList = []
       , selectedCamera = Nothing
-      , resolution = 100
+      , virtualCameraConfig = { resolution = 100 }
+      , isVirtualCamera = False
+      , publishVirtualCamera = False
       }
     , task
     )
 
 
-rpcCameraViewer rpcUrl cameraName =
+rpcCameraViewer rpcUrl cameraName isVirtualCamera =
     node "elm-canvas"
-        [ --     attribute "rpcUrl" rpcUrl
-          -- , attribute "cameraName" cameraName
-          property "rpcUrl" (E.string rpcUrl)
+        [ property "rpcUrl" (E.string rpcUrl)
         , property "cameraName" (E.string cameraName)
+        , property "isVirtualCamera" (E.bool isVirtualCamera)
         , attribute "style" "width: 100%; height: 100%; display: block;"
         ]
         [ div [ class "w-full h-full" ]
@@ -148,7 +160,62 @@ update msg model =
                     ( { model | message = "some error" }, Cmd.none )
 
         OnResolutionChange value ->
-            ( { model | resolution = value }, Cmd.none )
+            let
+                oldConfig =
+                    model.virtualCameraConfig
+            in
+            let
+                newConfig =
+                    { oldConfig | resolution = value / 100 }
+            in
+            ( { model | virtualCameraConfig = newConfig }, Cmd.perform SetVirtualCameraConfig )
+
+        ToggleIsVirtualCamera ->
+            ( { model | isVirtualCamera = not model.isVirtualCamera }, Cmd.none )
+
+        SetVirtualCameraConfig ->
+            case model.selectedCamera of
+                Just cameraName ->
+                    let
+                        task =
+                            Grpc.new setVirtualCameraConfig { cameraName = cameraName, resolutionRatio = model.virtualCameraConfig.resolution }
+                                |> Grpc.setHost "http://localhost:50051"
+                                |> Grpc.toTask
+                                |> Task.attempt (always NoOp)
+                    in
+                    ( model, task )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        TogglePublishVirtualCamera ->
+            case model.selectedCamera of
+                Just cameraName ->
+                    let
+                        nextIsPublish =
+                            not model.publishVirtualCamera
+                    in
+                    let
+                        task =
+                            if nextIsPublish then
+                                Grpc.new publishVirtualCamera { cameraName = cameraName }
+                                    |> Grpc.setHost "http://localhost:50051"
+                                    |> Grpc.toTask
+                                    |> Task.attempt (always NoOp)
+
+                            else
+                                Grpc.new unpublishVirtualCamera { cameraName = cameraName }
+                                    |> Grpc.setHost "http://localhost:50051"
+                                    |> Grpc.toTask
+                                    |> Task.attempt (always NoOp)
+                    in
+                    ( { model | publishVirtualCamera = nextIsPublish }, task )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 sizedString : Decode.Decoder String
@@ -160,18 +227,34 @@ sizedString =
 view : Model -> Html Msg
 view model =
     div [ class "flex w-screen h-screen overflow-hidden" ]
-        [ --  text (String.fromFloat model.resolution)
-          -- ,
-          div [ class "flex w-full h-full gap-2 p-2" ]
+        [ div
+            [ class "flex w-full h-full gap-2 p-2" ]
             [ div
-                [ class "card bg-black w-3/4 h-full p-0 flex items-center justify-center" ]
-                [ case model.selectedCamera of
+                [ class "card bg-black w-3/4 h-full p-0 flex items-center justify-center relative" ]
+                [ button [ class "btn bg-black absolute top-2 right-2", onClick ToggleIsVirtualCamera ]
+                    [ svg
+                        [ SA.xmlBase "http://www.w3.org/2000/svg"
+                        , SA.fill "none"
+                        , SA.viewBox "0 0 24 24"
+                        , SA.strokeWidth "1.5"
+                        , SA.stroke "currentColor"
+                        , SA.class "size-6"
+                        ]
+                        [ S.path
+                            [ SA.strokeLinecap "round"
+                            , SA.strokeLinejoin "round"
+                            , SA.d "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                            ]
+                            []
+                        ]
+                    ]
+                , case model.selectedCamera of
                     Nothing ->
                         p [ class "text-xs" ] [ text "カメラソースを選択してください" ]
 
                     Just cameraName ->
                         div [ class "w-full h-full flex items-center justify-center" ]
-                            [ rpcCameraViewer "http://localhost:50051" cameraName ]
+                            [ rpcCameraViewer "http://localhost:50051" cameraName model.isVirtualCamera ]
                 ]
             , div [ class "card w-1/4 px-4 pb-4 pt-4 flex flex-col" ]
                 [ div [ class "flex items-center gap-2" ]
@@ -196,16 +279,29 @@ view model =
                         [ text "設定"
                         ]
                     ]
-                , div [ class "w-ful flex flex-col gap-4" ]
+                , div [ class "w-ful h-full flex flex-col gap-4" ]
                     [ section [ class "flex flex-col gap-2" ]
                         [ label [ class "label" ] [ text "入力デバイス" ]
                         , selectView model.cameraList |> Html.map Select
                         ]
                     , section [ class "flex flex-col gap-2" ]
                         [ label [ class "label" ] [ text "解像度" ]
+                        , form [ class "form" ] [ sliderFloatView 0.0 100.0 1.0 model.virtualCameraConfig.resolution OnResolutionChange ]
+                        ]
+                    , div [ class "mt-auto" ]
+                        [ if model.publishVirtualCamera then
+                            button
+                                [ class "btn-destructive w-full"
+                                , onClick TogglePublishVirtualCamera
+                                ]
+                                [ p [ class "text-white" ] [ text "Unpublish" ] ]
 
-                        -- , input [ class "input w-full", attribute "type" "range", attribute "min" "0", attribute "max" "100", attribute "value" (String.fromInt model.resolution) ] []
-                        , form [ class "form" ] [ sliderFloatView 0.0 100.0 1.0 model.resolution OnResolutionChange ]
+                          else
+                            button
+                                [ class "btn-secondary w-full bg-blue-600"
+                                , onClick TogglePublishVirtualCamera
+                                ]
+                                [ p [ class "text-white" ] [ text "Publish" ] ]
                         ]
                     ]
                 ]

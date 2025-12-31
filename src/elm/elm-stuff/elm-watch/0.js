@@ -7326,7 +7326,15 @@ var $author$project$Main$init = function (_v0) {
 				'http://localhost:50051',
 				A2($anmolitor$elm_grpc$Grpc$new, $author$project$Proto$Camera$CameraService$getCameraList, $author$project$Proto$Camera$defaultGetCameraListRequest))));
 	return _Utils_Tuple2(
-		{cameraList: _List_Nil, counter: 0, message: '', resolution: 100, selectedCamera: $elm$core$Maybe$Nothing},
+		{
+			cameraList: _List_Nil,
+			counter: 0,
+			isVirtualCamera: false,
+			message: '',
+			publishVirtualCamera: false,
+			selectedCamera: $elm$core$Maybe$Nothing,
+			virtualCameraConfig: {resolution: 100}
+		},
 		task);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -7334,9 +7342,11 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Main$NoOp = {$: 'NoOp'};
 var $author$project$Main$Select = function (a) {
 	return {$: 'Select', a: a};
 };
+var $author$project$Main$SetVirtualCameraConfig = {$: 'SetVirtualCameraConfig'};
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -7348,10 +7358,92 @@ var $elm$core$List$head = function (list) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Basics$not = _Basics_not;
 var $GlobalWebIndex$cmd_extra$Cmd$Extra$perform = A2(
 	$elm$core$Basics$composeL,
 	$elm$core$Task$perform($elm$core$Basics$identity),
 	$elm$core$Task$succeed);
+var $author$project$Proto$Camera$Internals_$defaultProto__Camera__PublishVirtualCameraResponse = {};
+var $author$project$Proto$Camera$Internals_$decodeProto__Camera__PublishVirtualCameraResponse = A2($eriktim$elm_protocol_buffers$Protobuf$Decode$message, $author$project$Proto$Camera$Internals_$defaultProto__Camera__PublishVirtualCameraResponse, _List_Nil);
+var $author$project$Proto$Camera$decodePublishVirtualCameraResponse = $author$project$Proto$Camera$Internals_$decodeProto__Camera__PublishVirtualCameraResponse;
+var $elm$bytes$Bytes$Encode$getStringWidth = _Bytes_getStringWidth;
+var $elm$bytes$Bytes$Encode$Utf8 = F2(
+	function (a, b) {
+		return {$: 'Utf8', a: a, b: b};
+	});
+var $elm$bytes$Bytes$Encode$string = function (str) {
+	return A2(
+		$elm$bytes$Bytes$Encode$Utf8,
+		_Bytes_getStringWidth(str),
+		str);
+};
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$string = function (v) {
+	var width = $elm$bytes$Bytes$Encode$getStringWidth(v);
+	return A2(
+		$eriktim$elm_protocol_buffers$Protobuf$Encode$Encoder,
+		$eriktim$elm_protocol_buffers$Internal$Protobuf$LengthDelimited(width),
+		_Utils_Tuple2(
+			width,
+			$elm$bytes$Bytes$Encode$string(v)));
+};
+var $author$project$Proto$Camera$Internals_$encodeProto__Camera__PublishVirtualCameraRequest = function (value) {
+	return $eriktim$elm_protocol_buffers$Protobuf$Encode$message(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				1,
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$string(value.cameraName))
+			]));
+};
+var $author$project$Proto$Camera$encodePublishVirtualCameraRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__PublishVirtualCameraRequest;
+var $author$project$Proto$Camera$CameraService$publishVirtualCamera = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
+	{decoder: $author$project$Proto$Camera$decodePublishVirtualCameraResponse, encoder: $author$project$Proto$Camera$encodePublishVirtualCameraRequest, _package: 'camera', rpcName: 'PublishVirtualCamera', service: 'CameraService'});
+var $author$project$Proto$Camera$Internals_$defaultProto__Camera__SetVirtualCameraConfigResponse = {};
+var $author$project$Proto$Camera$Internals_$decodeProto__Camera__SetVirtualCameraConfigResponse = A2($eriktim$elm_protocol_buffers$Protobuf$Decode$message, $author$project$Proto$Camera$Internals_$defaultProto__Camera__SetVirtualCameraConfigResponse, _List_Nil);
+var $author$project$Proto$Camera$decodeSetVirtualCameraConfigResponse = $author$project$Proto$Camera$Internals_$decodeProto__Camera__SetVirtualCameraConfigResponse;
+var $elm$bytes$Bytes$Encode$F32 = F2(
+	function (a, b) {
+		return {$: 'F32', a: a, b: b};
+	});
+var $elm$bytes$Bytes$Encode$float32 = $elm$bytes$Bytes$Encode$F32;
+var $eriktim$elm_protocol_buffers$Protobuf$Encode$float = function (v) {
+	return A2(
+		$eriktim$elm_protocol_buffers$Protobuf$Encode$Encoder,
+		$eriktim$elm_protocol_buffers$Internal$Protobuf$Bit32,
+		_Utils_Tuple2(
+			4,
+			A2($elm$bytes$Bytes$Encode$float32, $elm$bytes$Bytes$LE, v)));
+};
+var $author$project$Proto$Camera$Internals_$encodeProto__Camera__SetVirtualCameraConfigRequest = function (value) {
+	return $eriktim$elm_protocol_buffers$Protobuf$Encode$message(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				1,
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$string(value.cameraName)),
+				_Utils_Tuple2(
+				2,
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$float(value.resolutionRatio))
+			]));
+};
+var $author$project$Proto$Camera$encodeSetVirtualCameraConfigRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__SetVirtualCameraConfigRequest;
+var $author$project$Proto$Camera$CameraService$setVirtualCameraConfig = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
+	{decoder: $author$project$Proto$Camera$decodeSetVirtualCameraConfigResponse, encoder: $author$project$Proto$Camera$encodeSetVirtualCameraConfigRequest, _package: 'camera', rpcName: 'SetVirtualCameraConfig', service: 'CameraService'});
+var $author$project$Proto$Camera$Internals_$defaultProto__Camera__UnpublishVirtualCameraResponse = {};
+var $author$project$Proto$Camera$Internals_$decodeProto__Camera__UnpublishVirtualCameraResponse = A2($eriktim$elm_protocol_buffers$Protobuf$Decode$message, $author$project$Proto$Camera$Internals_$defaultProto__Camera__UnpublishVirtualCameraResponse, _List_Nil);
+var $author$project$Proto$Camera$decodeUnpublishVirtualCameraResponse = $author$project$Proto$Camera$Internals_$decodeProto__Camera__UnpublishVirtualCameraResponse;
+var $author$project$Proto$Camera$Internals_$encodeProto__Camera__UnpublishVirtualCameraRequest = function (value) {
+	return $eriktim$elm_protocol_buffers$Protobuf$Encode$message(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				1,
+				$eriktim$elm_protocol_buffers$Protobuf$Encode$string(value.cameraName))
+			]));
+};
+var $author$project$Proto$Camera$encodeUnpublishVirtualCameraRequest = $author$project$Proto$Camera$Internals_$encodeProto__Camera__UnpublishVirtualCameraRequest;
+var $author$project$Proto$Camera$CameraService$unpublishVirtualCamera = $anmolitor$elm_grpc$Grpc$Internal$Rpc(
+	{decoder: $author$project$Proto$Camera$decodeUnpublishVirtualCameraResponse, encoder: $author$project$Proto$Camera$encodeUnpublishVirtualCameraRequest, _package: 'camera', rpcName: 'UnpublishVirtualCamera', service: 'CameraService'});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7395,18 +7487,86 @@ var $author$project$Main$update = F2(
 							{message: 'some error'}),
 						$elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'OnResolutionChange':
 				var value = msg.a;
+				var oldConfig = model.virtualCameraConfig;
+				var newConfig = _Utils_update(
+					oldConfig,
+					{resolution: value / 100});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{resolution: value}),
+						{virtualCameraConfig: newConfig}),
+					$GlobalWebIndex$cmd_extra$Cmd$Extra$perform($author$project$Main$SetVirtualCameraConfig));
+			case 'ToggleIsVirtualCamera':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{isVirtualCamera: !model.isVirtualCamera}),
 					$elm$core$Platform$Cmd$none);
+			case 'SetVirtualCameraConfig':
+				var _v3 = model.selectedCamera;
+				if (_v3.$ === 'Just') {
+					var cameraName = _v3.a;
+					var task = A2(
+						$elm$core$Task$attempt,
+						$elm$core$Basics$always($author$project$Main$NoOp),
+						$anmolitor$elm_grpc$Grpc$toTask(
+							A2(
+								$anmolitor$elm_grpc$Grpc$setHost,
+								'http://localhost:50051',
+								A2(
+									$anmolitor$elm_grpc$Grpc$new,
+									$author$project$Proto$Camera$CameraService$setVirtualCameraConfig,
+									{cameraName: cameraName, resolutionRatio: model.virtualCameraConfig.resolution}))));
+					return _Utils_Tuple2(model, task);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'TogglePublishVirtualCamera':
+				var _v4 = model.selectedCamera;
+				if (_v4.$ === 'Just') {
+					var cameraName = _v4.a;
+					var nextIsPublish = !model.publishVirtualCamera;
+					var task = nextIsPublish ? A2(
+						$elm$core$Task$attempt,
+						$elm$core$Basics$always($author$project$Main$NoOp),
+						$anmolitor$elm_grpc$Grpc$toTask(
+							A2(
+								$anmolitor$elm_grpc$Grpc$setHost,
+								'http://localhost:50051',
+								A2(
+									$anmolitor$elm_grpc$Grpc$new,
+									$author$project$Proto$Camera$CameraService$publishVirtualCamera,
+									{cameraName: cameraName})))) : A2(
+						$elm$core$Task$attempt,
+						$elm$core$Basics$always($author$project$Main$NoOp),
+						$anmolitor$elm_grpc$Grpc$toTask(
+							A2(
+								$anmolitor$elm_grpc$Grpc$setHost,
+								'http://localhost:50051',
+								A2(
+									$anmolitor$elm_grpc$Grpc$new,
+									$author$project$Proto$Camera$CameraService$unpublishVirtualCamera,
+									{cameraName: cameraName}))));
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{publishVirtualCamera: nextIsPublish}),
+						task);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$OnResolutionChange = function (a) {
 	return {$: 'OnResolutionChange', a: a};
 };
+var $author$project$Main$ToggleIsVirtualCamera = {$: 'ToggleIsVirtualCamera'};
+var $author$project$Main$TogglePublishVirtualCamera = {$: 'TogglePublishVirtualCamera'};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7430,6 +7590,23 @@ var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
@@ -7441,6 +7618,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
@@ -7458,8 +7636,8 @@ var $elm$virtual_dom$VirtualDom$property = F2(
 var $elm$html$Html$Attributes$property = $elm$virtual_dom$VirtualDom$property;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$rpcCameraViewer = F2(
-	function (rpcUrl, cameraName) {
+var $author$project$Main$rpcCameraViewer = F3(
+	function (rpcUrl, cameraName, isVirtualCamera) {
 		return A3(
 			$elm$html$Html$node,
 			'elm-canvas',
@@ -7473,6 +7651,10 @@ var $author$project$Main$rpcCameraViewer = F2(
 					$elm$html$Html$Attributes$property,
 					'cameraName',
 					$elm$json$Json$Encode$string(cameraName)),
+					A2(
+					$elm$html$Html$Attributes$property,
+					'isVirtualCamera',
+					$elm$json$Json$Encode$bool(isVirtualCamera)),
 					A2($elm$html$Html$Attributes$attribute, 'style', 'width: 100%; height: 100%; display: block;')
 				]),
 			_List_fromArray(
@@ -7509,7 +7691,6 @@ var $elm$html$Html$Events$alwaysStop = function (x) {
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7564,16 +7745,6 @@ var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$onFloatEvent = F2(
 	function (eventName, floatMsg) {
@@ -7647,10 +7818,43 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('card bg-black w-3/4 h-full p-0 flex items-center justify-center')
+								$elm$html$Html$Attributes$class('card bg-black w-3/4 h-full p-0 flex items-center justify-center relative')
 							]),
 						_List_fromArray(
 							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('btn bg-black absolute top-2 right-2'),
+										$elm$html$Html$Events$onClick($author$project$Main$ToggleIsVirtualCamera)
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$svg,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xmlBase('http://www.w3.org/2000/svg'),
+												$elm$svg$Svg$Attributes$fill('none'),
+												$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+												$elm$svg$Svg$Attributes$strokeWidth('1.5'),
+												$elm$svg$Svg$Attributes$stroke('currentColor'),
+												$elm$svg$Svg$Attributes$class('size-6')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$svg$Svg$path,
+												_List_fromArray(
+													[
+														$elm$svg$Svg$Attributes$strokeLinecap('round'),
+														$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+														$elm$svg$Svg$Attributes$d('M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99')
+													]),
+												_List_Nil)
+											]))
+									])),
 								function () {
 								var _v0 = model.selectedCamera;
 								if (_v0.$ === 'Nothing') {
@@ -7674,7 +7878,7 @@ var $author$project$Main$view = function (model) {
 											]),
 										_List_fromArray(
 											[
-												A2($author$project$Main$rpcCameraViewer, 'http://localhost:50051', cameraName)
+												A3($author$project$Main$rpcCameraViewer, 'http://localhost:50051', cameraName, model.isVirtualCamera)
 											]));
 								}
 							}()
@@ -7760,7 +7964,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('w-ful flex flex-col gap-4')
+										$elm$html$Html$Attributes$class('w-ful h-full flex flex-col gap-4')
 									]),
 								_List_fromArray(
 									[
@@ -7813,7 +8017,55 @@ var $author$project$Main$view = function (model) {
 													]),
 												_List_fromArray(
 													[
-														A5($author$project$Main$sliderFloatView, 0.0, 100.0, 1.0, model.resolution, $author$project$Main$OnResolutionChange)
+														A5($author$project$Main$sliderFloatView, 0.0, 100.0, 1.0, model.virtualCameraConfig.resolution, $author$project$Main$OnResolutionChange)
+													]))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('mt-auto')
+											]),
+										_List_fromArray(
+											[
+												model.publishVirtualCamera ? A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn-destructive w-full'),
+														$elm$html$Html$Events$onClick($author$project$Main$TogglePublishVirtualCamera)
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$p,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('text-white')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Unpublish')
+															]))
+													])) : A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('btn-secondary w-full bg-blue-600'),
+														$elm$html$Html$Events$onClick($author$project$Main$TogglePublishVirtualCamera)
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$p,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('text-white')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Publish')
+															]))
 													]))
 											]))
 									]))

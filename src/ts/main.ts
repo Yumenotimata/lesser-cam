@@ -1,6 +1,6 @@
 import { Client, createClient } from "@connectrpc/connect";
 import { createConnectTransport, createGrpcWebTransport } from "@connectrpc/connect-web";
-import { CameraService, GetLatestCameraFrameResponse } from "./camera_pb";
+import { CameraService, GetLatestCameraFrameResponse, GetLatestVirtualCameraFrameResponse } from "./camera_pb";
 import { trace, info, error, attachConsole } from '@tauri-apps/plugin-log'
 const detach = await attachConsole()
 
@@ -12,6 +12,7 @@ customElements.define("elm-canvas", class extends HTMLElement {
     private rpcClient!: Client<typeof CameraService>;
     private _cameraName!: string;
     private _rpcUrl!: string;
+    private _isVirtualCamera!: boolean;
 
     static observedAttributes = ["cameraname", "rpcurl"];
 
@@ -59,6 +60,12 @@ customElements.define("elm-canvas", class extends HTMLElement {
         this.requestId++;
     }
 
+    set isVirtualCamera(isVirtualCamera: boolean) {
+        info("set isVirtualCamera" + isVirtualCamera);
+        this._isVirtualCamera = isVirtualCamera;
+        this.requestId++;
+    }
+
     private inFlight = false;
     private requestId = 0;
 
@@ -70,9 +77,16 @@ customElements.define("elm-canvas", class extends HTMLElement {
         this.inFlight = true;
 
         try {
-            const response = await this.rpcClient.getLatestCameraFrame({
-                cameraName: this._cameraName,
-            });
+            let response: GetLatestCameraFrameResponse | GetLatestVirtualCameraFrameResponse;
+            if (this._isVirtualCamera) {
+                response = await this.rpcClient.getLatestVirtualCameraFrame({
+                    cameraName: this._cameraName,
+                });
+            } else {
+                response = await this.rpcClient.getLatestCameraFrame({
+                    cameraName: this._cameraName,
+                });
+            }
 
             // cameraName が変わっていたら捨てる
             if (currentId !== this.requestId) return;

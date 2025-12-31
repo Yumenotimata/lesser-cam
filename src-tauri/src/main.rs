@@ -7,14 +7,20 @@ mod camera {
 use camera::{
     camera_service_server::{CameraService, CameraServiceServer},
     GetCameraListRequest, GetCameraListResponse, GetLatestCameraFrameRequest,
-    GetLatestCameraFrameResponse,
+    GetLatestCameraFrameResponse, GetLatestVirtualCameraFrameRequest,
+    GetLatestVirtualCameraFrameResponse, PublishVirtualCameraRequest, PublishVirtualCameraResponse,
+    SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse, UnpublishVirtualCameraRequest,
+    UnpublishVirtualCameraResponse,
 };
-use opencv::{core::Vector, imgcodecs};
+use opencv::{
+    core::{MatTraitConstManual, Vector},
+    imgcodecs, imgproc,
+};
 
+use opencv::core::Mat;
 use rustc_hash::FxHasher;
 use std::{collections::HashMap, hash::BuildHasherDefault, time::Instant};
 use std::{sync::mpsc, thread::sleep};
-
 use std::{sync::Arc, thread, time::Duration};
 
 use tauri::Event;
@@ -27,20 +33,21 @@ use tonic::{Request, Response, Status};
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::CorsLayer;
 
-use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera};
+use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera, PyVirtualCam};
 use ws::{connect, CloseCode};
 
-use crate::camera::{SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse};
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct VirtualCameraConfig {
-    resolution_ratio: f32,
+    // 0.0 ~ 1.0
+    pub resolution_ratio: f32,
 }
+use tokio::task::spawn_blocking;
 
 struct MyCameraServiceState {
     opend_camera_map: HashMap<String, Camera, BuildHasherDefault<FxHasher>>,
     virtual_camera_configs: HashMap<String, VirtualCameraConfig>,
     available_camera_list: Vec<(i32, String)>,
+    virtual_camera_thread: Option<thread::JoinHandle<()>>,
 }
 
 impl MyCameraServiceState {
@@ -49,6 +56,7 @@ impl MyCameraServiceState {
             opend_camera_map: HashMap::default(),
             virtual_camera_configs: HashMap::default(),
             available_camera_list: Vec::new(),
+            virtual_camera_thread: None,
         }
     }
 }
@@ -64,6 +72,16 @@ impl MyCameraService {
             stream_thread: None,
             state: Arc::new(Mutex::new(MyCameraServiceState::new())),
         }
+    }
+}
+
+fn clamp<T: PartialOrd>(value: T, min: T, max: T) -> T {
+    if value < min {
+        min
+    } else if value > max {
+        max
+    } else {
+        value
     }
 }
 
@@ -114,9 +132,65 @@ impl CameraService for MyCameraService {
 
             let mut frame = Vector::new();
             imgcodecs::imencode_def(".jpeg", &mat, &mut frame).unwrap();
+
             let frame: Vec<u8> = frame.into_iter().collect();
 
             Ok(Response::new(GetLatestCameraFrameResponse { frame }))
+        } else {
+            Err(Status::not_found("camera not found"))
+        }
+    }
+
+    async fn get_latest_virtual_camera_frame(
+        &self,
+        request: Request<GetLatestVirtualCameraFrameRequest>,
+    ) -> Result<Response<GetLatestVirtualCameraFrameResponse>, Status> {
+        let target_camera_name = request.get_ref().camera_name.clone();
+
+        let mut state = self.state.lock().await;
+
+        let target_camera_id = state
+            .available_camera_list
+            .iter()
+            .find(|(_, name)| **name == target_camera_name)
+            .map(|(id, _)| *id);
+
+        if let Some(target_camera_id) = target_camera_id {
+            let config = state
+                .virtual_camera_configs
+                .entry(target_camera_name.clone())
+                .or_insert_with(|| VirtualCameraConfig {
+                    resolution_ratio: 1.0,
+                })
+                .clone();
+
+            // 指定されたカメラが開いていない場合は開いてキャッシュしておく
+            let camera = state
+                .opend_camera_map
+                .entry(target_camera_name.clone())
+                .or_insert_with(|| Camera::new(target_camera_id).unwrap());
+
+            let mat = camera.read().unwrap();
+            let mut resized = Mat::default();
+
+            let scale = clamp(config.resolution_ratio, 0.0, 1.0) as f64;
+
+            imgproc::resize(
+                &mat,
+                &mut resized,
+                opencv::core::Size::default(),
+                scale,
+                scale,
+                imgproc::INTER_AREA,
+            )
+            .unwrap();
+
+            let mut frame = Vector::new();
+            imgcodecs::imencode_def(".jpeg", &resized, &mut frame).unwrap();
+
+            let frame: Vec<u8> = frame.into_iter().collect();
+
+            Ok(Response::new(GetLatestVirtualCameraFrameResponse { frame }))
         } else {
             Err(Status::not_found("camera not found"))
         }
@@ -143,6 +217,115 @@ impl CameraService for MyCameraService {
         );
 
         Ok(Response::new(SetVirtualCameraConfigResponse {}))
+    }
+
+    async fn publish_virtual_camera(
+        &self,
+        request: Request<PublishVirtualCameraRequest>,
+    ) -> Result<Response<PublishVirtualCameraResponse>, Status> {
+        let target_camera_name = request.get_ref().camera_name.clone();
+
+        let mut state = self.state.lock().await;
+        let target_camera_id = state
+            .available_camera_list
+            .iter()
+            .find(|(_, name)| **name == target_camera_name)
+            .map(|(id, _)| *id);
+
+        println!(
+            "{:?} target_camera_id: {:?}",
+            target_camera_name, target_camera_id
+        );
+
+        if let Some(target_camera_id) = target_camera_id {
+            let config = state
+                .virtual_camera_configs
+                .entry(target_camera_name.clone())
+                .or_insert_with(|| VirtualCameraConfig {
+                    resolution_ratio: 1.0,
+                })
+                .clone();
+
+            let camera = state
+                .opend_camera_map
+                .entry(target_camera_name.clone())
+                .or_insert_with(|| Camera::new(target_camera_id).unwrap());
+
+            let mut camera_clone = camera.clone();
+
+            let h = tokio::task::spawn_blocking(move || {
+                let py_virtual_camera = PyVirtualCam::new(1920, 1080, 30).unwrap();
+
+                println!("py_virtual_camera: {:?}", py_virtual_camera);
+
+                loop {
+                    let mat = camera_clone.read().unwrap();
+                    let mut resized = Mat::default();
+
+                    let scale = clamp(config.resolution_ratio, 0.0, 1.0) as f64;
+
+                    imgproc::resize(
+                        &mat,
+                        &mut resized,
+                        opencv::core::Size::default(),
+                        1.0,
+                        1.0,
+                        imgproc::INTER_AREA,
+                    )
+                    .unwrap();
+
+                    // let mut frame = Vector::new();
+                    // imgcodecs::imencode_def(".jpeg", &resized, &mut frame).unwrap();
+
+                    let frame = resized.data_bytes().unwrap().to_vec();
+                    // let frame: Vec<u8> = resized.data().to_vec();
+
+                    py_virtual_camera.send(frame);
+                    println!("send frame");
+                }
+            });
+
+            // let mat = camera.read().unwrap();
+            // let mut resized = Mat::default();
+
+            // let config = state
+            //     .virtual_camera_configs
+            //     .entry(target_camera_name.clone())
+            //     .or_insert_with(|| VirtualCameraConfig {
+            //         resolution_ratio: 1.0,
+            //     })
+            //     .clone();
+
+            // let scale = clamp(config.resolution_ratio, 0.0, 1.0) as f64;
+
+            // imgproc::resize(
+            //     &mat,
+            //     &mut resized,
+            //     opencv::core::Size::default(),
+            //     scale,
+            //     scale,
+            //     imgproc::INTER_AREA,
+            // )
+            // .unwrap();
+
+            // let mut frame = Vector::new();
+            // imgcodecs::imencode_def(".jpeg", &resized, &mut frame).unwrap();
+
+            // let frame: Vec<u8> = frame.into_iter().collect();
+        };
+
+        Ok(Response::new(PublishVirtualCameraResponse {}))
+    }
+
+    async fn unpublish_virtual_camera(
+        &self,
+        request: Request<UnpublishVirtualCameraRequest>,
+    ) -> Result<Response<UnpublishVirtualCameraResponse>, Status> {
+        let target_camera_name = request.get_ref().camera_name.clone();
+
+        println!("unpublish virtual camera: {}", target_camera_name);
+
+        Ok(Response::new(UnpublishVirtualCameraResponse {}))
     }
 }
 

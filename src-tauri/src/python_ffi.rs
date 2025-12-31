@@ -15,6 +15,7 @@ pub fn enumerate_cameras() -> Result<Vec<(i32, String)>, PyErr> {
     })
 }
 
+#[derive(Debug)]
 pub struct PyVirtualCam {
     width: u32,
     height: u32,
@@ -57,20 +58,31 @@ impl PyVirtualCam {
 
     pub fn send(&self, frame: Vec<u8>) {
         let r = Python::attach(|py| {
+            println!("send frame: {}", frame.len());
+
             let frame = PyList::new(py, frame).unwrap();
+            println!("1");
             let frame = self
                 .py_numpy_module
                 .call_method1(py, "array", (frame,))
                 .unwrap();
+            println!("2");
             let frame = frame.call_method1(py, "astype", ("uint8",)).unwrap();
+            println!("3");
             let frame = frame
                 .call_method1(py, "reshape", (self.height, self.width, 3))
                 .unwrap();
+            println!("4");
+
+            let r = self.py_virtual_cam.call_method1(py, "send", (frame,));
 
             self.py_virtual_cam
-                .call_method1(py, "send", (frame,))
-                .unwrap()
+                .call_method0(py, "sleep_until_next_frame")
+                .unwrap();
+
+            println!("5");
+            println!("send result: {:?}", r);
         });
-        println!("send result: {:?}", r);
+        println!("6");
     }
 }
