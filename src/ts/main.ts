@@ -14,7 +14,6 @@ customElements.define("elm-canvas", class extends HTMLElement {
     private _rpcUrl!: string;
     private _isVirtualCamera!: boolean;
 
-
     static observedAttributes = ["cameraname", "rpcurl"];
 
     constructor() {

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file camera.proto.
  */
 export const file_camera: GenFile = /*@__PURE__*/
-  fileDesc("CgxjYW1lcmEucHJvdG8SBmNhbWVyYSIWChRHZXRDYW1lcmFMaXN0UmVxdWVzdCIsChVHZXRDYW1lcmFMaXN0UmVzcG9uc2USEwoLY2FtZXJhX2xpc3QYASADKAkiMgobR2V0TGF0ZXN0Q2FtZXJhRnJhbWVSZXF1ZXN0EhMKC2NhbWVyYV9uYW1lGAEgASgJIi0KHEdldExhdGVzdENhbWVyYUZyYW1lUmVzcG9uc2USDQoFZnJhbWUYASABKAwiOQoiR2V0TGF0ZXN0VmlydHVhbENhbWVyYUZyYW1lUmVxdWVzdBITCgtjYW1lcmFfbmFtZRgBIAEoCSI0CiNHZXRMYXRlc3RWaXJ0dWFsQ2FtZXJhRnJhbWVSZXNwb25zZRINCgVmcmFtZRgBIAEoDCJOCh1TZXRWaXJ0dWFsQ2FtZXJhQ29uZmlnUmVxdWVzdBITCgtjYW1lcmFfbmFtZRgBIAEoCRIYChByZXNvbHV0aW9uX3JhdGlvGAIgASgCIiAKHlNldFZpcnR1YWxDYW1lcmFDb25maWdSZXNwb25zZSIyChtQdWJsaXNoVmlydHVhbENhbWVyYVJlcXVlc3QSEwoLY2FtZXJhX25hbWUYASABKAkiHgocUHVibGlzaFZpcnR1YWxDYW1lcmFSZXNwb25zZSI0Ch1VbnB1Ymxpc2hWaXJ0dWFsQ2FtZXJhUmVxdWVzdBITCgtjYW1lcmFfbmFtZRgBIAEoCSIgCh5VbnB1Ymxpc2hWaXJ0dWFsQ2FtZXJhUmVzcG9uc2Uy7QQKDUNhbWVyYVNlcnZpY2USTAoNR2V0Q2FtZXJhTGlzdBIcLmNhbWVyYS5HZXRDYW1lcmFMaXN0UmVxdWVzdBodLmNhbWVyYS5HZXRDYW1lcmFMaXN0UmVzcG9uc2USYQoUR2V0TGF0ZXN0Q2FtZXJhRnJhbWUSIy5jYW1lcmEuR2V0TGF0ZXN0Q2FtZXJhRnJhbWVSZXF1ZXN0GiQuY2FtZXJhLkdldExhdGVzdENhbWVyYUZyYW1lUmVzcG9uc2USdgobR2V0TGF0ZXN0VmlydHVhbENhbWVyYUZyYW1lEiouY2FtZXJhLkdldExhdGVzdFZpcnR1YWxDYW1lcmFGcmFtZVJlcXVlc3QaKy5jYW1lcmEuR2V0TGF0ZXN0VmlydHVhbENhbWVyYUZyYW1lUmVzcG9uc2USZwoWU2V0VmlydHVhbENhbWVyYUNvbmZpZxIlLmNhbWVyYS5TZXRWaXJ0dWFsQ2FtZXJhQ29uZmlnUmVxdWVzdBomLmNhbWVyYS5TZXRWaXJ0dWFsQ2FtZXJhQ29uZmlnUmVzcG9uc2USYQoUUHVibGlzaFZpcnR1YWxDYW1lcmESIy5jYW1lcmEuUHVibGlzaFZpcnR1YWxDYW1lcmFSZXF1ZXN0GiQuY2FtZXJhLlB1Ymxpc2hWaXJ0dWFsQ2FtZXJhUmVzcG9uc2USZwoWVW5wdWJsaXNoVmlydHVhbENhbWVyYRIlLmNhbWVyYS5VbnB1Ymxpc2hWaXJ0dWFsQ2FtZXJhUmVxdWVzdBomLmNhbWVyYS5VbnB1Ymxpc2hWaXJ0dWFsQ2FtZXJhUmVzcG9uc2ViBnByb3RvMw");
+  fileDesc("CgxjYW1lcmEucHJvdG8SBmNhbWVyYSIWChRHZXRDYW1lcmFMaXN0UmVxdWVzdCIsChVHZXRDYW1lcmFMaXN0UmVzcG9uc2USEwoLY2FtZXJhX2xpc3QYASADKAkiMgobR2V0TGF0ZXN0Q2FtZXJhRnJhbWVSZXF1ZXN0EhMKC2NhbWVyYV9uYW1lGAEgASgJIi0KHEdldExhdGVzdENhbWVyYUZyYW1lUmVzcG9uc2USDQoFZnJhbWUYASABKAwiOQoiR2V0TGF0ZXN0VmlydHVhbENhbWVyYUZyYW1lUmVxdWVzdBITCgtjYW1lcmFfbmFtZRgBIAEoCSI0CiNHZXRMYXRlc3RWaXJ0dWFsQ2FtZXJhRnJhbWVSZXNwb25zZRINCgVmcmFtZRgBIAEoDCJOCh1TZXRWaXJ0dWFsQ2FtZXJhQ29uZmlnUmVxdWVzdBITCgtjYW1lcmFfbmFtZRgBIAEoCRIYChByZXNvbHV0aW9uX3JhdGlvGAIgASgCIiAKHlNldFZpcnR1YWxDYW1lcmFDb25maWdSZXNwb25zZTKhAwoNQ2FtZXJhU2VydmljZRJMCg1HZXRDYW1lcmFMaXN0EhwuY2FtZXJhLkdldENhbWVyYUxpc3RSZXF1ZXN0Gh0uY2FtZXJhLkdldENhbWVyYUxpc3RSZXNwb25zZRJhChRHZXRMYXRlc3RDYW1lcmFGcmFtZRIjLmNhbWVyYS5HZXRMYXRlc3RDYW1lcmFGcmFtZVJlcXVlc3QaJC5jYW1lcmEuR2V0TGF0ZXN0Q2FtZXJhRnJhbWVSZXNwb25zZRJ2ChtHZXRMYXRlc3RWaXJ0dWFsQ2FtZXJhRnJhbWUSKi5jYW1lcmEuR2V0TGF0ZXN0VmlydHVhbENhbWVyYUZyYW1lUmVxdWVzdBorLmNhbWVyYS5HZXRMYXRlc3RWaXJ0dWFsQ2FtZXJhRnJhbWVSZXNwb25zZRJnChZTZXRWaXJ0dWFsQ2FtZXJhQ29uZmlnEiUuY2FtZXJhLlNldFZpcnR1YWxDYW1lcmFDb25maWdSZXF1ZXN0GiYuY2FtZXJhLlNldFZpcnR1YWxDYW1lcmFDb25maWdSZXNwb25zZWIGcHJvdG8z");
 
 /**
  * @generated from message camera.GetCameraListRequest
@@ -146,66 +146,6 @@ export const SetVirtualCameraConfigResponseSchema: GenMessage<SetVirtualCameraCo
   messageDesc(file_camera, 7);
 
 /**
- * @generated from message camera.PublishVirtualCameraRequest
- */
-export type PublishVirtualCameraRequest = Message<"camera.PublishVirtualCameraRequest"> & {
-  /**
-   * @generated from field: string camera_name = 1;
-   */
-  cameraName: string;
-};
-
-/**
- * Describes the message camera.PublishVirtualCameraRequest.
- * Use `create(PublishVirtualCameraRequestSchema)` to create a new message.
- */
-export const PublishVirtualCameraRequestSchema: GenMessage<PublishVirtualCameraRequest> = /*@__PURE__*/
-  messageDesc(file_camera, 8);
-
-/**
- * @generated from message camera.PublishVirtualCameraResponse
- */
-export type PublishVirtualCameraResponse = Message<"camera.PublishVirtualCameraResponse"> & {
-};
-
-/**
- * Describes the message camera.PublishVirtualCameraResponse.
- * Use `create(PublishVirtualCameraResponseSchema)` to create a new message.
- */
-export const PublishVirtualCameraResponseSchema: GenMessage<PublishVirtualCameraResponse> = /*@__PURE__*/
-  messageDesc(file_camera, 9);
-
-/**
- * @generated from message camera.UnpublishVirtualCameraRequest
- */
-export type UnpublishVirtualCameraRequest = Message<"camera.UnpublishVirtualCameraRequest"> & {
-  /**
-   * @generated from field: string camera_name = 1;
-   */
-  cameraName: string;
-};
-
-/**
- * Describes the message camera.UnpublishVirtualCameraRequest.
- * Use `create(UnpublishVirtualCameraRequestSchema)` to create a new message.
- */
-export const UnpublishVirtualCameraRequestSchema: GenMessage<UnpublishVirtualCameraRequest> = /*@__PURE__*/
-  messageDesc(file_camera, 10);
-
-/**
- * @generated from message camera.UnpublishVirtualCameraResponse
- */
-export type UnpublishVirtualCameraResponse = Message<"camera.UnpublishVirtualCameraResponse"> & {
-};
-
-/**
- * Describes the message camera.UnpublishVirtualCameraResponse.
- * Use `create(UnpublishVirtualCameraResponseSchema)` to create a new message.
- */
-export const UnpublishVirtualCameraResponseSchema: GenMessage<UnpublishVirtualCameraResponse> = /*@__PURE__*/
-  messageDesc(file_camera, 11);
-
-/**
  * @generated from service camera.CameraService
  */
 export const CameraService: GenService<{
@@ -240,22 +180,6 @@ export const CameraService: GenService<{
     methodKind: "unary";
     input: typeof SetVirtualCameraConfigRequestSchema;
     output: typeof SetVirtualCameraConfigResponseSchema;
-  },
-  /**
-   * @generated from rpc camera.CameraService.PublishVirtualCamera
-   */
-  publishVirtualCamera: {
-    methodKind: "unary";
-    input: typeof PublishVirtualCameraRequestSchema;
-    output: typeof PublishVirtualCameraResponseSchema;
-  },
-  /**
-   * @generated from rpc camera.CameraService.UnpublishVirtualCamera
-   */
-  unpublishVirtualCamera: {
-    methodKind: "unary";
-    input: typeof UnpublishVirtualCameraRequestSchema;
-    output: typeof UnpublishVirtualCameraResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_camera, 0);

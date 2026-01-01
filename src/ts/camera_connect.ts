@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { GetCameraListRequest, GetCameraListResponse, GetLatestCameraFrameRequest, GetLatestCameraFrameResponse, GetLatestVirtualCameraFrameRequest, GetLatestVirtualCameraFrameResponse, PublishVirtualCameraRequest, PublishVirtualCameraResponse, SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse, UnpublishVirtualCameraRequest, UnpublishVirtualCameraResponse } from "./camera_pb.js";
+import { GetCameraListRequest, GetCameraListResponse, GetLatestCameraFrameRequest, GetLatestCameraFrameResponse, GetLatestVirtualCameraFrameRequest, GetLatestVirtualCameraFrameResponse, SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse } from "./camera_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -46,24 +46,6 @@ export const CameraService = {
       name: "SetVirtualCameraConfig",
       I: SetVirtualCameraConfigRequest,
       O: SetVirtualCameraConfigResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc camera.CameraService.PublishVirtualCamera
-     */
-    publishVirtualCamera: {
-      name: "PublishVirtualCamera",
-      I: PublishVirtualCameraRequest,
-      O: PublishVirtualCameraResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc camera.CameraService.UnpublishVirtualCamera
-     */
-    unpublishVirtualCamera: {
-      name: "UnpublishVirtualCamera",
-      I: UnpublishVirtualCameraRequest,
-      O: UnpublishVirtualCameraResponse,
       kind: MethodKind.Unary,
     },
   }

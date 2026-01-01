@@ -1,19 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "vmask",
+  "productName": "less-i-cam",
   "version": "0.1.0",
-  "identifier": "com.flukekit.vmask",
+  "identifier": "com.flukekit.less-i-cam",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "frontendDist": null
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "vmask",
+        "title": "less-i-cam",
         "width": 800,
         "height": 600
       }

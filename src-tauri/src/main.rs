@@ -15,7 +15,6 @@ use camera::{
 use opencv::{
     core::{MatTraitConstManual, Vector},
     imgcodecs, imgproc,
-    videoio::{VideoCapture, VideoCaptureTrait},
 };
 
 use opencv::core::Mat;
@@ -34,8 +33,8 @@ use tonic::{Request, Response, Status};
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::CorsLayer;
 
-use vmask_lib::{python_ffi::enumerate_cameras, Camera, PyVirtualCam};
-// use ws::{connect, CloseCode};
+use less_i_cam_lib::{python_ffi::enumerate_cameras, Camera, PyVirtualCam};
+use ws::{connect, CloseCode};
 
 #[derive(Debug, Clone)]
 struct VirtualCameraConfig {
@@ -255,8 +254,7 @@ impl CameraService for MyCameraService {
             let mut camera_clone = camera.clone();
 
             let h = thread::spawn(move || {
-                let mut vcap = VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
-                let py_virtual_camera = PyVirtualCam::new(16, 16, 30).unwrap();
+                let py_virtual_camera = PyVirtualCam::new(1920, 1080, 30).unwrap();
 
                 let mut c = 0;
                 println!("py_virtual_camera: {:?}", py_virtual_camera);
@@ -279,14 +277,11 @@ impl CameraService for MyCameraService {
 
                     // let mut frame = Vector::new();
                     // imgcodecs::imencode_def(".jpeg", &resized, &mut frame).unwrap();
-                    let mut frame = Mat::default();
-                    vcap.read(&mut frame).unwrap();
-                    let frame = frame.data_bytes().unwrap().to_vec();
 
                     // let frame = mat.data_bytes().unwrap().to_vec();
                     // let frame: Vec<u8> = resized.data().to_vec();
 
-                    py_virtual_camera.send(frame);
+                    py_virtual_camera.send(vec![(c % 255) as u8; 1920 * 1080 * 3]);
                     println!("send frame");
                     c += 1;
                 }
@@ -346,22 +341,22 @@ fn main() {
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
-            // let r = tokio::spawn(async {
-            //     thread::spawn(|| {
-            //         let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
+            let r = tokio::spawn(async {
+                thread::spawn(|| {
+                    let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
 
-            //         let mut c: u32 = 0;
-            //         loop {
-            //             // while true {
-            //             pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
-            //             c += 1;
-            //             // }
-            //         }
-            //     });
-            // })
-            // .await;
+                    let mut c: u32 = 0;
+                    loop {
+                        // while true {
+                        pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
+                        c += 1;
+                        // }
+                    }
+                });
+            })
+            .await;
 
-            // while true {}
+            while true {}
 
             let addr = "127.0.0.1:50051".parse().unwrap();
             let camera_service = MyCameraService::new();
