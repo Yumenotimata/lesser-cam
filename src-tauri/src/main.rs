@@ -4,18 +4,18 @@
 mod camera {
     tonic::include_proto!("camera");
 }
-
-use std::thread;
-
-use tonic::transport::Server;
-use tonic_web::GrpcWebLayer;
-use tower_http::cors::CorsLayer;
-use vmask_lib::PyVirtualCam;
-
 use crate::camera::{
     camera_service_server::{CameraService, CameraServiceServer},
     TestRequest, TestResponse,
 };
+use opencv::core::{Mat, MatTraitConstManual};
+use opencv::prelude::VideoCaptureTrait;
+use opencv::videoio::VideoCapture;
+use std::thread;
+use tonic::transport::Server;
+use tonic_web::GrpcWebLayer;
+use tower_http::cors::CorsLayer;
+use vmask_lib::PyVirtualCam;
 
 struct MyCameraService;
 
@@ -32,11 +32,17 @@ impl CameraService for MyCameraService {
         _request: tonic::Request<TestRequest>,
     ) -> Result<tonic::Response<TestResponse>, tonic::Status> {
         thread::spawn(|| {
-            let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
+            let mut vcap = VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
+
+            let pyvirtualcam = PyVirtualCam::new(1920, 1080, 20).unwrap();
 
             let mut c: u32 = 0;
             loop {
-                pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
+                let mut frame = Mat::default();
+                vcap.read(&mut frame).unwrap();
+                let frame = frame.data_bytes().unwrap().to_vec();
+
+                pyvirtualcam.send(frame);
                 c += 1;
             }
         });

@@ -33,6 +33,7 @@ tower-http = { version = "0.6.8", features = ["full"] }
 tonic-prost = "0.14.2"
 rustc-hash = "2.1.1"
 crossbeam-channel = "0.5.15"
+opencv = "0.97.2"
 
 [dependencies.pyo3]
 version = "0.27.1"
