@@ -1,17 +1,20 @@
+// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 mod camera {
     tonic::include_proto!("camera");
 }
 
 use std::thread;
 
-use tauri_elm_app::PyVirtualCam;
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::CorsLayer;
+use vmask_lib::PyVirtualCam;
 
 use crate::camera::{
-    TestRequest, TestResponse,
     camera_service_server::{CameraService, CameraServiceServer},
+    TestRequest, TestResponse,
 };
 
 struct MyCameraService;
@@ -43,7 +46,7 @@ impl CameraService for MyCameraService {
 }
 
 fn main() {
-    let h = thread::spawn(|| {
+    thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
             let addr = "127.0.0.1:50051".parse().unwrap();
@@ -66,5 +69,19 @@ fn main() {
         });
     });
 
-    h.join().unwrap();
+    tauri_launch();
+}
+
+#[tauri::command]
+fn greet(name: &str) -> String {
+    format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn tauri_launch() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![greet])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
