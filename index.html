@@ -1,43 +1,49 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="module" src="/src/main.ts" defer></script>
-  </head>
+<!-- shadcn/uiのダークモード有効化 -->
+<html lang="en" class="white">
 
-  <body>
-    <main class="container">
-      <h1>Welcome to Tauri</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>less-i-cam</title>
+  <link rel="stylesheet" href="/output.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/basecoat.cdn.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/basecoat.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.9/dist/js/dropdown-menu.min.js" defer></script>
+  <script type="module" src="/src/ts/main.ts" defer></script>
+  <script type="module" src="/src/ts/sync_view.ts" defer></script>
+  <script src="elm.js"></script>
+</head>
 
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/src/assets/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img
-            src="/src/assets/tauri.svg"
-            class="logo tauri"
-            alt="Tauri logo"
-          />
-        </a>
-        <a href="https://www.typescriptlang.org/docs" target="_blank">
-          <img
-            src="/src/assets/typescript.svg"
-            class="logo typescript"
-            alt="typescript logo"
-          />
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
+<body>
+  <!-- <div class="flex dark:bg-black h-screen"> -->
+  <div class="flex bg-gray-200 h-screen">
+    <div id="root"></div>
+    <script>
+      let app = Elm.Main.init({ node: document.getElementById("root") });
+    </script>
 
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
-    </main>
-  </body>
+    <!-- input要素にbasecoatのsliderを適用する -->
+    <script>
+      (() => {
+        const sliders = document.querySelectorAll('input[type="range"].input');
+        if (!sliders) return;
+
+        const updateSlider = (el) => {
+          const min = parseFloat(el.min || 0);
+          const max = parseFloat(el.max || 100);
+          const value = parseFloat(el.value);
+          const percent = (max === min) ? 0 : ((value - min) / (max - min)) * 100;
+          el.style.setProperty('--slider-value', `${percent}%`);
+        };
+
+        sliders.forEach(slider => {
+          updateSlider(slider);
+          slider.addEventListener('input', (event) => updateSlider(event.target));
+        });
+      })();
+    </script>
+  </div>
+</body>
+
 </html>

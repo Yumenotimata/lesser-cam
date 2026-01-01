@@ -3,11 +3,55 @@ syntax = "proto3";
 package camera;
 
 service CameraService {
-    rpc Test (TestRequest) returns (TestResponse);
+    rpc GetCameraList (GetCameraListRequest) returns (GetCameraListResponse);
+    rpc GetLatestCameraFrame (GetLatestCameraFrameRequest) returns (GetLatestCameraFrameResponse);
+    rpc GetLatestVirtualCameraFrame (GetLatestVirtualCameraFrameRequest) returns (GetLatestVirtualCameraFrameResponse);
+    rpc SetVirtualCameraConfig (SetVirtualCameraConfigRequest) returns (SetVirtualCameraConfigResponse);
+    rpc PublishVirtualCamera (PublishVirtualCameraRequest) returns (PublishVirtualCameraResponse);
+    rpc UnpublishVirtualCamera (UnpublishVirtualCameraRequest) returns (UnpublishVirtualCameraResponse);
 }
 
-message TestRequest {
+message GetCameraListRequest {
 }
 
-message TestResponse {
+message GetCameraListResponse {
+    repeated string camera_list = 1;
+}
+
+message GetLatestCameraFrameRequest {
+    string camera_name = 1;
+}
+
+message GetLatestCameraFrameResponse {
+    bytes frame = 1;
+}
+
+message GetLatestVirtualCameraFrameRequest {
+    string camera_name = 1;
+}
+
+message GetLatestVirtualCameraFrameResponse {
+    bytes frame = 1;
+}
+
+message SetVirtualCameraConfigRequest {
+    string camera_name = 1;
+    float resolution_ratio = 2;
+}
+
+message SetVirtualCameraConfigResponse {
+}
+
+message PublishVirtualCameraRequest {
+    string camera_name = 1;
+}
+
+message PublishVirtualCameraResponse {
+}
+
+message UnpublishVirtualCameraRequest {
+    string camera_name = 1;
+}
+
+message UnpublishVirtualCameraResponse {
 }

@@ -1,0 +1,11 @@
+{
+    "port": 53150,
+    "webSocketToken": "c62ffe63-7878-46eb-9058-bdffc799f916",
+    "targets": {
+        "My target name": {
+            "compilationMode": "standard",
+            "browserUiPosition": "BottomLeft",
+            "openErrorOverlay": false
+        }
+    }
+}
