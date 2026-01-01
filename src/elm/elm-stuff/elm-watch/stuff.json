@@ -1,5 +1,5 @@
 {
-    "port": 59054,
+    "port": 53150,
     "webSocketToken": "7593e59a-aad6-401d-a6b3-2c0bafd97d1e",
     "targets": {
         "My target name": {

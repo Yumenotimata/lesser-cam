@@ -1,0 +1,33 @@
+"filename", "language", "TypeScript", "Elm", "JSON", "Rust", "Python", "JSON with Comments", "JavaScript", "YAML", "CSS", "Markdown", "HTML", "comment", "blank", "total"
+"/Users/flukekit/workspace/tauri-elm-app/README.md", "Markdown", 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 8
+"/Users/flukekit/workspace/tauri-elm-app/buf.gen.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 8
+"/Users/flukekit/workspace/tauri-elm-app/buf.work.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3
+"/Users/flukekit/workspace/tauri-elm-app/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 6, 49
+"/Users/flukekit/workspace/tauri-elm-app/input.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"/Users/flukekit/workspace/tauri-elm-app/package-lock.json", "JSON", 0, 0, 2880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2881
+"/Users/flukekit/workspace/tauri-elm-app/package.json", "JSON", 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 31
+"/Users/flukekit/workspace/tauri-elm-app/public/elm.js", "JavaScript", 0, 0, 0, 0, 0, 0, 10171, 0, 0, 0, 0, 320, 1062, 11553
+"/Users/flukekit/workspace/tauri-elm-app/public/output.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 451, 0, 0, 0, 1, 452
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/build.rs", "Rust", 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 2, 8
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/capabilities/default.json", "JSON", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/src/camera.py", "Python", 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2, 10
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/src/camera.rs", "Rust", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 14, 9, 60
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/src/lib.rs", "Rust", 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/src/main.rs", "Rust", 0, 0, 0, 267, 0, 0, 0, 0, 0, 0, 0, 65, 73, 405
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/src/python_ffi.rs", "Rust", 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 0, 7, 13, 89
+"/Users/flukekit/workspace/tauri-elm-app/src-tauri/tauri.conf.json", "JSON", 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 37
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/elm-stuff/elm-watch/0.js", "JavaScript", 0, 0, 0, 0, 0, 0, 6878, 0, 0, 0, 0, 231, 970, 8079
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/elm-stuff/elm-watch/stuff.json", "JSON", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 12
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/elm-watch.json", "JSON", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/elm.json", "JSON", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/src/Main.elm", "Elm", 0, 276, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 327
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/src/Proto/Camera.elm", "Elm", 0, 320, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 526
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/src/Proto/Camera/CameraService.elm", "Elm", 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 110
+"/Users/flukekit/workspace/tauri-elm-app/src/elm/src/Proto/Camera/Internals_.elm", "Elm", 0, 363, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 216, 579
+"/Users/flukekit/workspace/tauri-elm-app/src/ts/camera_connect.ts", "TypeScript", 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 72
+"/Users/flukekit/workspace/tauri-elm-app/src/ts/camera_pb.ts", "TypeScript", 231, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 30, 263
+"/Users/flukekit/workspace/tauri-elm-app/src/ts/main.ts", "TypeScript", 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 26, 128
+"/Users/flukekit/workspace/tauri-elm-app/src/ts/sync_view.ts", "TypeScript", 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 21
+"/Users/flukekit/workspace/tauri-elm-app/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 3, 24
+"/Users/flukekit/workspace/tauri-elm-app/vite.config.ts", "TypeScript", 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 4, 34
+"Total", "-", 429, 1043, 3008, 382, 8, 21, 17049, 11, 452, 4, 43, 658, 2720, 25828

@@ -1,4 +1,4 @@
-// elm-watch hot {"version":"1.2.3","targetName":"My target name","webSocketPort":59054,"webSocketToken":"7593e59a-aad6-401d-a6b3-2c0bafd97d1e"}
+// elm-watch hot {"version":"1.2.3","targetName":"My target name","webSocketPort":53150,"webSocketToken":"7593e59a-aad6-401d-a6b3-2c0bafd97d1e"}
 "use strict";
 (() => {
   // node_modules/tiny-decoders/index.mjs
@@ -762,11 +762,11 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "7593e59a-aad6-401d-a6b3-2c0bafd97d1e";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1767157609117"
+    "1767243754094"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
-  var WEBSOCKET_PORT = "59054";
+  var WEBSOCKET_PORT = "53150";
   var CONTAINER_ID = "elm-watch";
   var DEBUG = String("false") === "true";
   var BROWSER_UI_MOVED_EVENT = "BROWSER_UI_MOVED_EVENT";
