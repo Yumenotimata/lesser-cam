@@ -12,12 +12,11 @@ use camera::{
     SetVirtualCameraConfigRequest, SetVirtualCameraConfigResponse, UnpublishVirtualCameraRequest,
     UnpublishVirtualCameraResponse,
 };
-use opencv::{
-    core::{MatTraitConstManual, Vector},
-    imgcodecs, imgproc,
-};
+use opencv::core::{Mat, MatTraitConstManual};
+use opencv::prelude::VideoCaptureTrait;
+use opencv::videoio::VideoCapture;
+use opencv::{core::Vector, imgcodecs, imgproc};
 
-use opencv::core::Mat;
 use rustc_hash::FxHasher;
 use std::{collections::HashMap, hash::BuildHasherDefault, time::Instant};
 use std::{sync::mpsc, thread::sleep};
@@ -64,13 +63,15 @@ impl MyCameraServiceState {
 struct MyCameraService {
     stream_thread: Option<thread::JoinHandle<()>>,
     state: Arc<Mutex<MyCameraServiceState>>,
+    frame_sender: crossbeam_channel::Sender<Vec<u8>>,
 }
 
 impl MyCameraService {
-    fn new() -> Self {
+    fn new(frame_sender: crossbeam_channel::Sender<Vec<u8>>) -> Self {
         Self {
             stream_thread: None,
             state: Arc::new(Mutex::new(MyCameraServiceState::new())),
+            frame_sender,
         }
     }
 }
@@ -253,11 +254,14 @@ impl CameraService for MyCameraService {
 
             let mut camera_clone = camera.clone();
 
-            let h = thread::spawn(move || {
-                let py_virtual_camera = PyVirtualCam::new(1920, 1080, 30).unwrap();
+            let frame_sender = self.frame_sender.clone();
 
-                let mut c = 0;
-                println!("py_virtual_camera: {:?}", py_virtual_camera);
+            let h = thread::spawn(move || {
+                // let py_virtual_camera = PyVirtualCam::new(1920, 1080, 30).unwrap();
+
+                // let mut c = 0;
+                // println!("py_virtual_camera: {:?}", py_virtual_camera);
+                let mut vcap = VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
 
                 loop {
                     // let mat = camera_clone.read().unwrap();
@@ -273,7 +277,12 @@ impl CameraService for MyCameraService {
                     //     1.0,
                     //     imgproc::INTER_AREA,
                     // )
-                    // .unwrap();
+                    // .unwrap();let mut frame = Mat::default();
+                    let mut frame = Mat::default();
+                    vcap.read(&mut frame).unwrap();
+                    let frame = frame.data_bytes().unwrap().to_vec();
+
+                    frame_sender.send(frame).unwrap();
 
                     // let mut frame = Vector::new();
                     // imgcodecs::imencode_def(".jpeg", &resized, &mut frame).unwrap();
@@ -281,9 +290,9 @@ impl CameraService for MyCameraService {
                     // let frame = mat.data_bytes().unwrap().to_vec();
                     // let frame: Vec<u8> = resized.data().to_vec();
 
-                    py_virtual_camera.send(vec![(c % 255) as u8; 1920 * 1080 * 3]);
-                    println!("send frame");
-                    c += 1;
+                    // py_virtual_camera.send(vec![(c % 255) as u8; 1920 * 1080 * 3]);
+                    // println!("send frame");
+                    // c += 1;
                 }
             });
 
@@ -338,28 +347,13 @@ impl CameraService for MyCameraService {
 // https://v2.tauri.app/ja/develop/
 
 fn main() {
+    let (s, r) = crossbeam_channel::unbounded::<Vec<u8>>();
+
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
-            let r = tokio::spawn(async {
-                thread::spawn(|| {
-                    let pyvirtualcam = PyVirtualCam::new(320, 240, 20).unwrap();
-
-                    let mut c: u32 = 0;
-                    loop {
-                        // while true {
-                        pyvirtualcam.send(vec![(c % 255) as u8; 320 * 240 * 3]);
-                        c += 1;
-                        // }
-                    }
-                });
-            })
-            .await;
-
-            while true {}
-
             let addr = "127.0.0.1:50051".parse().unwrap();
-            let camera_service = MyCameraService::new();
+            let camera_service = MyCameraService::new(s);
 
             // gRPC-web対応
             let allow_cors = CorsLayer::new()
@@ -381,6 +375,14 @@ fn main() {
     });
 
     sleep(Duration::from_secs(1));
+
+    thread::spawn(move || {
+        let pyvirtualcam = PyVirtualCam::new(1920, 1080, 20).unwrap();
+
+        while let Ok(frame) = r.recv() {
+            pyvirtualcam.send(frame);
+        }
+    });
 
     launch_tauri_app();
 }
