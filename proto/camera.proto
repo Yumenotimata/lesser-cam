@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package camera;
+
+service CameraService {
+    rpc GetCameraList (GetCameraListRequest) returns (GetCameraListResponse);
+    rpc GetLatestCameraFrame (GetLatestCameraFrameRequest) returns (GetLatestCameraFrameResponse);
+    rpc GetLatestVirtualCameraFrame (GetLatestVirtualCameraFrameRequest) returns (GetLatestVirtualCameraFrameResponse);
+    rpc PublishVirtualCamera (PublishVirtualCameraRequest) returns (PublishVirtualCameraResponse);
+    rpc UnpublishVirtualCamera (UnpublishVirtualCameraRequest) returns (UnpublishVirtualCameraResponse);
+}
+
+message GetCameraListRequest {
+}
+
+message GetCameraListResponse {
+    repeated CameraId camera_list = 1;
+}
+
+message CameraId {
+    int32 id = 1;
+    string name = 2;
+}
+
+message GetLatestCameraFrameRequest {
+    CameraId camera_id = 1;
+}
+
+message GetLatestCameraFrameResponse {
+    bytes frame = 1;
+}
+
+message GetLatestVirtualCameraFrameRequest {
+    CameraId camera_id = 1;
+    VirtualCameraConfig config = 2;
+}
+
+message GetLatestVirtualCameraFrameResponse {
+    bytes frame = 1;
+}
+
+
+message VirtualCameraConfig {
+    float resolution_ratio = 1;
+}
+
+message PublishVirtualCameraRequest {
+    CameraId camera_id = 1;
+    VirtualCameraConfig config = 2;
+}
+
+message PublishVirtualCameraResponse {
+}
+
+message UnpublishVirtualCameraRequest {
+    CameraId camera_id = 1;
+}
+
+message UnpublishVirtualCameraResponse {
+}

@@ -1,0 +1,38 @@
+{
+  "name": "less-i-cam",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "@buf/connectrpc_eliza.bufbuild_es": "^2.10.2-20230913231627-233fca715f49.1",
+    "@bufbuild/protobuf": "^2.10.2",
+    "@connectrpc/connect": "^2.1.1",
+    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect-web": "^2.1.1",
+    "@tailwindcss/cli": "^4.1.18",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-log": "^2.7.1",
+    "@tauri-apps/plugin-opener": "^2",
+    "elm-live": "^4.0.2",
+    "elm-watch": "^1.2.3",
+    "protoc-gen-elm": "^4.0.4",
+    "tailwindcss": "^4.1.18",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "eslint-config-xo": "^0.49.0",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
+  }
+}
